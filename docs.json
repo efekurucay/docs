@@ -13,8 +13,7 @@
       {
         "tab": "Guides",
         "groups": [
-          {
-            "group": "Get Started",
+          {"group": "Get Started",
             "pages": [
               "introduction",
               "deneme",
@@ -22,8 +21,7 @@
               "development"
             ]
           },
-          {
-            "group": "Essentials",
+          { "group": "Essentials",
             "pages": [
               "essentials/markdown",
               "essentials/code",
@@ -32,7 +30,16 @@
               "essentials/navigation",
               "essentials/reusable-snippets"
             ]
+          },
+          { "group": "Efe",
+            "pages": [
+              "efekurucay/introduction",
+              "efekurucay/deneme",
+              "efekurucay/quickstart",
+              "efekurucay/development"
+            ]
           }
+
         ]
       },
       {
