@@ -1,0 +1,192 @@
+{
+  "main": {
+    "id": "46fa02e8976517bb",
+    "type": "split",
+    "children": [
+      {
+        "id": "91b05749e0b460ef",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ed8ba160b9892c9d",
+            "type": "leaf",
+            "state": {
+              "type": "json",
+              "state": {
+                "file": "docs.json"
+              },
+              "icon": "lucide-file",
+              "title": "docs"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "f7d3bf2372e32cfb",
+    "type": "split",
+    "children": [
+      {
+        "id": "918a828fabcdded6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "88b835f2ffd7e523",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Dosya Gezgini"
+            }
+          },
+          {
+            "id": "a19f1da87dc07664",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Ara"
+            }
+          },
+          {
+            "id": "697d2d94449cb95d",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Yer İmleri"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "f1ba78a1543eb384",
+    "type": "split",
+    "children": [
+      {
+        "id": "3e1462a48f9b42db",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "764a16eb9dee561f",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Geri Bağlantılar"
+            }
+          },
+          {
+            "id": "36f62b19ab3fb08c",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Giden bağlantılar"
+            }
+          },
+          {
+            "id": "d58fdd8ca96a8674",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Etiketler"
+            }
+          },
+          {
+            "id": "908a00f67707ce5d",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Anahat"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Hızlı geçişi aç": false,
+      "graph:Grafik görünümünü aç": false,
+      "canvas:Yeni tuval oluşturun": false,
+      "daily-notes:Bugünün Notunu Aç": false,
+      "templates:Şablon ekle": false,
+      "command-palette:Komut paletini aç": false,
+      "edit-mdx:New .mdx file": false,
+      "smart-connections:Open: View Smart Connections": false,
+      "smart-connections:Open: Smart Chat Conversation": false,
+      "gemini-scribe:Open Gemini Chat": false,
+      "publish:Değişiklikleri yayınla": false
+    }
+  },
+  "active": "ed8ba160b9892c9d",
+  "lastOpenFiles": [
+    "snippets/snippet-intro.mdx",
+    "development.mdx",
+    "docs.json",
+    "favicon.svg",
+    "introduction.mdx",
+    "Backup/API Reference.mdx",
+    "Backup",
+    "API Reference.md",
+    "api-reference/openapi.json",
+    "api-reference/introduction.mdx",
+    "api-reference/endpoint/create.mdx",
+    "README.md",
+    "quickstart.mdx",
+    "images/checks-passed.png",
+    "images/hero-dark.png",
+    "images/hero-light.png",
+    "logo/light.svg",
+    "logo/dark.svg"
+  ]
+}
