@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "lecture-notes/About-Lecture-Notes.mdx",
+                "file": "lecture-notes/CSE-2/2-spring/linear-algebra/linear-algebra.mdx",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "About-Lecture-Notes"
+              "title": "linear-algebra"
             }
           }
         ]
@@ -167,8 +167,11 @@
       "publish:Değişiklikleri yayınla": false
     }
   },
-  "active": "88b835f2ffd7e523",
+  "active": "0cbaff6e25d30583",
   "lastOpenFiles": [
+    "lecture-notes/CSE-2/cse-2-lectures.mdx",
+    "lecture-notes/CSE-2/2-spring/linear-algebra/linear-algebra.mdx",
+    "lecture-notes/About-Lecture-Notes.mdx",
     "blog/blog.mdx",
     "blog",
     "efe/services - Kopya.mdx",
@@ -177,9 +180,6 @@
     "efe/projects - Kopya.mdx",
     "efe/projects.mdx",
     "efe/experience - Kopya.mdx",
-    "efe/aboutme.mdx",
-    "lecture-notes/CSE-2/cse-2-lectures.mdx",
-    "lecture-notes/CSE-2/2-spring/cse-2-spring.mdx",
     "de.md",
     "node_modules/picomatch/README.md",
     "node_modules/braces/README.md",
