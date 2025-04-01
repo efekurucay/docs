@@ -2,34 +2,16 @@
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
-      {"tab": "Guides",
+      {"tab": "E-FE-E-RA",
 
       
         "groups": [
           
-          {
-            "group": "Get Started",
-            "pages": [
-              "introduction",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Essentials",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/settings",
-              "essentials/navigation",
-              "essentials/reusable-snippets"
-            ]
+          {"group": " ",
+            "pages": ["quickstart","Web0"]
           }
         ]
       },
-
-
 
 
       {"tab": "Lecture Notes",
@@ -258,9 +240,9 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/efekurucay24",
+      "github": "https://github.com/efekurucay",
+      "linkedin": "https://linkedin.com/in/efekurucay24"
     }
   }
 }

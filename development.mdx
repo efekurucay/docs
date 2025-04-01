@@ -1,109 +1,300 @@
 ---
-title: "Development"
-description: "Preview changes locally to update your docs"
+title: 'Development Guide'
+description: 'Complete guide for Mintlify components and features'
 ---
 
-<Info>
-  **Prerequisite**: Please install Node.js (version 19 or higher) before proceeding.  sad Please upgrade to `docs.json` before proceeding and delete the legacy `mint.json` file.
-</Info>
+## Basic Markdown Features
 
-Follow these steps to install and run Mintlify on your operating system:
+### Text Formatting
 
-**Step 1**: Install Mintlify:
+You can use basic markdown formatting:
+- **Bold text** using `**text**`
+- *Italic text* using `*text*`
+- ~~Strikethrough~~ using `~~text~~`
+- `Code` using \`code\`
 
-<CodeGroup>
+### Lists
 
-```bash npm
-npm i -g mintlify
+Ordered lists:
+1. First item
+2. Second item
+3. Third item
+
+Unordered lists:
+- Item one
+- Item two
+- Item three
+
+### Code Blocks
+
+```javascript
+// With syntax highlighting
+function hello() {
+  console.log('Hello world!');
+}
 ```
 
+## Mintlify Components
 
-```bash yarn
-yarn global add mintlify
-```
+### Cards
 
-</CodeGroup>
+<Card title="Basic Card" icon="square-1">
+  This is a basic card component
+</Card>
 
-**Step 2**: Navigate to the docs directory (where the `docs.json` file is located) and execute the following command:
+<CardGroup>
+  <Card title="Card in Group" icon="square-2">
+    Cards can be grouped together
+  </Card>
+  <Card title="Another Card" icon="square-3">
+    Multiple cards in a row
+  </Card>
+</CardGroup>
 
-```bash
-mintlify dev
-```
+### Accordions
 
-A local preview of your documentation will be available at `http://localhost:3000`.
-
-### Custom Ports
-
-By default, Mintlify uses port 3000. You can customize the port Mintlify runs on by using the `--port` flag. To run Mintlify on port 3333, for instance, use this command:
-
-```bash
-mintlify dev --port 3333
-```
-
-If you attempt to run Mintlify on a port that's already in use, it will use the next available port:
-
-```md
-Port 3000 is already in use. Trying 3001 instead.
-```
-
-## Mintlify Versions
-
-Please note that each CLI release is associated with a specific version of Mintlify. If your local website doesn't align with the production version, please update the CLI:
-
-<CodeGroup>
-
-```bash npm
-npm i -g mintlify@latest
-```
-
-
-```bash yarn
-yarn global upgrade mintlify
-```
-
-</CodeGroup>
-
-## Validating Links
-
-The CLI can assist with validating reference links made in your documentation. To identify any broken links, use the following command:
-
-```bash
-mintlify broken-links
-```
-
-## Deployment
-
-<Tip>
-  Unlimited editors available under the [Pro
-  Plan](https://mintlify.com/pricing) and above.
-</Tip>
-
-If the deployment is successful, you should see the following:
-
-<Frame>
-  <img
-    src="/images/checks-passed.png"
-    style={{ borderRadius:"0.5rem" }}
-  />
-</Frame>
-
-## Code Formatting
-
-We suggest using extensions on your IDE to recognize and format MDX. If you're a VSCode user, consider the [MDX VSCode extension](https://marketplace.visualstudio.com/items?itemName=unifiedjs.vscode-mdx) for syntax highlighting, and [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) for code formatting.
-
-## Troubleshooting
+<Accordion title="Basic Accordion">
+  Content inside an accordion can be hidden and shown
+</Accordion>
 
 <AccordionGroup>
-  <Accordion title='Error: Could not load the "sharp" module using the darwin-arm64 runtime'>
-    This may be due to an outdated version of node. Try the following:
-
-    1. Remove the currently-installed version of mintlify: `npm remove -g mintlify`
-    2. Upgrade to Node v19 or higher.
-    3. Reinstall mintlify: `npm install -g mintlify`
+  <Accordion title="Grouped Accordion 1">
+    Accordions can be grouped
   </Accordion>
-  <Accordion title="Issue: Encountering an unknown error">
-    Solution: Go to the root of your device and delete the ~/.mintlify folder. Afterwards, run `mintlify dev` again.
+  <Accordion title="Grouped Accordion 2">
+    Multiple accordions in a group
   </Accordion>
 </AccordionGroup>
 
-Curious about what changed in the CLI version? [Check out the CLI changelog.](https://www.npmjs.com/package/mintlify?activeTab=versions)
+### Callouts
+
+<Note>
+  This is a note callout
+</Note>
+
+<Warning>
+  This is a warning callout
+</Warning>
+
+<Info>
+  This is an info callout
+</Info>
+
+<Tip>
+  This is a tip callout
+</Tip>
+
+### Tabs
+
+<Tabs>
+  <Tab title="First Tab">
+    Content in first tab
+  </Tab>
+  <Tab title="Second Tab">
+    Content in second tab
+  </Tab>
+</Tabs>
+
+### Steps
+
+<Steps>
+  <Step title="First Step">
+    Description of first step
+  </Step>
+  <Step title="Second Step">
+    Description of second step
+  </Step>
+</Steps>
+
+## Available Icons
+
+You can use any of these icons in components that accept an `icon` prop:
+
+### Common Icons
+- 📁 `folder`
+- 💻 `computer`
+- 🔍 `search`
+- ✉️ `envelope`
+- 🌐 `globe`
+- 📱 `mobile`
+- 🔧 `wrench`
+- 📊 `chart`
+- 🎯 `target`
+- ⚡ `bolt`
+
+### Development Icons
+- `code`
+- `terminal`
+- `git`
+- `github`
+- `gitlab`
+- `browser`
+- `database`
+- `server`
+- `cloud`
+- `api`
+
+### UI Elements
+- `button`
+- `input`
+- `form`
+- `menu`
+- `sidebar`
+- `layout`
+- `grid`
+- `table`
+- `list`
+- `image`
+
+## Advanced Features
+
+### API Components
+
+```api-reference
+  title: API Reference
+  description: Example of API documentation
+```
+
+<ResponseField name="status" type="string">
+  The status of the response
+</ResponseField>
+
+<ParamField path="user_id" type="string">
+  The ID of the user
+</ParamField>
+
+### Math Equations
+
+You can write math equations using LaTeX syntax:
+
+Inline equation: $E = mc^2$
+
+Block equation:
+$$
+\frac{n!}{k!(n-k)!} = \binom{n}{k}
+$$
+
+### Mermaid Diagrams
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
+## Page Navigation
+
+### Table of Contents
+
+<TOCInline toc={toc} />
+
+### Navigation Links
+
+<Navigation
+  title="See Also"
+  items={[
+    {
+      title: 'Getting Started',
+      icon: 'rocket',
+      href: '/getting-started'
+    },
+    {
+      title: 'Components',
+      icon: 'puzzle',
+      href: '/components'
+    }
+  ]}
+/>
+
+## Styling
+
+### Custom CSS
+
+You can use custom CSS classes:
+
+<div className="custom-class">
+  Styled content
+</div>
+
+### Frames
+
+<Frame>
+  <img src="example.png" />
+</Frame>
+
+<Frame type="glass">
+  Content with glass effect
+</Frame>
+
+## Tips and Best Practices
+
+1. Always provide descriptive titles and icons for cards and accordions
+2. Use appropriate callouts for different types of information
+3. Group related content using CardGroup or AccordionGroup
+4. Include code examples when explaining technical features
+5. Use steps for sequential instructions
+6. Add navigation elements for better user experience
+
+## Examples
+
+### Complete Component Example
+
+<Card title="User Profile" icon="user">
+  <Tabs>
+    <Tab title="Info">
+      <AccordionGroup>
+        <Accordion title="Basic Details">
+          - Name: John Doe
+          - Email: john@example.com
+        </Accordion>
+        <Accordion title="Settings">
+          <Steps>
+            <Step title="Edit Profile">
+              Click the edit button
+            </Step>
+            <Step title="Save Changes">
+              Don't forget to save
+            </Step>
+          </Steps>
+        </Accordion>
+      </AccordionGroup>
+    </Tab>
+    <Tab title="Activity">
+      <Note>
+        Recent activity will appear here
+      </Note>
+    </Tab>
+  </Tabs>
+</Card>
+
+### API Documentation Example
+
+<Card title="API Endpoint" icon="code">
+  ```bash
+  GET /api/users/{user_id}
+  ```
+
+  <ParamField path="user_id" type="string">
+    The unique identifier of the user
+  </ParamField>
+
+  <ResponseField name="user" type="object">
+    The user object containing all user information
+  </ResponseField>
+</Card>
+
+## Additional Resources
+
+<CardGroup>
+  <Card title="Mintlify Documentation" icon="book">
+    Official documentation and guides
+  </Card>
+  <Card title="Component Library" icon="puzzle">
+    Browse all available components
+  </Card>
+  <Card title="Examples" icon="template">
+    Real-world implementation examples
+  </Card>
+</CardGroup>
