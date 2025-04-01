@@ -1,27 +1,22 @@
-{
-  "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
-  "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
-  },
+{"$schema": "https://mintlify.com/docs.json","theme": "mint","name": "Mint Starter Kit","colors": {"primary": "#16A34A","light": "#07C983","dark": "#15803D"},
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
-      {
-        "tab": "Guides",
+      {"tab": "Guides",
+
+      
         "groups": [
-          {"group": "Get Started",
+          
+          {
+            "group": "Get Started",
             "pages": [
               "introduction",
-              "deneme",
               "quickstart",
               "development"
             ]
           },
-          { "group": "Essentials",
+          {
+            "group": "Essentials",
             "pages": [
               "essentials/markdown",
               "essentials/code",
@@ -30,34 +25,147 @@
               "essentials/navigation",
               "essentials/reusable-snippets"
             ]
-          },
-          { "group": "Efe",
-            "pages": [
-              "efekurucay/introduction",
-              "efekurucay/deneme",
-              "efekurucay/quickstart",
-              "efekurucay/development"
-            ]
           }
-
         ]
+      },
+
+
+
+
+      {"tab": "Lecture Notes",
+
+
+        "groups": [ 
+          
+        
+        
+        
+        
+        
+        {"group": "Akdeniz University Lecture Notes", "pages": [
+            "lecture-notes/About-Lecture-Notes"
+          ]},
+
+          {"group": "CSE 1 (2023-2024)", "pages": [
+        "lecture-notes/CSE-1/CSE-1-Lectures", 
+            {"group":"Fall (2023)", "pages": [
+              
+              "lecture-notes/CSE-1/1-fall/CSE-1-Fall-Lectures",
+              {"group":"Computer Programming 1", "pages": [
+              
+                "lecture-notes/CSE-1/1-fall/computer-programming-1/Computer-Programming-1-Theory",
+                "lecture-notes/CSE-1/1-fall/computer-programming-1/Computer-Programming-1-Lab"
+               
+  
+              ]},
+              "lecture-notes/CSE-1/1-fall/introduction-to-computer-science/Introduction-to-Computer-Science",
+              "lecture-notes/CSE-1/1-fall/mathematics-for-engineering-1/Mathematics-for-Engineering-1",
+              "lecture-notes/CSE-1/1-fall/natural-sciences/Natural-Sciences",
+              "lecture-notes/CSE-1/1-fall/physics-for-computer-science-1/Physics-for-Computer-Science-1",
+              "lecture-notes/CSE-1/1-fall/turk-dili-1/Turk-Dili-1"
+
+            ]},
+
+            {"group":"Spring (2024)", "pages": [
+              
+              "lecture-notes/CSE-1/1-spring/CSE-1-Spring-Lectures",
+              "lecture-notes/CSE-1/1-spring/kariyer-planlama/Kariyer-Planlama",
+              {"group":"Computer Programming 2", "pages": [
+              
+                "lecture-notes/CSE-1/1-spring/computer-programming-2/Computer-Programming-2-Theory",
+                "lecture-notes/CSE-1/1-spring/computer-programming-2/Computer-Programming-2-Lab"
+               
+  
+              ]},
+              "lecture-notes/CSE-1/1-spring/physics-for-computer-science-2/Physics-for-Computer-Science-2",
+              "lecture-notes/CSE-1/1-spring/statistic-for-engineering/Statistic-for-Engineering",
+              "lecture-notes/CSE-1/1-spring/turk-dili-2/Turk-Dili-2",
+              "lecture-notes/CSE-1/1-spring/mathematics-for-engineering-2/Mathematics-for-Engineering-2"
+              
+
+
+
+            ]}
+
+
+          ]}
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        ]
+          
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     ],
+
+
+
+
+
+
     "global": {
       "anchors": [
         {
           "anchor": "Documentation",
-          "href": "https://docs.efekurucay.com",
+          "href": "https://mintlify.com/docs",
           "icon": "book-open-cover"
         },
         {
           "anchor": "Community",
-          "href": "https://efekurucay.com/community",
+          "href": "https://mintlify.com/community",
           "icon": "slack"
         },
         {
           "anchor": "Blog",
-          "href": "https://efekurucay.com/blog",
+          "href": "https://mintlify.com/blog",
           "icon": "newspaper"
         }
       ]
@@ -70,21 +178,21 @@
   "navbar": {
     "links": [
       {
-        "label": "Contact",
-        "href": "mailto:contact@efekurucay.com"
+        "label": "Support",
+        "href": "mailto:hi@mintlify.com"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Efe Home",
-      "href": "https://efekurucay.com"
+      "label": "Dashboard",
+      "href": "https://dashboard.mintlify.com"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/efekurucay24",
-      "github": "https://github.com/efekurucay",
-      "linkedin": "https://linkedin.com/in/efekurucay24"
+      "x": "https://x.com/mintlify",
+      "github": "https://github.com/mintlify",
+      "linkedin": "https://linkedin.com/company/mintlify"
     }
   }
 }

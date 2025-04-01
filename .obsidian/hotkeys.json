@@ -1,0 +1,18 @@
+{
+  "json-table:generate-table-from-selected-json": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "Numpad9"
+    }
+  ],
+  "json-table:generate-json-from-selected-table": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "Numpad8"
+    }
+  ]
+}
