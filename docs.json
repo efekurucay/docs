@@ -46,8 +46,66 @@
             "lecture-notes/About-Lecture-Notes"
           ]},
 
+
+
+          {"group": "CSE 2 (2024-2025)", "pages": [
+            "lecture-notes/CSE-2/cse-2-lectures",
+
+            {"group":"Spring (2025)", "pages": [
+              "lecture-notes/CSE-2/2-spring/cse-2-spring",
+              "lecture-notes/CSE-2/2-spring/ataturk-ilkeleri-ve-inkilap-tarihi-2/ataturk-ilkeleri-ve-inkilap-tarihi-2",
+
+              {"group":"Advanced Application Development", "pages": [
+                "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-lab",
+                "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-theory"
+              ]},
+
+              "lecture-notes/CSE-2/2-spring/database-management-system/database-management-system",
+              "lecture-notes/CSE-2/2-spring/computer-organization/computer-organization",
+              "lecture-notes/CSE-2/2-spring/discrete-mathematics-2/discrete-mathematics-2",
+              "lecture-notes/CSE-2/2-spring/linear-algebra/linear-algebra"
+            ]},
+
+
+
+
+
+
+            {"group":"Fall (2024)", "pages": [
+              "lecture-notes/CSE-2/2-fall/cse-2-fall",
+              "lecture-notes/CSE-2/2-fall/object-oriented-analysis-and-design/object-oriented-analysis-and-design",
+              "lecture-notes/CSE-2/2-fall/discrete-mathematics-1/discrete-mathematics-1",
+              "lecture-notes/CSE-2/2-fall//ataturk-ilkeleri-ve-inkilap-tarihi-1/ataturk-ilkeleri-ve-inkilap-tarihi-1",
+
+              {"group":"Digital Design", "pages": [
+                "lecture-notes/CSE-2/2-fall/digital-design/digital-design-lab",
+                "lecture-notes/CSE-2/2-fall/digital-design/digital-design-theory"
+              ]},
+
+              {"group":"Microcontroller Programming", "pages": [
+                "lecture-notes/CSE-2/2-fall/microcontroller-programming/microcontroller-programming-lab",
+                "lecture-notes/CSE-2/2-fall/microcontroller-programming/microcontroller-programming-theory"
+              ]},
+
+              {"group":"Data Structures", "pages": [
+                "lecture-notes/CSE-2/2-fall/data-structures/data-structures-lab",
+                "lecture-notes/CSE-2/2-fall/data-structures/data-structures-theory"
+              ]}
+
+
+
+
+
+
+
+            ]}
+            
+          ]},
+
+
+
           {"group": "CSE 1 (2023-2024)", "pages": [
-        "lecture-notes/CSE-1/CSE-1-Lectures", 
+            "lecture-notes/CSE-1/CSE-1-Lectures", 
             {"group":"Fall (2023)", "pages": [
               
               "lecture-notes/CSE-1/1-fall/CSE-1-Fall-Lectures",
@@ -87,10 +145,20 @@
 
             ]}
 
-
           ]}
 
+
+          
         
+
+
+
+
+
+
+
+
+
         
         
         
