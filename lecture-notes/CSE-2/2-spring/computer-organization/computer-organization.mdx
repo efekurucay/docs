@@ -1,0 +1,298 @@
+---
+title: Computer Organization
+description: CSE 206 Computer Organization
+icon: computer
+---
+
+
+Temel Kavramlar ve Tanımlar:
+
+•
+
+Bilgisayar Mimarisi (Computer Architecture): Programcı tarafından görülebilen ve programın mantıksal yürütülmesini doğrudan etkileyen sistemin özelliklerini tanımlar. Bunlar arasında komut seti, çeşitli veri tiplerini temsil etmek için kullanılan bit sayısı, giriş/çıkış (G/Ç) mekanizmaları ve bellek adresleme teknikleri bulunur1 .... Başka bir deyişle, bir programcının bilgisayarı nasıl gördüğüdür.
+
+•
+
+Bilgisayar Organizasyonu (Computer Organization): Mimarinin belirtimlerini gerçekleştiren operasyonel birimleri ve bunların birbirleriyle olan bağlantılarını ifade eder. Programcı tarafından doğrudan görülmeyen donanım detayları, kontrol sinyalleri ve bilgisayar ile çevre birimleri arasındaki arayüzler bu kapsamdadır1 .... Yani, mimarinin fiziksel olarak nasıl hayata geçirildiğidir.
+
+•
+
+Yapı (Structure): Bir sistemdeki bileşenlerin birbirleriyle olan ilişkilenme biçimidir3 ....
+
+•
+
+Fonksiyon (Function): Tek tek bileşenlerin yapı içerisinde bir parçası olarak gerçekleştirdiği operasyondur3 .... Bir bilgisayarın temel olarak gerçekleştirebileceği dört temel fonksiyon vardır:
+
+◦
+
+Veri İşleme (Data processing): Geniş bir formda olabilen verilerin çeşitli gereksinimlere göre işlenmesi5 .
+
+◦
+
+Veri Saklama (Data storage): Kısa ve uzun süreli veri depolama5 .
+
+◦
+
+Veri Hareketi (Data movement): Bilgisayar ile doğrudan bağlı olan çevre birimleri arasında veri alışverişi (Giriş/Çıkış - I/O) ve uzak mesafelerdeki cihazlarla veri iletişimi (Veri iletişimi - Data communications)5 .
+
+◦
+
+Kontrol (Control): Bir kontrol birimi (control unit) aracılığıyla bilgisayarın kaynaklarının yönetilmesi ve fonksiyonel parçalarının talimatlara yanıt olarak çalıştırılması5 .
+
+Bilgisayarın Evrimi ve Performans:
+
+•
+
+Bilgisayar Nesilleri: Bilgisayar teknolojisindeki önemli değişimleri ve gelişmeleri ifade eder6 .... Kaynaklarda bahsedilen ilk nesiller şunlardır:
+
+◦
+
+Birinci Nesil (Vakum Tüpleri): ENIAC gibi ilk elektronik dijital bilgisayarlar vakum tüplerini kullanmıştır7 ....
+
+◦
+
+İkinci Nesil (Transistörler): 1947'de Bell Labs'da icat edilen transistörler, vakum tüplerine göre daha küçük, ucuz ve daha az ısı yayan bir teknoloji sunmuştur6 ....
+
+◦
+
+Üçüncü Nesil (Entegre Devreler - Integrated Circuits): 1958'de mikroelektronik alanındaki devrimle birlikte entegre devreler ortaya çıkmıştır. Tek bir silikon yonga üzerinde birçok transistörün üretilebilmesi mümkün hale gelmiştir9 ....
+
+◦
+
+Sonraki Nesiller: Büyük ölçekli entegrasyon (LSI) ve çok büyük ölçekli entegrasyon (VLSI) gibi teknolojilerle işlemci ve bellek yoğunluğu sürekli artmıştır6 .
+
+•
+
+Moore Yasası (Moore's Law): Intel'in kurucu ortağı Gordon Moore tarafından 1965'te öne sürülen bu yasa, bir yonga üzerindeki transistör sayısının yaklaşık olarak her 18-24 ayda ikiye katlanacağını öngörür11 .... Bu durum, işlemci hızlarının ve kapasitelerinin sürekli artmasına yol açmıştır.
+
+•
+
+Performans Tasarımı: Bilgisayar performansını etkileyen faktörler şunlardır15 :
+
+◦
+
+Mikroişlemci Hızı (Microprocessor Speed): İşlemcinin komutları ne kadar hızlı işleyebildiği.
+
+◦
+
+Performans Dengesi (Performance Balance): İşlemci, bellek ve G/Ç sistemleri arasındaki performans uyumu.
+
+◦
+
+Çip Organizasyonu ve Mimarisi (Chip Organization and Architecture): Çok çekirdekli (multi-core), MICs (Many Integrated Core), GPGPUs (General-Purpose computing on Graphics Processing Units) gibi teknolojiler performans artışında önemli rol oynar16 .
+
+•
+
+Performans Değerlendirme: Performansı ölçmek için kullanılan metrikler arasında saat hızı (clock speed), saniyedeki komut sayısı (instructions per second - IPS) ve benchmark testleri bulunur16 .
+
+Bilgisayar Sistemi - Üst Düzey Bakış ve Bağlantılar:
+
+•
+
+Bir bilgisayar sistemi temel olarak işlemci (CPU - Central Processing Unit), bellek (memory) ve giriş/çıkış (I/O) bileşenlerinden oluşur17 .... Bu bileşenlerin birbirleriyle veri ve kontrol sinyallerini alışverişi yapabilmesi için bağlantı yapılarına (interconnection structures) ihtiyaç vardır13 .... En yaygın bağlantı yapısı veri yoludur (bus)13 ....
+
+•
+
+Veri Yolu (Bus): Birden fazla cihazın aynı iletişim ortamını paylaştığı bir iletişim yoludur. Genellikle paralel elektriksel iletkenlerden oluşur19 . Bir veri yolu temel olarak şunlardan oluşur:
+
+◦
+
+Adres Yolu (Address Bus): Bellek veya G/Ç adreslerini taşır. Adres yolunun genişliği, adreslenebilir konum sayısını belirler20 ....
+
+◦
+
+Veri Yolu (Data Bus): Gerçek veriyi taşır. Veri yolunun genişliği, bir seferde taşınabilecek veri miktarını etkiler20 ....
+
+◦
+
+Kontrol Yolu (Control Bus): Komutları, zamanlama sinyallerini ve kontrol bilgilerini taşır20 ....
+
+•
+
+Veri yolu tipleri arasında dedicated (ayrılmış) veri yolları (belirli bir fonksiyon için ayrılmış) ve multiplexed (çoklanmış) veri yolları (adres ve verinin aynı hatlar üzerinden farklı zamanlarda taşındığı) bulunur20 .
+
+•
+
+Veri yolu erişimini kontrol etmek için arbitrasyon (arbitration) mekanizmaları kullanılır18 .... Bu mekanizmalar merkezi veya dağıtık olabilir.
+
+•
+
+PCI (Peripheral Component Interconnect): Yüksek performanslı çevre birimlerini bağlamak için yaygın olarak kullanılan bir standart bağlantı yoludur22 ....
+
+Önbellek (Cache) Bellek:
+
+•
+
+Bellek Hiyerarşisi: Bilgisayar sistemlerinde hız ve maliyet dengesini sağlamak için farklı hız ve kapasitelerde bellek katmanları kullanılır. Önbellek (cache), işlemciye en yakın ve en hızlı bellek katmanıdır24 ....
+
+•
+
+Önbellek Prensipleri: Önbellek, sık kullanılan verilere daha hızlı erişim sağlamak amacıyla çalışır. Temel önbellek tasarım unsurları şunlardır26 :
+
+◦
+
+Önbellek Boyutu (Cache Size): Önbellekte saklanabilecek veri miktarı.
+
+◦
+
+Eşleme Fonksiyonu (Mapping Function): Ana bellekteki bir bloğun önbellekte hangi satıra yerleştirileceğini belirler. Üç temel eşleme fonksiyonu vardır:
+
+▪
+
+Doğrudan Eşleme (Direct Mapping): Her ana bellek bloğunun önbellekte yalnızca bir olası konumu vardır26 ....
+
+▪
+
+Tam İlişkisel Eşleme (Associative Mapping): Bir ana bellek bloğu önbellekte herhangi bir yere yerleştirilebilir26 .
+
+▪
+
+Küme İlişkisel Eşleme (Set-Associative Mapping): Önbellek kümeler halinde düzenlenir ve bir ana bellek bloğu belirli bir küme içindeki herhangi bir satıra yerleştirilebilir28 ....
+
+◦
+
+Yer Değiştirme Algoritması (Replacement Algorithm): Önbellek dolu olduğunda ve yeni bir blok getirilmesi gerektiğinde hangi bloğun çıkarılacağını belirler (LRU - Least Recently Used, FIFO - First In First Out, Rastgele gibi)26 .
+
+◦
+
+Yazma Politikası (Write Policy): Veri önbellekte değiştirildiğinde ana belleğin ne zaman güncelleneceğini belirler (write-through, write-back)26 .
+
+◦
+
+Satır Boyutu (Line Size): Önbelleğe getirilen veri bloğunun boyutu.
+
+◦
+
+Önbellek Sayısı (Number of Caches): Tek seviyeli veya çok seviyeli önbellekler olabilir (L1, L2, L3 önbellekleri gibi)26 .
+
+Temel Bilgisayar Organizasyonu ve Tasarımı (M. Morris Mano Modeli):
+
+•
+
+Mano'nun basitleştirilmiş bilgisayar modeli, işlemci (CPU), bellek ve G/Ç birimlerinden oluşur30 .... Bu modelde temel bileşenler şunlardır:
+
+◦
+
+Bellek Birimi (Memory Unit): Komutları ve verileri saklar. Mano modelinde 4096 x 16 bitlik bir bellek varsayılır33 ....
+
+◦
+
+Yazmaçlar (Registers): İşlemci içinde hızlı erişilebilen depolama konumlarıdır. Mano modelinde kullanılan temel yazmaçlar şunlardır:
+
+▪
+
+AR (Address Register): Bellek adresini tutar34 ....
+
+▪
+
+PC (Program Counter): Bir sonraki çalıştırılacak komutun adresini tutar34 ....
+
+▪
+
+DR (Data Register): Bellekten okunan veya belleğe yazılacak veriyi geçici olarak tutar34 .
+
+▪
+
+AC (Accumulator): Aritmetik ve mantıksal işlemler için kullanılan temel yazmaç34 ....
+
+▪
+
+IR (Instruction Register): Bellekten getirilen mevcut komutu tutar33 ....
+
+▪
+
+Diğer yazmaçlar (TR, OUTR, INPR, SC)34 .
+
+◦
+
+Kontrol Birimi (Control Unit): Komutların alınmasını, çözülmesini ve yürütülmesini kontrol eder. Zamanlama sinyalleri (timing signals) ve kontrol sinyalleri (control signals) üretir33 ....
+
+◦
+
+ALU (Arithmetic Logic Unit): Aritmetik ve mantıksal işlemleri gerçekleştirir34 ....
+
+◦
+
+Veri Yolu (Bus): Bileşenler arasında veri transferini sağlar34 ....
+
+•
+
+Komut Formatı (Instruction Format): Bir komut genellikle bir işlem kodu (opcode) (yapılacak işlemi belirtir) ve bir adres (işlem için kullanılacak bellek konumlarını veya yazmaçları belirtir) olmak üzere iki kısımdan oluşur33 ....
+
+•
+
+Komut Seti (Instruction Set): Bir işlemcinin çalıştırabileceği tüm komutların kümesidir. Mano modelinde aritmetik, mantıksal, veri transferi ve kontrol komutları bulunur40 ....
+
+•
+
+Komut Döngüsü (Instruction Cycle): Bir komutun yürütülmesi için geçen adımlar dizisidir (fetch, decode, execute)42 ....
+
+•
+
+Mikroprogramlı Kontrol (Microprogrammed Control): Kontrol sinyallerinin bir kontrol belleğinde (control memory) saklanan mikrokomutlar aracılığıyla üretildiği bir kontrol birimi tasarım yöntemidir44 . Bu yöntemde mikrorutinler ve mikroişlemler kavramları önemlidir44 ....
+
+Paralel İşleme (Parallel Processing):
+
+•
+
+Birden fazla komutun veya verinin aynı anda işlenmesi prensibine dayanır. Farklı paralel işleme mimarileri mevcuttur:
+
+◦
+
+SISD (Single Instruction, Single Data): Tek komut akışı ve tek veri akışı (standart Von Neumann mimarisi)46 .
+
+◦
+
+MISD (Multiple Instruction, Single Data): Çoklu komut akışı ve tek veri akışı (günümüzde sınıflandırılabilecek bir bilgisayar yoktur)46 ....
+
+◦
+
+SIMD (Single Instruction, Multiple Data): Tek komut akışı ve çoklu veri akışı (dizi işlemciler, vektör işlemciler)46 ....
+
+◦
+
+MIMD (Multiple Instruction, Multiple Data): Çoklu komut akışı ve çoklu veri akışı (çok işlemcili sistemler)46 .
+
+•
+
+Boru Hattı (Pipelining): Bir ardışık işlemi alt işlemlere ayırarak her bir alt işlemin farklı bir donanım segmentinde eş zamanlı olarak yürütülmesini sağlayan bir tekniktir48 .
+
+•
+
+Vektör İşleme (Vector Processing): Aynı işlemi büyük veri dizileri üzerinde paralel olarak gerçekleştirmek için özel komutlar kullanan bir yöntemdir49 .
+
+•
+
+Çok İşlemcili Sistemler (Multiprocessor Systems): Birden fazla işlem birimine sahip sistemlerdir. Bellek paylaşımı ve önbellek tutarlılığı gibi konular önem kazanır50 .
+
+•
+
+Ara Bağlantı Ağları (Interconnection Networks): Çok işlemcili sistemlerde işlemciler ve bellekler arasındaki iletişimi sağlayan ağlardır (örneğin, banyan ağı, delta ağı)51 .
+
+Çıkmış Soru Tipleri:
+
+Verilen çıkmış sorulara bakıldığında, sınavlarda aşağıdaki gibi soru tipleriyle karşılaşılabilir:
+
+•
+
+Temel Kavramların Tanımı ve Açıklanması: Bilgisayar mimarisi ve organizasyonu arasındaki fark, veri yolu, önbellek, komut döngüsü gibi temel kavramların tanımlanması ve açıklanması istenebilir52 ....
+
+•
+
+Kısaltmaların Açılımı: MBR, MAR, ALU gibi bilgisayar organizasyonu bağlamında sıkça kullanılan kısaltmaların tam adlarının yazılması istenebilir35 ....
+
+•
+
+IAS Bilgisayar Yapısı: IAS bilgisayarının temel bileşenlerinin (aritmetik-lojik birim, kontrol birimi, bellek, G/Ç) ve bunlar arasındaki bağlantıların tanınması ve isimlendirilmesi istenebilir36 .... Şemalar üzerindeki numaralandırılmış kısımların ne anlama geldiği sorulabilir.
+
+•
+
+Assembly Diline Giriş: Basit assembly dili komutlarının ne işe yaradığının anlaşılmasına yönelik sorular olabilir (örneğin, belirli bir komutun etkilediği yazmaçlar veya bellek konumları)57 .
+
+•
+
+Önbellek Kavramları: Doğrudan eşleme, ilişkisel eşleme gibi önbellek eşleme tekniklerinin temel prensiplerinin anlaşılmasına yönelik sorular sorulabilir.
+
+•
+
+Bilgisayarın Evrimi: Bilgisayar nesilleri ve bu nesillerdeki temel teknolojik değişiklikler hakkında bilgi istenebilir. Moore Yasası'nın etkileri sorulabilir.

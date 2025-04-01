@@ -11,12 +11,14 @@
             "id": "0cbaff6e25d30583",
             "type": "leaf",
             "state": {
-              "type": "json",
+              "type": "markdown",
               "state": {
-                "file": "docs.json"
+                "file": "lecture-notes/About-Lecture-Notes.mdx",
+                "mode": "source",
+                "source": false
               },
               "icon": "lucide-file",
-              "title": "docs"
+              "title": "About-Lecture-Notes"
             }
           }
         ]
@@ -165,19 +167,20 @@
       "publish:Değişiklikleri yayınla": false
     }
   },
-  "active": "0cbaff6e25d30583",
+  "active": "88b835f2ffd7e523",
   "lastOpenFiles": [
-    "efe.json",
-    "docs.json",
+    "blog/blog.mdx",
+    "blog",
+    "efe/services - Kopya.mdx",
+    "efe/blog.mdx",
+    "efe/services.mdx",
+    "efe/projects - Kopya.mdx",
+    "efe/projects.mdx",
+    "efe/experience - Kopya.mdx",
+    "efe/aboutme.mdx",
+    "lecture-notes/CSE-2/cse-2-lectures.mdx",
+    "lecture-notes/CSE-2/2-spring/cse-2-spring.mdx",
     "de.md",
-    "node_modules/picomatch/lib/utils.js",
-    "node_modules/picomatch/lib/scan.js",
-    "node_modules/picomatch/lib/picomatch.js",
-    "node_modules/picomatch/lib/parse.js",
-    "node_modules/picomatch/lib/constants.js",
-    "node_modules/picomatch/lib",
-    "node_modules/chokidar/lib/nodefs-handler.js",
-    "node_modules/chokidar/lib/fsevents-handler.js",
     "node_modules/picomatch/README.md",
     "node_modules/braces/README.md",
     "node_modules/picomatch/CHANGELOG.md",

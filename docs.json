@@ -178,7 +178,18 @@
 
 
 
+      },
+
+
+      {"tab": "Blog",
+        "groups": [
+          {"group": "Blog Posts", "pages": [
+            "blog/blog"
+          ]}
+        ]
       }
+
+      
 
 
 
