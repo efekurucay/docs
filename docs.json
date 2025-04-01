@@ -1,14 +1,16 @@
 {"$schema": "https://mintlify.com/docs.json","theme": "mint","name": "Mint Starter Kit","colors": {"primary": "#16A34A","light": "#07C983","dark": "#15803D"},
   "favicon": "/favicon.svg",
+
+
   "navigation": {
     "tabs": [
-      {"tab": "E-FE-E-RA",
+      {"tab": "Home",
 
       
         "groups": [
           
           {"group": " ",
-            "pages": ["quickstart","Web0"]
+            "pages": ["quickstart"]
           }
         ]
       },
@@ -178,49 +180,10 @@
 
       }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    ],
-
-
-
-
-
-
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
+
+
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg"
@@ -228,8 +191,9 @@
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+
+        "label": "Contact",
+        "href": "mailto:contact@efekurucay.com"
       }
     ],
     "primary": {
@@ -240,9 +204,13 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/efekurucay24",
+      "x-twitter": "https://x.com/efekurucay24",
       "github": "https://github.com/efekurucay",
-      "linkedin": "https://linkedin.com/in/efekurucay24"
+      "linkedin": "https://linkedin.com/in/efekurucay24",
+      "medium": "https://medium.com/@efekurucay",
+      "website": "https://efekurucay.com",
+      "instagram": "https://www.instagram.com/eferoam",
+      "youtube": "https://www.youtube.com/@efekurucay24"
     }
   }
 }
