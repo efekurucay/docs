@@ -5,32 +5,35 @@ icon: X
 ---
 ## Doğrusal Denklemler
 
-### [](#doğrusal-denklem-çözümleri)Doğrusal Denklem Çözümleri,
+### Doğrusal Denklem Çözümleri
 
-Bir (doğrusal) denklemin çözümü, denklemi sağlayan belirli bir değerler topluluğudur.
+Bir (doğrusal) denklemin çözümü, denklemi doğru kılan (sağlayan) belirli bir değer veya değerler topluluğudur.
 
-Örneğin, `2x + 5 = 11` denkleminde x=3 olur ve denklemin 'tek çözümü' budur.
+Örneğin, 2x + 5 = 11 denkleminde x=3 olur ve bu, denklemin **'tek çözümü'**dür.
 
-- `3a - 4b = 14` -- bu denklemde ise örnek olarak a=6, b=1 yani (6,1) bir çözümdür. Fakat tek çözüm olmayabilir. Bu denklem için, (22/3,2) de bir çözümdür. Aslında bu şekilde **sonsuz sayıda** çözüm barındırabilir.
+- 3a - 4b = 14 denkleminde ise örnek olarak a=6, b=1 yani (6,1) bir çözümdür. Fakat bu tek çözüm olmayabilir. Bu denklem için (22/3, 2) de bir çözümdür. Aslında bu şekilde **sonsuz sayıda** çözüm barındırabilir.
+    
 
-### [](#doğrusal-denklem-sistemleri)Doğrusal Denklem Sistemleri
+### Doğrusal Denklem Sistemleri
 
-Bazı durumlarda aynı anda 2 veya daha fazla denklemin çözümüyle ilgileniriz.
+Bazı durumlarda aynı anda 2 veya daha fazla denklemin çözüm kümesiyle ilgileniriz. Bu denklem topluluğuna **doğrusal denklem sistemi** denir.
 
-1. `2a - b = 4`, `a + 3b =3`  - 2 bilinmeyenli 2 denklem sistemi.
-2. `2a - b - c = 3` , `a + 2b + 3c = -5`  3 bilinmeyenli 2 denklem sistemi. **'underdetermined'**
-3. `2x + y = 5` , `-x + 4y = √3` , `2x - 3y = 0` 2 bilinmeyenli 3 denklem sistemi.** 'overdetermined'**
+1. 2a - b = 4, a + 3b = 3 - 2 bilinmeyenli 2 denklemden oluşan sistem.
+    
+2. 2a - b - c = 3, a + 2b + 3c = -5 - 3 bilinmeyenli 2 denklemden oluşan sistem. Bu tür sistemlere (bilinmeyen sayısı > denklem sayısı) **'eksik belirlenmiş' (underdetermined)** sistem denir.
+    
+3. 2x + y = 5, -x + 4y = √3, 2x - 3y = 0 - 2 bilinmeyenli 3 denklemden oluşan sistem. Bu tür sistemlere (denklem sayısı > bilinmeyen sayısı) **'aşırı belirlenmiş' (overdetermined)** sistem denir.
+    
 
-Yani aslında denklem sisteminin çözülmesi için en az bilinmeyen sayısı kadar denklem gerekiyor.
+Genel bir kural olarak, bir denklem sisteminin tek bir çözüme sahip olması için genellikle en az bilinmeyen sayısı kadar (lineer bağımsız) denklem olması beklenir, ancak bu tek başına yeterli veya gerekli değildir.
 
-### [](#doğrusal-sistemlerin-kökleri)Doğrusal Sistemlerin Kökleri
+### Doğrusal Sistemlerin Çözümleri (Örnek: Diyet Düzenleme)
 
-#### [](#örnek-1-diyet-düzenleme)Örnek 1: Diyet Düzenleme
+Bir laboratuvardaki tavşanlara, **Mix A**, **Mix B** ve **Mix C** olarak etiketlenmiş üç farklı besin türünden oluşan katı bir diyet verilmektedir. Bu karışımların makro besin değerleri (gram cinsinden) aşağıdaki tabloda gösterilmiştir:
 
-Bir laboratuvardaki tavşanlara, **Mix A**, **Mix B** ve **Mix C** olarak etiketlenmiş üç farklı besin türünden oluşan katı bir diyet verilmektedir. Bu karışımların makro besin değerleri (gram cinsinden) aşağıdaki tabloda gösterilmiştir:
-
-||Karbonhidrat (g)|Protein (g)|Yağ (g)|
+|   |   |   |   |
 |---|---|---|---|
+||Karbonhidrat (g)|Protein (g)|Yağ (g)|
 |**Mix A**|3|1|1|
 |**Mix B**|1|5|6|
 |**Mix C**|12|4|0.5|
@@ -38,157 +41,262 @@ Bir laboratuvardaki tavşanlara, **Mix A**, **Mix B** ve **Mix C** olarak e
 Her tavşanın günlük olarak:
 
 - 35 gram karbonhidrat,
+    
 - 28 gram protein,
-- 27 gram yağ
-
-alması gerekmektedir. Bu gereksinimleri karşılamak için her bir karışımdan ne kadar verileceğini hesaplamak amacıyla bir denklem sistemi kuracağız.
+    
+- 27 gram yağ  
+    alması gerekmektedir. Bu gereksinimleri karşılamak için her bir karışımdan ne kadar verileceğini hesaplamak amacıyla bir denklem sistemi kuracağız.
+    
 
 Varsayalım ki her tavşan:
 
-- a birim **Mix A**,
-- b birim **Mix B**,
-- c birim **Mix C** alıyor olsun.
-
-##### [](#denklem-sistemi)Denklem Sistemi
+-         `a a a`
+          
+    
+    birim **Mix A**,
+    
+-         `b b b`
+          
+    
+    birim **Mix B**,
+    
+-         `c c c`
+          
+    
+    birim **Mix C** alıyor olsun.
+    
 
 Tablodaki değerleri kullanarak aşağıdaki doğrusal denklemleri elde ederiz:
 
-1. **Karbonhidrat denklemi**  
-    3a+1b+12c=35
-2. **Protein denklemi**  
-    a+5b+4c=28
-3. **Yağ denklemi**  
-    a+6b+0.5c=27
-
-Bu üç denklem, a, b ve c değerlerini bulmak için çözülmesi gereken doğrusal denklem sistemini oluşturur.
-
-{3a+b+12c=35a+5b+4c=282a+6b+0.5c=27**Soru:** Sadece bu üç besin türünü kullanarak, her türlü diyet ihtiyacını (farklı makro besin hedeflerini) karşılamak mümkün müdür?
-
-Bazı koşullarda kurulan denklem sistemlerinde pozitif olması gereken değerler negatif olabilir. Bu yüzden her zaman garanti değildir.
-
-### [](#doğrusal-denklemler-sisteminin-çözümleri)Doğrusal Denklemler Sisteminin Çözümleri
-
-#### [](#örnek-denklem-sistemi)Örnek denklem sistemi
-
-(Doğrusal) bir sistemin çözümü, sistemdeki her denklemi sağlayan değerlerin bir koleksiyonudur.
-
-- `2x - y = 4`, `-x + 3y = 3` bu sisteme göre  
-    -(5,6) ilk denklemin çözümü fakat ikinci denkleme uymuyor. -(1, 4/3) ise aynı şekilde 2. denklemi sağlıyor fakat 1. için uygun değil.
+1. **Karbonhidrat denklemi:**
     
-- Denklemi çözdüğümüzde (3,2) değerlerinin iki denklemi de sağladığını görebiliriz. Bu değer, bu denklem için tek çözümdür.
+    3a + 1b + 12c = 35  
+    ]
+    
+2. **Protein denklemi:**
+    
+    a + 5b + 4c = 28  
+    ]
+    
+3. **Yağ denklemi:** (Not: Orijinal metinde bu denklemde '2a' vardı, tabloya göre 'a' olmalı.)
+    
+    a + 6b + 0.5c = 27  
+    ]
     
 
-#### [](#örnek-denklem-sistemi--sonsuz-sayıda-çözüm-)Örnek denklem sistemi ( Sonsuz sayıda çözüm )
+Bu üç denklem,
 
-- `2x - y = 4`, `-4x + 2y = 8` denklem sisteminde görüldüğü üzere iki denklem de aynı. Çözümler yaptığımızda (1,2), (8,12) gibi değerlerin, (a, (2a-4)) , bu sistemi çözdüğünü göreceksiniz. Haliyle sonsuza kadar uzanan bir çözüm sayımız oluyor.
+        `a a a`
+      
 
-#### [](#örnek-denklem-sistemi--çözüm-yok-)Örnek denklem sistemi ( Çözüm yok )
+,
 
-- `2x - y = 4` , `6x - 3y = 9` bu sistemi çözmeye çalıştığımızda 2. denklemin de `2x - y = 3` e denk geldiğini görüyoruz. Yani aynı `2x - y` değeri hem 3'e, hem de 4'e karşılık geliyor. Bu da bu denklem sisteminin çözümü olmadığını bize gösteriyor.
+        `b b b`
+      
 
-### [](#eksik-belirlenmiş-sistemlerin-çözümleri-underdetermined)Eksik Belirlenmiş Sistemlerin Çözümleri (Underdetermined)
+ve
 
-- Bu sistemlerin genellikle sonsuz sayıda çözümleri bulunur.
-    
-- `x+y+z=2`, `x-2y+z=5` denklem sistemini incelersek, - `(a,-1,3-a) formundaki her üçlü çözümün bu sistemi sağladığını görüyoruz.
-    
-- `2x-y+3z=5`, `-4x+2y-6z=8` denklem sisteminin ise çözümü yoktur.
-    
+        `c c c`
+      
 
-### [](#aşırı-belirlenmiş-sistemlerin-çözümleri-overdetermined)Aşırı Belirlenmiş Sistemlerin Çözümleri (Overdetermined)
+değerlerini bulmak için çözülmesi gereken doğrusal denklem sistemini oluşturur:
 
-- Bu sistemlerin genellikle çözümü yoktur.
-    
-- `2x+y=2`, `x-2y=5`, `-x+7y=-4` denklemini incelediğimizde tek bir ortak çözümü olmadığını göreceğiz. örneğin ilk iki denklemi çözersek `x=9/5 , y=8/5` oluyor. fakat bu değerler 3. denklemi sağlamıyor. Fakat sağlayacak şekilde ayarladığımızda son denklem yerine `-x+7y=-13` denklemi olsaydı bu denklem sisteminin tek çözümü olurdu.
-    
-- Yani `3a - 4b = 14` gibi bir denklemin sonsuz çözümü olduğu gibi, `a=5 ve b=2` olan da sonsuz denklem yazılabilir gibi düşünebiliriz.
-    
+        `{3a+b+12c=35a+5b+4c=28a+6b+0.5c=27\begin{cases} 3a + b + 12c = 35 \\ a + 5b + 4c = 28 \\ a + 6b + 0.5c = 27 \end{cases} ⎩⎨⎧​3a+b+12c=35a+5b+4c=28a+6b+0.5c=27​}`
+      
 
-### [](#doğrusal-bir-sistemin-çözüm-sayısı)Doğrusal Bir Sistemin Çözüm Sayısı
+**Soru:** Sadece bu üç besin türünü kullanarak, her türlü diyet ihtiyacını (farklı makro besin hedeflerini) karşılamak mümkün müdür?
 
-- Doğrusal bir sistem verildiğinde, çözümlerinin sayısı için 3 olası durum vardır:
+Yanıt: Bu, hedeflenen besin değerlerine bağlıdır. Kurulan denklem sisteminin çözümü var olsa bile, çözümdeki
+
+        `a,b,ca, b, ca,b,c`
+      
+
+değerlerinin fiziksel olarak anlamlı olması gerekir (örneğin, negatif miktarda karışım verilemez). Bazı hedef değerler için sistemin çözümü olmayabilir veya negatif değerler içerebilir. Bu yüzden her zaman garanti değildir.
+
+### Doğrusal Denklem Sisteminin Çözüm Türleri
+
+(Doğrusal) bir sistemin çözümü, sistemdeki **her denklemi aynı anda** sağlayan değerler kümesidir.
+
+#### Örnek denklem sistemi (Tek Çözüm)
+
+- 2x - y = 4
     
-    ```
-    (i) Sistemin kendine özgü bir çözümü olabilir.
-    (ii) Sistemin sonsuz sayıda çözümü olabilir.
-    (iii) Sistemin çözümü olmayabilir.
-    ```
-    
-- Sistemin en az bir çözümü varsa (durum (i) ve (ii)), bu sisteme **tutarlı sistem** denir.(**consistent**)
-    
-- Sistemin herhangi bir çözümü yoksa (durum (iii)), buna **tutarsız sistem** denir. (**inconsistent**)
-    
-- Bir doğrusal denklem sisteminin neden 2 veya daha fazla **sonlu **sayıda çözümü bulunamayacağını grafiklerini çizerek anlayabiliriz. Örneğin iki doğru düşünürsek,
-    
-    ```
-      - Eğer doğrular bir noktada kesişiyorsa, sistemin tek bir çözümü vardır.
-      - Eğer doğrular üst üste çakışıyorsa, sistemin sonsuz çözümü vardır.
-      - Eğer doğrular paralel ve farklıysa, sistemin çözümü yoktur.
-    
-       -2 veya 3 gibi sonlu sayıda çözüm olamaz çünkü doğrusal denklemler doğrulara karşılık gelir ve iki doğru birden fazla ayrık noktada kesişemez.
-    ```
+- -x + 3y = 3
     
 
-Bu durum genel olarak daha yüksek boyutlar için de geçerlidir çünkü doğrusal sistemler doğrular, düzlemler veya daha yüksek boyutlu hiper düzlemler olarak yorumlanabilir ve bunların ya tek bir kesişim noktası olur, ya tamamen çakışır (sonsuz çözüm), ya da hiç kesişmez (çözüm yok).
+Bu sistemde:
 
-### [](#2-bilinmeyenli-sistemlerin-geometrik-yorumlanması)2 Bilinmeyenli Sistemlerin Geometrik Yorumlanması
+- (5, 6) ilk denklemi sağlar (2*5 - 6 = 4), fakat ikinci denklemi sağlamaz (-5 + 3*6 = 13 ≠ 3).
+    
+- (1, 4/3) ikinci denklemi sağlar (-1 + 3*(4/3) = -1 + 4 = 3), fakat birinci denklemi sağlamaz (2*1 - 4/3 = 6/3 - 4/3 = 2/3 ≠ 4).
+    
 
-- ax +by = c biçimindeki her denklem, burada a,b, c bilinen sabitlerdir, analitik düzlemde bir çizgiye karşılık gelir.
-- Bu, bilinmeyenli denklemli sistemlerin geometrik açıdan analiz edilmesini mümkün kılar.
+Sistemi çözdüğümüzde (örneğin yerine koyma veya yok etme metoduyla), (x, y) = (3, 2) değerlerinin her iki denklemi de sağladığını görürüz:
 
-![geometric.png](67b7315ca4f31-geometric.png)
+- 2*3 - 2 = 6 - 2 = 4 (Sağlıyor)
+    
+- -3 + 3*2 = -3 + 6 = 3 (Sağlıyor)  
+    Bu değer çifti, bu sistemin **tek çözümü**dür.
+    
+
+#### Örnek denklem sistemi (Sonsuz Sayıda Çözüm)
+
+- 2x - y = 4
+    
+- -4x + 2y = -8
+    
+
+İkinci denklemi -2 ile sadeleştirirsek, 2x - y = 4 elde ederiz, ki bu birinci denklemle aynıdır. Bu durumda, iki denklem aslında aynı doğruyu temsil eder. Bu doğru üzerindeki her nokta sistemin bir çözümüdür. Örneğin:
+
+- (1, -2): 2(1) - (-2) = 4 ve -4(1) + 2(-2) = -4 - 4 = -8. (Sağlıyor)
+    
+- (3, 2): 2(3) - 2 = 4 ve -4(3) + 2(2) = -12 + 4 = -8. (Sağlıyor)  
+    Genel çözüm, x = a dersek, y = 2a - 4 şeklinde ifade edilebilir. Yani (a, 2a - 4) formundaki tüm noktalar çözümdür. Dolayısıyla **sonsuz sayıda çözüm** vardır.
+    
+
+#### Örnek denklem sistemi (Çözüm Yok)
+
+- 2x - y = 4
+    
+- 6x - 3y = 9
+    
+
+İkinci denklemi 3 ile sadeleştirirsek, 2x - y = 3 elde ederiz. Sisteme göre 2x - y ifadesi hem 4'e hem de 3'e eşit olmalıdır. Bu bir çelişkidir (4 ≠ 3). Bu iki denklem, birbirine paralel fakat farklı doğruları temsil eder. Kesişim noktaları yoktur, dolayısıyla bu denklem sisteminin **çözümü yoktur**.
+
+### Eksik Belirlenmiş Sistemlerin Çözümleri (Underdetermined)
+
+Denklem sayısının bilinmeyen sayısından az olduğu sistemlerdir.
+
+- Bu sistemlerin genellikle **sonsuz sayıda çözümü** bulunur, ancak çözümü olmayabilir de.
+    
+- Örnek 1: x + y + z = 2, x - 2y + z = 5
+    
+    - İkinci denklemden birinci denklemi çıkarırsak: (x - 2y + z) - (x + y + z) = 5 - 2 => -3y = 3 => y = -1.
+        
+    - y = -1 değerini ilk denkleme yerine koyarsak: x + (-1) + z = 2 => x + z = 3.
+        
+    - Bu durumda, z'yi serbest değişken olarak seçersek (örneğin z = a), x = 3 - a olur.
+        
+    - Sistemin çözümü (3 - a, -1, a) formundaki tüm üçlülerdir (burada a herhangi bir reel sayıdır). Görüldüğü gibi **sonsuz sayıda çözüm** vardır.
+        
+- Örnek 2: 2x - y + 3z = 5, -4x + 2y - 6z = 8
+    
+    - İkinci denklem, birinci denklemin -2 katıdır: -2 * (2x - y + 3z) = -4x + 2y - 6z.
+        
+    - Ancak, sabit terimler uyuşmuyor: -2 * 5 = -10, fakat ikinci denklemde sabit terim 8'dir.
+        
+    - Bu bir çelişki (-10 ≠ 8) olduğundan, bu sistemin **çözümü yoktur**.
+        
+
+### Aşırı Belirlenmiş Sistemlerin Çözümleri (Overdetermined)
+
+Denklem sayısının bilinmeyen sayısından fazla olduğu sistemlerdir.
+
+- Bu sistemlerin genellikle **çözümü yoktur**, ancak tek bir çözümü veya sonsuz çözümü de olabilir (eğer bazı denklemler diğerlerinin lineer kombinasyonu ise).
+    
+- Örnek: 2x + y = 2, x - 2y = 5, -x + 7y = -4
+    
+    - İlk iki denklemi çözelim:
+        
+        - İlk denklemi 2 ile çarp: 4x + 2y = 4.
+            
+        - İkinci denklemle topla: (4x + 2y) + (x - 2y) = 4 + 5 => 5x = 9 => x = 9/5.
+            
+        - x = 9/5'i ilk denkleme koy: 2(9/5) + y = 2 => 18/5 + y = 10/5 => y = 10/5 - 18/5 = -8/5.
+            
+    - İlk iki denklemin ortak çözümü (x, y) = (9/5, -8/5)'dir.
+        
+    - Bu çözümü üçüncü denklemde kontrol edelim: -x + 7y = -(9/5) + 7(-8/5) = -9/5 - 56/5 = -65/5 = -13.
+        
+    - Üçüncü denklem -x + 7y = -4 olmasını gerektiriyordu, ancak biz -13 bulduk. -13 ≠ -4 olduğundan, bu nokta üçüncü denklemi sağlamaz.
+        
+    - Dolayısıyla, bu üç denklemi aynı anda sağlayan bir (x, y) çifti yoktur; sistemin **çözümü yoktur**.
+        
+    - Not: Eğer üçüncü denklem -x + 7y = -13 olsaydı, o zaman (9/5, -8/5) tüm sistemi sağlardı ve sistemin tek çözümü olurdu.
+        
+- Tıpkı 3a - 4b = 14 gibi tek bir denklemin sonsuz çözüme (sonsuz sayıda (a, b) çiftine) sahip olması gibi, belirli bir çözüm noktası (örneğin, a=5, b=2) da sonsuz sayıda farklı denklem veya denklem sistemini sağlayabilir.
+    
+
+### Doğrusal Bir Sistemin Çözüm Sayısı
+
+Doğrusal bir denklem sistemi verildiğinde, çözüm sayısı için yalnızca 3 olasılık vardır:
+
+(i) Sistemin **tek bir (özgün) çözümü** olabilir.  
+(ii) Sistemin **sonsuz sayıda çözümü** olabilir.  
+(iii) Sistemin **hiç çözümü olmayabilir**.
+
+- Sistemin en az bir çözümü varsa (durum (i) ve (ii)), bu sisteme **tutarlı (consistent)** sistem denir.
+    
+- Sistemin herhangi bir çözümü yoksa (durum (iii)), buna **tutarsız (inconsistent)** sistem denir.
+    
+
+**Neden Sonlu Sayıda (örneğin 2 veya 3 tane) Çözüm Olamaz?**
+
+Bunu 2 bilinmeyenli sistemlerin geometrik yorumuyla kolayca anlayabiliriz:  
+Her bir denklem bir doğruyu temsil eder. İki doğrunun düzlemdeki durumları şunlar olabilir:
+
+- Eğer doğrular **tek bir noktada kesişiyorsa**, sistemin tek bir çözümü vardır (Durum i).
+    
+- Eğer doğrular **üst üste çakışıyorsa** (aynı doğruysa), sistemin sonsuz çözümü vardır (Durum ii).
+    
+- Eğer doğrular **paralel ve farklıysa**, sistemin çözümü yoktur (Durum iii).
+    
+
+İki farklı doğrunun birden fazla ayrık noktada (örneğin 2 veya 3 noktada) kesişmesi mümkün değildir. Bu nedenle, bir doğrusal sistemin 2 veya 3 gibi sonlu sayıda çözümü olamaz. Bu ilke, daha yüksek boyutlardaki düzlemler ve hiperdüzlemler için de geçerlidir. Kesişimleri ya tek bir nokta, ya bir doğru/düzlem/... (sonsuz çözüm) ya da boş küme (çözüm yok) olabilir.
+
+### 2 Bilinmeyenli Sistemlerin Geometrik Yorumlanması
+
+ax + by = c biçimindeki her denklem (a, b, c sabitler ve a ile b aynı anda sıfır değil), analitik düzlemde bir **doğru**ya karşılık gelir. Bu sayede 2 bilinmeyenli sistemler geometrik olarak yorumlanabilir:
+
+![alt text](67b7315ca4f31-geometric.png)
+
+  
+(Resim: Üç durumu gösteren çizimler - Kesişen, Paralel, Çakışık doğrular)
 
 ---
 
-### [](#3-bilinmeyenli-sistemlerin-geometrik-yorumlanması)3 Bilinmeyenli Sistemlerin Geometrik Yorumlanması
+### 3 Bilinmeyenli Sistemlerin Geometrik Yorumlanması
 
-- Doğrusal denklemler sistemini 3 bilinmeyenli olarak düşündüğümüzde, bu sistemin her bir denklemi uzayda bir düzleme karşılık gelir. Üç düzlemin nasıl kesiştiğine bağlı olarak sistemin çözüm kümesi değişir.
+3 bilinmeyenli (ax + by + cz = d) bir doğrusal denklem, 3 boyutlu uzayda bir **düzlem**e karşılık gelir. 3 denklemden oluşan bir sistem, uzaydaki üç düzlemin birbirine göre konumunu inceler.
 
-#### [](#1-tutarlı-consistent-sistemler)1. Tutarlı (Consistent) Sistemler
+#### 1. Tutarlı (Consistent) Sistemler (En az bir çözüm var)
 
-Bir sistemin **tutarlı** olması, en az bir çözümü olduğu anlamına gelir. Üç düzlem için şu olasılıklar vardır:
+- Üç düzlem **tek bir noktada** kesişir. Bu nokta sistemin tek çözümüdür.
+    
 
-##### [](#11-tek-çözüm-unique-solution)1.1 Tek Çözüm (Unique Solution)
+- Üç düzlem **bir doğru boyunca** kesişir. Bu doğru üzerindeki tüm noktalar sistemin çözümüdür.
+    
 
-- Üç düzlem **tek bir noktada** kesişir.
-- Sistem **tek bir çözüm** içerir.
+- Üç düzlem tamamen **üst üste çakışıktır** (aslında tek bir düzlemdir). Bu düzlem üzerindeki tüm noktalar sistemin çözümüdür. (Not: İki düzlem çakışık, üçüncüsü bunları bir doğru boyunca kesiyorsa yine 1.2'deki durum oluşur.)
+    
 
-##### [](#12-sonsuz-çözüm---doğru-infinitely-many-solutions---line)1.2 Sonsuz Çözüm - Doğru (Infinitely Many Solutions - Line)
+#### 2. Tutarsız (Inconsistent) Sistemler (Çözüm yok)
 
-- Üç düzlem **bir doğru boyunca** kesişir.
-- Sistem **sonsuz sayıda çözüm** içerir.
+- Üç düzlem birbirine **paraleldir** ve farklıdır (veya ikisi çakışık, üçüncüsü onlara paralel ve farklıdır). Hiçbir ortak noktaları yoktur.
+    
 
-##### [](#13-sonsuz-çözüm---çakışık-düzlemler-infinitely-many-solutions---coincident-planes)1.3 Sonsuz Çözüm - Çakışık Düzlemler (Infinitely Many Solutions - Coincident Planes)
+- İki düzlem birbirine **paralel ve farklıdır**, üçüncü düzlem ise bu paralel düzlemleri (farklı doğrularda) keser. Üçünün birden ortak olduğu bir nokta yoktur.
+    
 
-- Üç düzlem tamamen **üst üste çakışıktır**.
-- Sistem **sonsuz sayıda çözüm** içerir.
+- Düzlemler birbirine paralel değildir, ancak **ikişer ikişer kesiştiklerinde oluşan üç kesişim doğrusu birbirine paraleldir** veya aynı noktada kesişmezler (üçgen prizma gibi). Üçünün birden ortak olduğu bir nokta yoktur.
+    
 
-#### [](#2-tutarsız-inconsistent-sistemler)**2. Tutarsız (Inconsistent) Sistemler**
+#### Geometrik Yorum Özeti
 
-Bir sistemin **tutarsız** olması, hiç çözümü olmadığı anlamına gelir. 3 düzlem için şu olasılıklar vardır:
+- **Tutarlı sistemler:** Düzlemlerin ortak bir noktası, doğrusu veya düzlemi vardır.
+    
+- **Tutarsız sistemler:** Düzlemlerin üçünün birden ortak olduğu hiçbir nokta yoktur.
+    
 
-##### [](#21-üç-düzlem-paralel-no-solution---parallel-planes)**2.1 Üç Düzlem Paralel (No Solution - Parallel Planes)**
+![alt text](content/uploads/67c05b596d0f4-Ekran-g--r--nt--s---2025-02-27-153057.png)
 
-- Üç düzlem birbirine **paraleldir** ve kesişmez.
-- **Sistem çözümsüzdür.**
+  
+(Resim: Tutarlı sistemler için düzlem konfigürasyonları)
 
-##### [](#22-i̇ki-düzlem-paralel-üçüncüsü-kesişmez-no-solution---two-parallel-planes)**2.2 İki Düzlem Paralel, Üçüncüsü Kesişmez (No Solution - Two Parallel Planes)**
+![alt text](content/uploads/67c05b412f8fb-Ekran-g--r--nt--s---2025-02-27-153119.png)
 
-- İki düzlem birbirine **paraleldir**, üçüncü düzlem bunları kesmez.
-- **Sistem çözümsüzdür.**
-
-##### [](#23-üç-düzlem-kesişiyor-fakat-ortak-çözüm-yok-no-solution---skew-intersections)**2.3 Üç Düzlem Kesişiyor Fakat Ortak Çözüm Yok (No Solution - Skew Intersections)**
-
-- Her düzlem diğer **iki düzlemi bir doğru boyunca keser**, fakat bu doğrular aynı noktada kesişmez.
-- **Sistem çözümsüzdür.**
-
-#### [](#sonuç)**Sonuç**
-
-- **Tutarlı sistemler** en az bir çözüme sahiptir (tekil veya sonsuz).
-- **Tutarsız sistemler** çözüme sahip değildir.
-- Sistemlerin geometrik yorumları, doğrusal cebirin temel kavramları arasında yer alır ve çözümlerin varlığını anlamada önemli bir rol oynar. ![consistent systems](content/uploads/67c05b596d0f4-Ekran-g--r--nt--s---2025-02-27-153057.png)
-
-![inconsistent systems](content/uploads/67c05b412f8fb-Ekran-g--r--nt--s---2025-02-27-153119.png)
+  
+(Resim: Tutarsız sistemler için düzlem konfigürasyonları)
 
 ---
 
@@ -196,42 +304,51 @@ Bir sistemin **tutarsız** olması, hiç çözümü olmadığı anlamına geli
 
 ---
 
-# [](#matrisler)Matrisler
+# Matrisler
 
-Lineer sistemleri sistematik bir şekilde ele almak için yeni araçlar tanımlıyoruz.
+Lineer denklem sistemlerini daha sistematik ve düzenli bir şekilde ele almak ve çözmek için **matris** adı verilen matematiksel yapıları kullanırız.
 
-## [](#matris-nedir)Matris Nedir?
+## Matris Nedir?
 
-**Matris**, sayıların dikdörtgensel bir düzen içinde yazıldığı bir yapıdır. (Bu derste aksi belirtilmedikçe "sayı" ile reel sayılar kastedilmektedir.)
+**Matris**, sayıların (veya başka matematiksel nesnelerin) dikdörtgen bir tablo şeklinde düzenlenmiş halidir. Bu derste, aksi belirtilmedikçe, matris içindeki "sayılar" reel sayıları ifade edecektir.
 
-## [](#matris-örnekleri)Matris Örnekleri
+## Matris Örnekleri
 
-Bir matrisin kaç satır ve kaç sütundan oluştuğu onun boyutunu belirler. Genel olarak, bir matris **m × n** boyutuna sahiptir. Burada:
+Bir matrisin **boyutu** (veya mertebesi), sahip olduğu satır ve sütun sayısı ile belirlenir. Genel olarak, bir matris **m × n** boyutundadır denir. Burada:
 
-- **m**, satır sayısını ifade eder.
-- **n**, sütun sayısını ifade eder.
+- **m**: Matrisin **satır** sayısını ifade eder.
+    
+- **n**: Matrisin **sütun** sayısını ifade eder.
+    
 
-### [](#örnek-matrisler)Örnek Matrisler
+### Örnek Matrisler
 
 1. **Matris A**:
     
-    A=[10π25−27110]
     
-    - **Boyut**: 2 satır × 3 sütun (**2 × 3** matrisi)
-    - **Eleman (Entry)**: Matris içindeki her sayı bir elemandır ve A toplam 6 elemana sahiptir.
-    - **Gösterim**: Matrisler köşeli parantez [] ya da yuvarlak parantez () ile gösterilebilir.
+    ]
+    
+    - **Boyut**: 2 satır × 3 sütun (**2 × 3** boyutlu matris).
+        
+    - **Eleman (Entry/Girdi)**: Matrisin içindeki her bir sayıya matrisin elemanı veya girdisi denir. Matris A'nın toplam 2 * 3 = 6 elemanı vardır.
+        
+    - **Gösterim**: Matrisler genellikle köşeli parantez [ ] veya yuvarlak parantez ( ) içine alınarak gösterilir.
+        
 2. **Matris B**:
     
-    B=[1e1sin⁡(0.5)]
     
-    - **Boyut**: 2 × 2 matrisi (**2 satır, 2 sütun**)
-    - **Kare Matris**: Satır ve sütun sayısı eşitse, bu tür matrislere **kare matris** denir. Burada B kare bir matristir.
+    
+    - **Boyut**: 2 satır × 2 sütun (**2 × 2** boyutlu matris).
+        
+    - **Kare Matris**: Satır sayısı sütun sayısına eşit olan matrislere (**m = n**) **kare matris** denir. Matris B, 2 × 2 boyutlu bir kare matristir.
+        
 
 ---
 
-✅ **Özet:**
+✅ **Özet:**
 
-- Matrisler sayıların tablosal düzenidir.
-- Boyutu **m × n** olup, satır ve sütun sayısıyla belirlenir.
-- Kare matrisler **m = n** olan matrislerdir.
-}
+- Matrisler, sayıların dikdörtgen bir tablo düzenidir.
+    
+- Bir matrisin boyutu **m × n** (m satır, n sütun) olarak ifade edilir.
+    
+- Satır ve sütun sayısı eşit olan (m = n) matrislere **kare matris** denir.
