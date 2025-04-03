@@ -10,7 +10,8 @@
         "groups": [
           
           {"group": " ",
-            "pages": ["quickstart"]
+            "pages": ["efe/home"
+          ]
           }
         ]
       },

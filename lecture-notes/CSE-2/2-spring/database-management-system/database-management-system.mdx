@@ -1,0 +1,249 @@
+---
+title: Database Management System
+description: CSE 207 Database Management System
+icon: database
+---
+
+
+
+
+Below is the detailed completion of the provided notes in both Turkish and English, formatted in markdown as requested. Each section and subsection has been expanded with comprehensive explanations and examples where applicable.
+markdown
+## Türkçe Notlar
+
+### 1. Veri Tabanı Yönetim Sistemleri
+
+#### 1.1. Veri Tabanı Yönetim Sistemleri Nedir?
+Veri Tabanı Yönetim Sistemi (VTYS), verilerin sistematik bir şekilde depolanması, organize edilmesi, yönetilmesi ve erişilmesi için tasarlanmış bir yazılım sistemidir. VTYS, kullanıcıların verileri kolayca eklemesine, güncellemesine, silmesine ve sorgulamasına olanak tanır. Aynı zamanda veri güvenliğini ve bütünlüğünü korumak için çeşitli araçlar ve mekanizmalar sunar. Örnek VTYS'ler arasında MySQL, Oracle, ve PostgreSQL bulunur.
+
+#### 1.2. Veri Tabanı Yönetim Sistemlerinin Yapısı
+VTYS'ler genellikle şu üç temel bileşenden oluşur:
+- **Veri Tabanı:** Verilerin fiziksel olarak saklandığı alan. Bu, diskler veya bulut depolama gibi fiziksel ortamlarda olabilir.
+- **Veri Tabanı Yönetim Sistemi Yazılımı:** Verilere erişim, yönetim ve sorgulama işlevlerini sağlayan ana yazılımdır. Kullanıcı ile veri tabanı arasında bir köprü görevi görür.
+- **Uygulama Programları:** Kullanıcıların VTYS ile etkileşim kurmasını sağlayan arayüzler veya yazılımlardır. Örneğin, bir web uygulaması veya masaüstü programı.
+
+#### 1.3. Veri Tabanı Yönetim Sistemlerinin Fonksiyonları
+VTYS'lerin sunduğu temel fonksiyonlar şunlardır:
+- **Veri Tanımlama:** Verilerin yapısını ve ilişkilerini belirlemek için kullanılır (örneğin, tablolar ve alanlar oluşturma).
+- **Veri Manipülasyonu:** Verilerin eklenmesi, güncellenmesi ve silinmesi gibi işlemleri kapsar.
+- **Veri Sorgulama:** Kullanıcıların belirli verilere erişmek için sorgular çalıştırmasını sağlar (örneğin, SQL ile).
+- **Veri Güvenliği:** Verilerin yetkisiz erişime karşı korunmasını sağlar (örneğin, şifreleme ve yetkilendirme).
+- **Veri Bütünlüğü:** Verilerin tutarlı ve doğru kalmasını garanti eder (örneğin, birincil anahtar kısıtlamaları).
+
+#### 1.4. Veri Tabanı Yönetim Sistemlerinin Türleri
+VTYS'ler kullanım amaçlarına ve veri saklama yöntemlerine göre farklı türlerde olabilir:
+- **İlişkisel VTYS (RDBMS):** Veriler tablolarda saklanır ve SQL ile yönetilir. Örnek: MySQL, PostgreSQL.
+- **NoSQL VTYS:** Büyük veri ve esnek yapılar için tasarlanmıştır. Örnek: MongoDB, Cassandra.
+- **Nesne Tabanlı VTYS:** Veriler nesne olarak saklanır, genellikle nesne yönelimli programlama ile uyumludur. Örnek: db4o.
+- **Hiyerarşik VTYS:** Veriler ağaç yapısında organize edilir. Örnek: IBM IMS.
+
+---
+
+### 2. SQL
+
+#### 2.1. SQL Nedir?
+SQL (Structured Query Language - Yapılandırılmış Sorgu Dili), ilişkisel veri tabanlarında verileri tanımlamak, sorgulamak, güncellemek ve yönetmek için kullanılan standart bir programlama dilidir. SQL, kullanıcıların karmaşık veri tabanı işlemlerini basit komutlarla gerçekleştirmesine olanak tanır.
+
+#### 2.2. SQL'de Veri Tanımlama
+Veri tanımlama, veri tabanı şemasını oluşturmak için kullanılır. Tablolar, sütunlar ve ilişkiler bu aşamada tanımlanır. Örnek:
+```sql
+CREATE TABLE ogrenciler (
+    id INT PRIMARY KEY,
+    ad VARCHAR(50),
+    soyad VARCHAR(50),
+    dogum_tarihi DATE
+);
+Bu komut, bir "ogrenciler" tablosu oluşturur ve her öğrenciye bir kimlik numarası, ad, soyad ve doğum tarihi atar.
+2.3. SQL'de Veri Sorgulama
+Veri sorgulama, SELECT komutu ile yapılır ve belirli verilere erişmek için kullanılır. Örnek:
+sql
+SELECT * FROM ogrenciler WHERE ad = 'Ahmet';
+Bu sorgu, adı "Ahmet" olan tüm öğrencileri döndürür.
+2.4. SQL'de Veri Güncelleme
+Veri güncelleme, mevcut verileri değiştirmek için UPDATE komutu ile gerçekleştirilir. Örnek:
+sql
+UPDATE ogrenciler SET soyad = 'Yılmaz' WHERE id = 1;
+Bu komut, kimlik numarası 1 olan öğrencinin soyadını "Yılmaz" olarak günceller.
+2.5. SQL'de Veri Silme
+Veri silme, DELETE komutu ile yapılır ve belirli verileri tablodan kaldırır. Örnek:
+sql
+DELETE FROM ogrenciler WHERE id = 1;
+Bu komut, kimlik numarası 1 olan öğrenciyi siler.
+2.6. SQL'de Veri Tablosu Oluşturma
+Yeni bir tablo oluşturmak için CREATE TABLE komutu kullanılır. Örnek:
+sql
+CREATE TABLE ogretmenler (
+    id INT PRIMARY KEY,
+    ad VARCHAR(50),
+    soyad VARCHAR(50),
+    bolum VARCHAR(50)
+);
+Bu, öğretmenler için bir tablo oluşturur.
+2.7. SQL'de Veri Tablosu Silme
+Bir tabloyu tamamen silmek için DROP TABLE komutu kullanılır. Örnek:
+sql
+DROP TABLE ogretmenler;
+Bu komut, "ogretmenler" tablosunu siler.
+2.8. SQL'de Veri Tablosu Güncelleme
+Mevcut bir tabloyu değiştirmek (örneğin, yeni sütun eklemek) için ALTER TABLE komutu kullanılır. Örnek:
+sql
+ALTER TABLE ogrenciler ADD COLUMN adres VARCHAR(100);
+Bu komut, "ogrenciler" tablosuna bir "adres" sütunu ekler.
+2.9. SQL'de Veri Tablosu Sorgulama
+Tablodaki tüm verileri görmek için SELECT komutu kullanılır. Örnek:
+sql
+SELECT * FROM ogrenciler;
+Bu sorgu, "ogrenciler" tablosundaki tüm verileri döndürür.
+2.10. SQL'de Veri Tablosu Silme
+Tabloyu silmek için tekrar DROP TABLE komutu kullanılır. Örnek:
+sql
+DROP TABLE ogrenciler;
+Bu komut, "ogrenciler" tablosunu tamamen siler.
+3. Veri Modelleme
+3.1. Veri Modelleme Nedir?
+Veri modelleme, bir veri tabanındaki verilerin yapısını, ilişkilerini ve organizasyonunu görsel olarak temsil eden bir süreçtir. Bu, veri tabanı tasarımının temel bir adımıdır ve verilerin nasıl saklanacağını ve erişileceğini planlamak için kullanılır.
+3.2. Veri Modelleme Tipleri
+Veri modelleme üç ana seviyede gerçekleştirilir:
+Kavramsal Model: Verilerin genel yapısını ve temel ilişkilerini tanımlar. Teknik detaylardan uzak, üst düzey bir bakış sunar.
+Mantıksal Model: Verilerin mantıksal yapısını (örneğin, tablolar ve ilişkiler) tanımlar. Veri tabanı türüne bağlı olmadan tasarlanır.
+Fiziksel Model: Verilerin fiziksel depolama yapısını (örneğin, dosya yapıları ve indeksler) tanımlar.
+3.3. Veri Modelleme Araçları
+Veri modellemeyi kolaylaştırmak için kullanılan araçlar şunlardır:
+ER Diyagramları (Varlık-İlişki Diyagramları): Varlıklar (örneğin, öğrenciler, öğretmenler) ve bu varlıklar arasındaki ilişkileri gösterir.
+UML Diyagramları (Birleşik Modelleme Dili): Nesne tabanlı sistemler için veri yapısını temsil eder.
+4. Veri Türleri ve İşlemler
+4.1. Veri Türleri
+Veri türleri, bir veri tabanında saklanan verilerin biçimini ve kullanımını belirler. Yaygın veri türleri:
+Integer (Tam Sayı): Tam sayılar için kullanılır (örneğin, 1, 42).
+Float (Ondalık Sayı): Ondalık sayılar için kullanılır (örneğin, 3.14).
+Varchar (Değişken Uzunlukta Metin): Metin verileri için kullanılır (örneğin, "Ahmet").
+Date (Tarih): Tarih bilgisi saklar (örneğin, 2023-10-15).
+4.2. Veri İşlemleri
+Veri işlemleri, veriler üzerinde gerçekleştirilen temel eylemlerdir:
+Ekleme: Yeni veri eklemek (örneğin, INSERT INTO ile).
+Güncelleme: Mevcut veriyi değiştirmek (örneğin, UPDATE ile).
+Silme: Veriyi kaldırmak (örneğin, DELETE ile).
+Sorgulama: Veriye erişmek veya analiz etmek (örneğin, SELECT ile).
+5. Veri Güvenliği ve İlave Konular
+5.1. Veri Güvenliği
+Veri güvenliği, verilerin yetkisiz erişime, değiştirilmeye veya silinmeye karşı korunmasını sağlayan yöntemler ve teknolojiler bütünüdür. Bu, özellikle hassas veriler (örneğin, kişisel bilgiler) için kritik öneme sahiptir.
+5.2. Veri Güvenliği Araçları
+Veri güvenliğini sağlamak için kullanılan başlıca araçlar:
+Şifreleme: Verileri şifreli bir formata dönüştürerek korur (örneğin, AES şifreleme).
+Kimlik Doğrulama: Kullanıcıların kimliğini doğrular (örneğin, parola veya biyometrik doğrulama).
+Yetkilendirme: Kullanıcıların hangi verilere erişebileceğini belirler (örneğin, rol tabanlı erişim kontrolü).
+English Notes
+1. Database Management Systems
+1.1. What is a Database Management System?
+A Database Management System (DBMS) is a software system designed to store, manage, and retrieve data efficiently. It enables users to create, update, delete, and query data while ensuring data security and integrity. Examples include MySQL, Oracle, and PostgreSQL.
+1.2. The Structure of a Database Management System
+A DBMS typically consists of three main components:
+Database: The physical location where data is stored, such as disks or cloud storage.
+Database Management System Software: The core software that facilitates access, management, and querying of the data.
+Application Programs: Interfaces or applications that allow users to interact with the DBMS, such as web apps or desktop tools.
+1.3. The Functions of a Database Management System
+The key functions of a DBMS include:
+Data Definition: Defines the structure and relationships of data (e.g., creating tables and fields).
+Data Manipulation: Handles insertion, updating, and deletion of data.
+Data Querying: Enables users to retrieve data using queries (e.g., via SQL).
+Data Security: Protects data from unauthorized access (e.g., through encryption).
+Data Integrity: Ensures data remains consistent and accurate (e.g., via primary key constraints).
+1.4. The Types of Database Management Systems
+DBMSs vary based on their purpose and data storage methods:
+Relational DBMS (RDBMS): Stores data in tables and uses SQL for management. Examples: MySQL, PostgreSQL.
+NoSQL DBMS: Designed for big data and flexible structures. Examples: MongoDB, Cassandra.
+Object-Oriented DBMS: Stores data as objects, often used with object-oriented programming. Example: db4o.
+Hierarchical DBMS: Organizes data in a tree-like structure. Example: IBM IMS.
+2. SQL
+2.1. What is SQL?
+SQL (Structured Query Language) is a standardized language used to define, query, update, and manage data in relational databases. It allows users to perform complex database operations with simple commands.
+2.2. Data Definition in SQL
+Data definition involves creating the database schema, including tables, columns, and relationships. Example:
+sql
+CREATE TABLE students (
+    id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    birth_date DATE
+);
+This command creates a "students" table with an ID, first name, last name, and birth date.
+2.3. Data Querying in SQL
+Data querying is performed using the SELECT command to retrieve specific data. Example:
+sql
+SELECT * FROM students WHERE first_name = 'John';
+This query returns all students named "John."
+2.4. Data Updating in SQL
+Data updating modifies existing data using the UPDATE command. Example:
+sql
+UPDATE students SET last_name = 'Smith' WHERE id = 1;
+This updates the last name of the student with ID 1 to "Smith."
+2.5. Data Deletion in SQL
+Data deletion removes data from a table using the DELETE command. Example:
+sql
+DELETE FROM students WHERE id = 1;
+This deletes the student with ID 1.
+2.6. Data Table Creation in SQL
+A new table is created using the CREATE TABLE command. Example:
+sql
+CREATE TABLE teachers (
+    id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    department VARCHAR(50)
+);
+This creates a table for teachers.
+2.7. Data Table Deletion in SQL
+A table is deleted using the DROP TABLE command. Example:
+sql
+DROP TABLE teachers;
+This deletes the "teachers" table.
+2.8. Data Table Update in SQL
+A table is modified (e.g., adding a column) using the ALTER TABLE command. Example:
+sql
+ALTER TABLE students ADD COLUMN address VARCHAR(100);
+This adds an "address" column to the "students" table.
+2.9. Data Table Querying in SQL
+All data in a table is retrieved using the SELECT command. Example:
+sql
+SELECT * FROM students;
+This returns all data from the "students" table.
+2.10. Data Table Deletion in SQL
+A table is deleted using the DROP TABLE command. Example:
+sql
+DROP TABLE students;
+This deletes the "students" table.
+3. Data Modeling
+3.1. What is Data Modeling?
+Data modeling is the process of creating a visual representation of data structures, relationships, and organization within a database. It is a critical step in database design to plan how data will be stored and accessed.
+3.2. Data Modeling Types
+Data modeling occurs at three levels:
+Conceptual Model: Defines the high-level structure and relationships of data, independent of technical details.
+Logical Model: Specifies the logical structure (e.g., tables and relationships), independent of the database type.
+Physical Model: Details the physical storage structure (e.g., file systems and indexes).
+3.3. Data Modeling Tools
+Tools that facilitate data modeling include:
+ER Diagrams (Entity-Relationship Diagrams): Illustrate entities (e.g., students, teachers) and their relationships.
+UML Diagrams (Unified Modeling Language): Represent data structures for object-oriented systems.
+4. Data Types and Operations
+4.1. Data Types
+Data types define the format and usage of data in a database. Common types include:
+Integer: Whole numbers (e.g., 1, 42).
+Float: Decimal numbers (e.g., 3.14).
+Varchar: Variable-length text (e.g., "John").
+Date: Date values (e.g., 2023-10-15).
+4.2. Data Operations
+Data operations are the core actions performed on data:
+Insertion: Adding new data (e.g., using INSERT INTO).
+Updating: Modifying existing data (e.g., using UPDATE).
+Deletion: Removing data (e.g., using DELETE).
+Querying: Retrieving or analyzing data (e.g., using SELECT).
+5. Data Security and Additional Topics
+5.1. Data Security
+Data security involves protecting data from unauthorized access, modification, or deletion. It is vital for safeguarding sensitive information, such as personal or financial data.
+5.2. Data Security Tools
+Key tools for ensuring data security include:
+Encryption: Converts data into a secure format (e.g., AES encryption).
+Authentication: Verifies user identity (e.g., passwords or biometrics).
+Authorization: Controls user access rights (e.g., role-based access control).
+
+This response provides a detailed and self-contained explanation of each section and subsection in both Turkish and English, formatted in markdown for clarity and readability. Examples and additional details have been included to enhance understanding.
