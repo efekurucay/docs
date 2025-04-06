@@ -3,304 +3,1124 @@ title: Computer Organization
 description: CSE 206 Computer Organization
 icon: computer
 ---
+## Türkçe
+### Ders Materyali
+
+*   **Ders Kitapları:**
+    *   **Ana Kitap:** `Computer Organization and Architecture, Designing for Performance`, 10. baskı, William Stallings, Prentice Hall, 2016
+        *   **Ek Açıklama:** Dersin ana kaynağı bu kitaptır. Konu anlatımları ve sıralama genellikle bu kitaba göre olacaktır.
+    *   `Computer System Architecture`, 3. Baskı, M. Morris Mano
+        *   **Ek Açıklama:** Özellikle dijital mantık ve temel mimari konularında faydalı olabilecek klasik bir kaynaktır.
+    *   `Structured Computer Organization`, 6. baskı, Andrew S. Tannenbaum, Prentice Hall, 2013
+        *   **Ek Açıklama:** Farklı bir bakış açısı ve organizasyon yapısı sunan önemli bir alternatiftir.
+    *   `Assembly Language for x86 Processors`, Global Edition, 7/E, Kip R. Irvine, 2015, Pearson
+        *   **Ek Açıklama:** Dönemin son haftalarında işlenecek Assembly dili konuları için kullanılacak kitaptır.
+
 ---
- TÜRKÇE
+
+
+### Açıklama (Ders İçeriği)
+
+*   Basit bir saklı programlı bilgisayarın organizasyonu:
+    *   CPU (Merkezi İşlem Birimi), Veri Yolları (Busses) ve Bellek.
+*   Komut setleri.
+*   Makine kodu ve assembly dili.
+*   Derleyiciler tarafından üretilen assembly dili için kurallar/gelenekler.
+*   Kayan nokta sayı gösterimi.
+*   Basit işlemcilerin donanım organizasyonu.
+*   Adres çevrimi ve sanal bellek.
+    *   **Ek Açıklama:** Bu liste, derste ele alınacak ana konu başlıklarını özetlemektedir. Ders, bilgisayarın en temel donanım ve yazılım etkileşimlerinden başlayarak, komutların nasıl işlendiği, verilerin nasıl temsil edildiği ve belleğin nasıl yönetildiği gibi konuları kapsayacaktır.
+
 ---
-##   Türkçe Notlar
 
-Temel Kavramlar ve Tanımlar:
+### HEDEF (1/3)
 
-•
+*   **Temel bilgisayar organizasyonu anlayışı:**
+    *   İşlemcilerin, ana belleğin ve giriş/çıkış aygıtlarının rolleri.
+    *   Programların makine komutları dizisi olarak kavranması konseptinin anlaşılması.
+    *   Assembly dili ve makine dili arasındaki ilişkinin anlaşılması.
+    *   Assembly dili programlamada beceri geliştirilmesi; yüksek seviyeli derlenmiş diller ile assembly dili arasındaki ilişkinin anlaşılması.
+    *   **Ek Açıklama:** Bu hedefler, dersin sonunda öğrencilerin bilgisayarın temel bileşenlerini ve nasıl çalıştıklarını anlamalarını amaçlamaktadır. Özellikle programların donanım seviyesinde nasıl komutlara dönüştüğünü ve assembly dilinin bu süreçteki yerini kavramak önemlidir.
 
-Bilgisayar Mimarisi (Computer Architecture): Programcı tarafından görülebilen ve programın mantıksal yürütülmesini doğrudan etkileyen sistemin özelliklerini tanımlar. Bunlar arasında komut seti, çeşitli veri tiplerini temsil etmek için kullanılan bit sayısı, giriş/çıkış (G/Ç) mekanizmaları ve bellek adresleme teknikleri bulunur1 .... Başka bir deyişle, bir programcının bilgisayarı nasıl gördüğüdür.
+---
 
-•
+### HEDEF (2/3)
 
-Bilgisayar Organizasyonu (Computer Organization): Mimarinin belirtimlerini gerçekleştiren operasyonel birimleri ve bunların birbirleriyle olan bağlantılarını ifade eder. Programcı tarafından doğrudan görülmeyen donanım detayları, kontrol sinyalleri ve bilgisayar ile çevre birimleri arasındaki arayüzler bu kapsamdadır1 .... Yani, mimarinin fiziksel olarak nasıl hayata geçirildiğidir.
+*   **Temel bilgisayar organizasyonu anlayışı:**
+    *   Tamsayı operandlarla **aritmetik** ve **mantıksal** işlemlerin anlaşılması.
+    *   **Kayan nokta sayı sistemleri** ve işlemlerinin anlaşılması.
+    *   İşlemciler için basit **veri yolu (data path)** ve **kontrol tasarımlarının** anlaşılması.
+    *   **Önbellek (cache)** yapıları ve sanal bellek şemaları dahil olmak üzere **bellek organizasyonunun** anlaşılması.
+    *   **Ek Açıklama:** Bu bölümde hedefler daha spesifikleşiyor. Sayıların bilgisayarda nasıl temsil edildiği (tamsayı, kayan nokta) ve işlemcinin bu sayılarla nasıl işlem yaptığı (aritmetik/mantık), verinin işlemci içinde nasıl aktığı (veri yolu) ve komutların nasıl yürütüldüğü (kontrol tasarımı) ile belleğin verimli kullanımı için kullanılan teknikler (önbellek, sanal bellek) öğrenilecektir.
 
-•
+---
 
-Yapı (Structure): Bir sistemdeki bileşenlerin birbirleriyle olan ilişkilenme biçimidir3 ....
+### HEDEF (3/3)
 
-•
+*   **Temel bilgisayar organizasyonu anlayışı:**
+    *   Ders, temel makine mimarisi ve tasarımı, dijital mantık devreleri, dijital bileşenler, merkezi işlem birimi, komutların ve verilerin makine düzeyinde temsili, adresleme teknikleri, bellek organizasyonu ve komutların makine düzeyinde yürütülmesini içerir.
+    *   **Ek Açıklama:** Bu hedef, önceki hedefleri toparlayarak dersin geniş kapsamını özetler. Dijital devrelerden başlayarak, bileşenlerin nasıl bir araya geldiği, komutların nasıl kodlandığı, verilere nasıl erişildiği ve tüm sistemin makine seviyesinde nasıl çalıştığı bütüncül bir şekilde ele alınacaktır.
 
-Fonksiyon (Function): Tek tek bileşenlerin yapı içerisinde bir parçası olarak gerçekleştirdiği operasyondur3 .... Bir bilgisayarın temel olarak gerçekleştirebileceği dört temel fonksiyon vardır:
 
-◦
+### Bölüm 1: Temel Kavramlar ve Bilgisayar Evrimi
 
-Veri İşleme (Data processing): Geniş bir formda olabilen verilerin çeşitli gereksinimlere göre işlenmesi5 .
+*   **Ek Açıklama:** Dersin içeriğine giriş yapılmaktadır. Bu bölümde bilgisayar mimarisi ile organizasyonu arasındaki fark, bilgisayarın temel yapısı, fonksiyonları ve tarihsel gelişimi ele alınacaktır.
 
-◦
+---
 
-Veri Saklama (Data storage): Kısa ve uzun süreli veri depolama5 .
+### Bilgisayar Mimarisi vs. Bilgisayar Organizasyonu
 
-◦
+**Bilgisayar Mimarisi**
+*   Bir sistemin **programcı tarafından görülebilen** öznitelikleri.
+*   Bir programın mantıksal yürütülmesi üzerinde doğrudan etkisi vardır.
+*   **Mimari öznitelikler şunları içerir:**
+    *   Komut seti
+    *   Veri tiplerini temsil etmek için kullanılan bit sayısı
+    *   G/Ç mekanizmaları
+    *   Belleğe adresleme teknikleri
 
-Veri Hareketi (Data movement): Bilgisayar ile doğrudan bağlı olan çevre birimleri arasında veri alışverişi (Giriş/Çıkış - I/O) ve uzak mesafelerdeki cihazlarla veri iletişimi (Veri iletişimi - Data communications)5 .
+**Bilgisayar Organizasyonu**
+*   Donanım detaylarının **programcıya şeffaf (görünmez)** olması.
+*   Kontrol sinyalleri, bilgisayar ve çevre birimleri arasındaki arayüzler, kullanılan bellek teknolojisi.
+*   **Organizasyonel öznitelikler şunları içerir:**
+    *   Mimari özellikleri gerçekleştiren operasyonel birimler ve bunların ara bağlantıları.
 
-◦
+**(Ortadaki Diyagramın Açıklaması):** Mimari (Architectural) öznitelikler (ne olduğu) ve Organizasyonel (Organizational) öznitelikler (nasıl yapıldığı) birbirini tamamlar ve birlikte bir bilgisayar sistemini oluşturur. Mimari, programcının etkileşimde bulunduğu soyut arayüz iken, organizasyon bu arayüzün donanımda nasıl hayata geçirildiğidir.
 
-Kontrol (Control): Bir kontrol birimi (control unit) aracılığıyla bilgisayarın kaynaklarının yönetilmesi ve fonksiyonel parçalarının talimatlara yanıt olarak çalıştırılması5 .
+*   **Ek Açıklama:** Bu ayrım çok önemlidir. **Mimari**, bir bilgisayarın programcı açısından ne yapabildiğidir (örneğin, hangi komutları anladığı). **Organizasyon** ise bu işlevlerin donanım seviyesinde nasıl gerçekleştirildiğidir (örneğin, komutları işlemek için hangi devrelerin nasıl bağlandığı). Aynı mimariye sahip farklı bilgisayarlar (örneğin, farklı hızlarda çalışan Intel işlemciler) farklı organizasyonlara sahip olabilirler.
 
-Bilgisayarın Evrimi ve Performans:
+---
 
-•
+### IBM System/370 Mimarisi
 
-Bilgisayar Nesilleri: Bilgisayar teknolojisindeki önemli değişimleri ve gelişmeleri ifade eder6 .... Kaynaklarda bahsedilen ilk nesiller şunlardır:
+*   IBM System/370 mimarisi:
+    *   1970 yılında tanıtıldı.
+    *   Bir dizi model içeriyordu.
+    *   Müşteriler, orijinal yazılımlarını terk etmek zorunda kalmadan daha pahalı, daha hızlı bir modele yükseltme yapabiliyordu.
+    *   Yeni modeller geliştirilmiş teknolojiyle tanıtıldı, ancak müşterinin yazılım yatırımını korumak için aynı mimariyi korudular.
+    *   Mimari, IBM'in ana bilgisayar (mainframe) ürün hattının mimarisi olarak günümüze kadar hayatta kalmıştır.
+    *   **Ek Açıklama:** IBM System/360 ve devamı olan 370, bilgisayar tarihinde bir dönüm noktasıdır. Çünkü ilk defa farklı fiyat ve performans seviyelerinde, ancak aynı yazılımı çalıştırabilen uyumlu bir bilgisayar "ailesi" sunmuştur. Bu, mimari ve organizasyon ayrımının ticari başarısını gösteren önemli bir örnektir. Sağdaki resim, tipik bir System/370 ana bilgisayarını göstermektedir.
 
-◦
+---
 
-Birinci Nesil (Vakum Tüpleri): ENIAC gibi ilk elektronik dijital bilgisayarlar vakum tüplerini kullanmıştır7 ....
+### Yapı ve Fonksiyon
 
-◦
+*   **Hiyerarşik sistem:**
+    *   Birbirleriyle ilişkili alt sistemler kümesi.
+*   Karmaşık sistemlerin hiyerarşik doğası, hem tasarımları hem de açıklamaları için esastır.
+*   Tasarımcı, belirli bir zamanda sistemin yalnızca belirli bir seviyesiyle ilgilenmelidir.
+    *   Her seviyede **yapı** ve **fonksiyon** ile ilgilenilir.
+*   **Yapı (Structure):**
+    *   Bileşenlerin birbirleriyle nasıl ilişkili olduğu.
+*   **Fonksiyon (Function):**
+    *   Bireysel bileşenlerin yapının bir parçası olarak çalışması.
+    *   **Ek Açıklama:** Bilgisayarlar gibi karmaşık sistemleri anlamak ve tasarlamak için onları hiyerarşik olarak (katman katman) düşünürüz. Her katmanda, o katmanı oluşturan parçaların neler olduğuna (**yapı**) ve bu parçaların ne iş yaptığına (**fonksiyon**) bakarız. Örneğin, bilgisayarın en üst seviye yapısı CPU, Bellek, G/Ç iken, CPU'nun yapısı ALU, Kontrol Birimi, Kaydedicilerdir.
 
-İkinci Nesil (Transistörler): 1947'de Bell Labs'da icat edilen transistörler, vakum tüplerine göre daha küçük, ucuz ve daha az ısı yayan bir teknoloji sunmuştur6 ....
+---
 
-◦
+### Fonksiyon (Bilgisayarın Temel İşlevleri)
 
-Üçüncü Nesil (Entegre Devreler - Integrated Circuits): 1958'de mikroelektronik alanındaki devrimle birlikte entegre devreler ortaya çıkmıştır. Tek bir silikon yonga üzerinde birçok transistörün üretilebilmesi mümkün hale gelmiştir9 ....
+Bir bilgisayarın gerçekleştirebileceği dört temel işlev vardır:
 
-◦
+1.  **Veri İşleme (Data Processing):**
+    *   Veri çok çeşitli formlarda olabilir ve işleme gereksinimlerinin aralığı geniştir.
+2.  **Veri Saklama (Data Storage):**
+    *   Kısa vadeli (Short-term) - Örn: Ana Bellek (RAM)
+    *   Uzun vadeli (Long-term) - Örn: Sabit Disk (HDD), SSD
+3.  **Veri Hareketi (Data Movement):**
+    *   **Giriş-Çıkış (Input-output - I/O):** Verilerin doğrudan bilgisayara bağlı bir cihazdan (çevre birimi) alındığı veya bu cihaza gönderildiği durumlar.
+    *   **Veri İletişimi (Data Communications):** Verilerin daha uzun mesafelerde, uzak bir cihaza veya cihazdan taşındığı durumlar.
+4.  **Kontrol (Control):**
+    *   Bir kontrol birimi, bilgisayarın kaynaklarını yönetir ve komutlara yanıt olarak işlevsel parçalarının performansını düzenler (orkestra şefi gibi).
+    *   **Ek Açıklama:** Bir bilgisayarın yaptığı her şey bu dört temel işlevden birine veya birkaçının birleşimine girer. Hesaplama yapmak (işleme), sonucu geçici olarak saklamak (saklama), sonucu ekrana göndermek (hareket) ve tüm bu adımları yönetmek (kontrol) gibi.
 
-Sonraki Nesiller: Büyük ölçekli entegrasyon (LSI) ve çok büyük ölçekli entegrasyon (VLSI) gibi teknolojilerle işlemci ve bellek yoğunluğu sürekli artmıştır6 .
+---
 
-•
+### Yapı (Üst Seviye)
+
+**(Şekil 1.4 - Bilgisayarın Üst Seviye Yapısı Açıklaması):**
+
+*   **Bilgisayar (COMPUTER):** En dış katman.
+    *   **G/Ç (I/O):** Giriş/Çıkış birimleri.
+    *   **Ana Bellek (Main Memory):** Veri ve programları saklar.
+    *   **CPU (Central Processing Unit - Merkezi İşlem Birimi):** Hesaplama ve kontrol merkezi.
+    *   **Sistem Veri Yolu (System Bus):** Bu üç ana bileşen arasındaki iletişimi sağlar.
+*   **CPU Detayı:**
+    *   **Kaydediciler (Registers):** CPU içindeki çok hızlı, küçük depolama alanları.
+    *   **ALU (Arithmetic Logic Unit - Aritmetik Mantık Birimi):** Hesaplamaları yapar.
+    *   **Kontrol Birimi (Control Unit):** Komutları yorumlar ve CPU'nun çalışmasını yönetir.
+    *   **Dahili Veri Yolu (Internal Bus):** CPU içindeki bileşenler arası iletişimi sağlar.
+*   **Kontrol Birimi Detayı:**
+    *   **Sıralama Mantığı (Sequencing Logic):** Komut adımlarını belirler.
+    *   **Kontrol Birimi Kaydedicileri ve Kod Çözücüler (Control unit registers and decoders):** Komutları anlamak ve kontrol sinyalleri üretmek için kullanılır.
+    *   **Kontrol Belleği (Control Memory):** (Bazı tasarımlarda) Kontrol sinyallerini üretmek için mikroprogramları saklar.
+
+*   **Ek Açıklama:** Bu şekil, bir bilgisayarın hiyerarşik yapısını görselleştirir. En tepede ana bileşenler ve aralarındaki sistem veri yolu bulunur. Daha sonra CPU'nun içine bakıldığında ALU, kontrol birimi ve kaydediciler görülür. Kontrol biriminin de kendi içinde daha detaylı bir yapısı vardır. Bu katmanlı yapı, karmaşıklığı yönetmeyi kolaylaştırır.
+
+---
+
+### Yapısal Bileşenler (Ana)
+
+Bilgisayarın dört ana yapısal bileşeni vardır:
+
+1.  **CPU (Central Processing Unit - Merkezi İşlem Birimi):** Bilgisayarın çalışmasını kontrol eder ve veri işleme fonksiyonlarını gerçekleştirir.
+2.  **Ana Bellek (Main Memory):** Verileri saklar.
+3.  **G/Ç (I/O - Input/Output):** Bilgisayar ile dış ortamı arasında veri taşır.
+4.  **Sistem Ara Bağlantısı (System Interconnection):** CPU, ana bellek ve G/Ç arasında iletişim sağlayan mekanizma (genellikle veri yolları - buses).
+    *   **(Resim Açıklaması):** Sağdaki karikatürvari çizim, bu dört ana bileşenin bir bilgisayar kasası içinde nasıl bir arada bulunduğunu temsil etmektedir.
 
-Moore Yasası (Moore's Law): Intel'in kurucu ortağı Gordon Moore tarafından 1965'te öne sürülen bu yasa, bir yonga üzerindeki transistör sayısının yaklaşık olarak her 18-24 ayda ikiye katlanacağını öngörür11 .... Bu durum, işlemci hızlarının ve kapasitelerinin sürekli artmasına yol açmıştır.
+*   **Ek Açıklama:** Bu dört bileşen, modern bir bilgisayarın temel taşlarıdır. Tüm işlemler bu bileşenler ve aralarındaki etkileşimler üzerine kuruludur.
 
-•
+---
 
-Performans Tasarımı: Bilgisayar performansını etkileyen faktörler şunlardır15 :
+### CPU (Merkezi İşlem Birimi)
+
+Ana yapısal bileşenleri:
+
+1.  **Kontrol Birimi (Control Unit):**
+    *   CPU'nun ve dolayısıyla bilgisayarın çalışmasını kontrol eder.
+2.  **Aritmetik ve Mantık Birimi (Arithmetic and Logic Unit - ALU):**
+    *   Bilgisayarın veri işleme fonksiyonunu gerçekleştirir (toplama, çıkarma, AND, OR vb.).
+3.  **Kaydediciler (Registers):**
+    *   CPU içinde dahili depolama sağlar (çok hızlı erişim).
+4.  **CPU Ara Bağlantısı (CPU Interconnection):**
+    *   Kontrol birimi, ALU ve kaydediciler arasında iletişim sağlayan mekanizma (dahili veri yolları).
+    *   **(Resim Açıklaması):** Slayttaki resimler, modern işlemcileri (CPU'ları) fiziksel olarak göstermektedir.
 
-◦
+*   **Ek Açıklama:** CPU, bilgisayarın "beyni" olarak kabul edilir. Kontrol Birimi ne yapılacağını söyler, ALU hesaplamaları yapar, Kaydediciler ise işlem sırasında gerekli olan verileri geçici olarak tutar.
 
-Mikroişlemci Hızı (Microprocessor Speed): İşlemcinin komutları ne kadar hızlı işleyebildiği.
+---
 
-◦
+### Çok Çekirdekli Bilgisayar Yapısı
 
-Performans Dengesi (Performance Balance): İşlemci, bellek ve G/Ç sistemleri arasındaki performans uyumu.
+*   **Merkezi İşlem Birimi (CPU - Central Processing Unit):**
+    *   Komutları getiren (fetch) ve yürüten (execute) bilgisayar bölümü.
+    *   Bir ALU, bir kontrol birimi ve kaydedicilerden oluşur.
+    *   Tek işlem birimine sahip bir sistemde "işlemci" (processor) olarak adlandırılır.
+*   **Çekirdek (Core):**
+    *   Bir işlemci yongası (chip) üzerindeki bireysel işlem birimi.
+    *   İşlevsellik olarak tek CPU'lu bir sistemdeki CPU'ya eşdeğer olabilir.
+    *   Özelleşmiş işlem birimleri de "çekirdek" olarak adlandırılır (örn: grafik işlemci çekirdekleri).
+*   **İşlemci (Processor):**
+    *   Bir veya daha fazla çekirdek içeren fiziksel bir silikon parçası.
+    *   Komutları yorumlayan ve yürüten bilgisayar bileşenidir.
+    *   Birden fazla çekirdek içeriyorsa **çok çekirdekli işlemci (multicore processor)** olarak adlandırılır.
+    *   **(Resim Açıklaması):** Sağdaki resim, Intel Pentium Dual-Core (çift çekirdekli) bir işlemcinin fiziksel görünümünü göstermektedir.
+
+*   **Ek Açıklama:** Modern işlemcilerin çoğu "çok çekirdekli"dir. Bu, tek bir fiziksel işlemci yongasının içinde birden fazla bağımsız işlem birimi (çekirdek) bulunduğu anlamına gelir. Bu sayede bilgisayar aynı anda birden fazla işi daha verimli bir şekilde yapabilir.
+
+---
+
+### Önbellek Bellek (Cache Memory)
+
+*   İşlemci ile ana bellek arasında birden fazla bellek katmanı bulunur.
+*   Ana bellekten daha **küçük** ve daha **hızlıdır**.
+*   Yakın gelecekte kullanılması muhtemel olan verileri ana bellekten önbelleğe yerleştirerek bellek erişimini **hızlandırmak** için kullanılır.
+*   Çekirdeğe en yakın seviye 1 (L1) ve çekirdekten giderek uzaklaşan ek seviyeler (L2, L3, vb.) ile birden fazla önbellek seviyesi kullanılarak daha büyük bir performans artışı elde edilebilir.
+    *   **Ek Açıklama:** İşlemciler ana bellekten çok daha hızlıdır. Bu hız farkını kapatmak için araya küçük ama çok hızlı olan önbellekler konulur. İşlemci bir veriye ihtiyaç duyduğunda önce en yakın (L1) önbelleğe bakar. Eğer veri oradaysa (cache hit), çok hızlı alır. Orada yoksa (cache miss), bir sonraki seviyeye (L2), sonra L3'e ve en son ana belleğe bakar. Veri bulunduğunda hem işlemciye gönderilir hem de daha hızlı erişim için önbellek katmanlarına kopyalanır. Bu işlem "bellek hiyerarşisi" olarak bilinir.
+
+---
+
+### Çok Çekirdekli Bilgisayarın Elemanları (Basitleştirilmiş Görünüm)
+
+**(Şekil 1.2 Açıklaması):**
+
+*   **Anakart (MOTHERBOARD):**
+    *   Ana bellek yongaları (Main memory chips)
+    *   G/Ç yongaları (I/O chips)
+    *   İşlemci yongası (Processor chip)
+*   **İşlemci Yongası (PROCESSOR CHIP):**
+    *   Birden fazla Çekirdek (Core)
+    *   Paylaşımlı L3 önbellek (L3 cache)
+*   **Çekirdek (CORE):**
+    *   Komut mantığı (Instruction logic)
+    *   Aritmetik ve mantık birimi (ALU)
+    *   Yükleme/Saklama mantığı (Load/store logic)
+    *   L1 Komut önbelleği (L1 I-cache)
+    *   L1 Veri önbelleği (L1 D-cache)
+    *   L2 komut önbelleği (L2 instruction cache - bazen L1 ile birleşik olur)
+    *   L2 veri önbelleği (L2 data cache - bazen L1 ile birleşik olur)
+    *   **Ek Açıklama:** Bu şema, önceki slaytlarda bahsedilen bileşenlerin nasıl bir araya geldiğini gösterir. Anakart üzerinde işlemci bulunur. İşlemcinin içinde birden fazla çekirdek ve genellikle paylaşılan bir L3 önbellek vardır. Her çekirdeğin kendi içinde ise ALU, kontrol mantığı ve kendine ait L1 ve L2 önbellekleri bulunur. L1 genellikle komut ve veri için ayrıdır (Harvard mimarisi yaklaşımı), L2 ve L3 ise genellikle birleşiktir (Unified cache).
+
+---
+
+### Anakart Örneği (İki Intel Dört Çekirdekli Xeon İşlemci ile)
+
+**(Şekil 1.3 Açıklaması):**
+
+*   Bu resim, sunucu veya iş istasyonu sınıfı bir anakartı göstermektedir.
+*   **Ana Bileşenler:**
+    *   İki adet Dört Çekirdekli Intel Xeon İşlemci soketi (her biri kendi soğutucusuyla)
+    *   Entegre Bellek Denetleyicileri (İşlemcilerin üzerinde)
+    *   Altı Kanal DDR3 Bellek Yuvaları (RAM takılır)
+    *   Intel 3420 Yongaseti (Chipset) - Anakartın diğer bileşenlerini yönetir.
+    *   PCI Express Konnektörleri (Genişletme kartları için - ekran kartı vb.)
+    *   Güç ve Arka Panel G/Ç Konnektörü
+    *   SATA Arayüzleri (Sabit diskler, SSD'ler için)
+    *   USB Portları (Dahili ve Harici)
+    *   VGA Video Çıkışı
+    *   BIOS yongası
+    *   Ethernet Portları ve Denetleyici
+
+*   **Ek Açıklama:** Bu gerçek dünya örneği, teorik yapıların fiziksel olarak nasıl karmaşık ve entegre bir şekilde anakart üzerinde yer aldığını göstermektedir. Farklı bileşenler arasındaki bağlantılar (veri yolları) anakart üzerindeki iletken yollarla sağlanır.
+
+---
+
+### zEnterprise EC12 İşlemci Birimi (PU) Yongası Diyagramı
+
+**(Şekil 1.4 Açıklaması):**
+
+*   Bu resim, IBM'in yüksek performanslı bir ana bilgisayar (mainframe) işlemcisinin yonga (die) fotoğrafıdır.
+*   **Görünen Yapılar:**
+    *   Birden fazla **CORE** (İşlemci Çekirdekleri - Toplam 6 tane aktif görünüyor)
+    *   Büyük **L3 Cache** (Önbellek) alanları (Çekirdekler arasında paylaşılır)
+    *   **L3 Control** (L3 Önbellek Kontrol Mantığı)
+    *   **SC i/o** (System Control I/O - Sistem Kontrol Giriş/Çıkış Arayüzleri)
+    *   **G X i/o** ve **M C i/o** (Muhtemelen diğer çip dışı bağlantı arayüzleri)
+
+*   **Ek Açıklama:** Bu, çok çekirdekli tasarımın başka bir örneğidir, ancak bu sefer masaüstü veya sunucu işlemcilerinden ziyade büyük ölçekli, görev kritik sistemler için tasarlanmış bir mainframe işlemcisidir. Çok sayıda çekirdek ve devasa önbellek kapasitesi dikkat çekicidir.
+
+---
+
+### Anakart Düzeni (Örnek: ASUS P5KPL-AM SE)
+
+**(Şekil 1.5.3 ve Tablo Açıklaması):**
+
+*   Bu slayt, tipik bir masaüstü bilgisayar anakartının (ASUS P5KPL-AM SE modeli) düzenini ve üzerindeki önemli konnektör/yuvaları göstermektedir.
+*   **Tablodaki Önemli Parçalar:**
+    *   ATX Güç Konnektörleri (Anakarta güç sağlar)
+    *   LGA775 CPU Soketi (İşlemcinin takıldığı yer)
+    *   DDR2 DIMM Yuvaları (RAM modüllerinin takıldığı yer)
+    *   CPU ve Kasa Fan Konnektörleri
+    *   SATA Konnektörleri (Modern diskler için)
+    *   IDE Konnektörü (Eski tip diskler/CD-ROM için)
+    *   Clear RTC RAM Jumper'ı (BIOS ayarlarını sıfırlamak için)
+    *   USB Konnektörleri (Kasa ön paneli USB portları için)
+    *   Sistem Paneli Konnektörü (Güç düğmesi, reset düğmesi, LED'ler için)
+    *   Ses Konnektörleri (Ön panel ve optik sürücü için)
+*   **Diyagramdaki Önemli Parçalar (Numaralandırılmış):**
+    *   Klavye/Mouse (KBMS - PS/2 portları)
+    *   ATX 12V Güç Konnektörü (CPU için ek güç)
+    *   CPU Soketi (LGA775)
+    *   DDR2 Bellek Yuvaları
+    *   SATA Portları
+    *   Arka Panel Portları (VGA, COM, USB, LAN, Ses)
+    *   PCI Express x16 Yuvası (Ekran kartı için)
+    *   PCI Yuvası (Eski genişletme kartları için)
+    *   Yongaseti (Intel G31 - Kuzey Köprüsü, Intel ICH7 - Güney Köprüsü)
+    *   BIOS Pili
+
+*   **Ek Açıklama:** Bu detaylı şema, bir anakart üzerindeki çok sayıda bileşeni, yuva ve konnektörü tanımlar. Bilgisayarın farklı parçalarının nereye bağlandığını anlamak için önemlidir. Tablodaki sayfa numaraları, anakartın kullanım kılavuzundaki ilgili bölümlere referans vermektedir.
+
+---
+
+### Bilgisayar Tarihi
+
+#### İlk Nesil: Vakum Tüpleri (First Generation: Vacuum Tubes)
+
+*   Dijital mantık elemanları ve bellek için **vakum tüpleri** kullanıldı.
+*   **IAS Bilgisayarı:**
+    *   Temel tasarım yaklaşımı **saklı program kavramı (stored program concept)** idi.
+        *   Matematikçi **John von Neumann**'a atfedilir.
+        *   Fikrin ilk yayını 1945'te EDVAC (başka bir erken bilgisayar) içindi.
+    *   Tasarım Princeton İleri Araştırmalar Enstitüsü'nde başladı.
+    *   1952'de tamamlandı.
+    *   Sonraki tüm genel amaçlı bilgisayarların prototipi oldu.
+    *   **(Resim Açıklaması):** Sağdaki resim bir vakum tüpünü göstermektedir.
+
+*   **Ek Açıklama:** İlk bilgisayarlar, bugünkü transistörlerin veya entegre devrelerin yerine, büyük, çok enerji tüketen ve sık sık arızalanan vakum tüplerini kullanıyordu. IAS bilgisayarı ve von Neumann mimarisi (programın ve verinin aynı bellekte saklanması fikri) modern bilgisayarların temelini atmıştır.
+
+---
+
+### IAS Yapısı
+
+**(Şekil 1.6 IAS Yapısı Açıklaması):**
+
+*   **Merkezi İşlem Birimi (CPU - Central processing unit):**
+    *   **Aritmetik-Mantık Birimi (CA - Arithmetic-logic unit):**
+        *   AC (Accumulator - Akümülatör Kaydedicisi)
+        *   MQ (Multiplier-Quotient - Çarpma-Bölme Kaydedicisi)
+        *   Aritmetik-mantık devreleri
+        *   MBR (Memory Buffer Register - Bellek Tampon Kaydedicisi)
+    *   **Program Kontrol Birimi (CC - Program control unit):**
+        *   IBR (Instruction Buffer Register - Komut Tampon Kaydedicisi)
+        *   PC (Program Counter - Program Sayacı)
+        *   MAR (Memory Address Register - Bellek Adres Kaydedicisi)
+        *   IR (Instruction Register - Komut Kaydedicisi)
+        *   Kontrol Devreleri ve Sinyalleri
+*   **Ana Bellek (M - Main memory):** Adreslenebilir kelimelerden oluşur (M(0) ... M(4095)).
+*   **Giriş/Çıkış Ekipmanı (I, O - Input-output equipment):**
+*   **Veri Yolları:** Bileşenler arasında Komutlar ve Veri (Instructions and data) ile Adresler (Addresses) taşınır.
+*   **Kaydedici Açıklamaları:**
+    *   **AC:** Hesaplama sonuçlarını ve operandları tutar.
+    *   **MQ:** Çarpma ve bölme işlemleri için kullanılır.
+    *   **MBR:** Bellekten okunan veya belleğe yazılacak veriyi geçici olarak tutar.
+    *   **IBR:** Bellekten getirilen komut çiftinin sağ tarafındaki komutu geçici olarak tutar.
+    *   **PC:** Bir sonraki okunacak komutun adresini tutar.
+    *   **MAR:** Erişilecek bellek konumunun adresini tutar.
+    *   **IR:** Şu anda yürütülen komutun işlem kodunu (opcode) tutar.
+
+*   **Ek Açıklama:** Bu şema, von Neumann mimarisinin ilk somut örneklerinden biri olan IAS bilgisayarının temel yapısını gösterir. CPU'nun iki ana bölümü (aritmetik-mantık ve kontrol), ana bellek ve G/Ç birimleri arasındaki temel veri akışını ve kullanılan anahtar kaydedicileri içerir.
+
+---
+
+### IAS Bellek Formatları
+
+**(Şekil 1.7 IAS Bellek Formatları Açıklaması):**
+
+*   **Bellek Kelimesi (Word):** 40 bit uzunluğundadır.
+*   **(a) Sayı Kelimesi (Number word):**
+    *   Bit 0: İşaret biti (sign bit) (0 pozitif, 1 negatif)
+    *   Bit 1-39: Sayının değeri (magnitude)
+*   **(b) Komut Kelimesi (Instruction word):**
+    *   Bir bellek kelimesi **iki adet 20 bitlik komut** içerir.
+    *   **Sol Komut (left instruction - Bit 0-19):**
+        *   Bit 0-7: Opcode (İşlem Kodu - Ne yapılacağını belirtir)
+        *   Bit 8-19: Adres (Address - İşlem yapılacak verinin bellek adresi)
+    *   **Sağ Komut (right instruction - Bit 20-39):**
+        *   Bit 20-27: Opcode
+        *   Bit 28-39: Adres
+
+*   **Ek Açıklama:** IAS'ta hem veriler hem de komutlar aynı bellekte saklanır (saklı program kavramı). Veriler 40 bitlik işaretli sayılar olarak temsil edilir. Komutlar ise 20 bitliktir ve her bellek kelimesine iki komut sığdırılarak bellek kullanımı optimize edilmeye çalışılmıştır. Her komut, yapılacak işlemi (opcode) ve işlemin yapılacağı verinin yerini (adres) belirtir.
+
+---
+
+### IAS Kaydedicileri (Registers)
+
+*   **Bellek Tampon Kaydedicisi (MBR - Memory buffer register):**
+    *   Bellekte saklanacak veya G/Ç birimine gönderilecek bir kelimeyi içerir.
+    *   Veya bellekten veya G/Ç biriminden bir kelime almak için kullanılır.
+*   **Bellek Adres Kaydedicisi (MAR - Memory address register):**
+    *   Belleğe MBR'den yazılacak veya MBR'ye okunacak kelimenin bellek adresini belirtir.
+*   **Komut Kaydedicisi (IR - Instruction register):**
+    *   Yürütülmekte olan komutun 8-bitlik işlem kodunu (opcode) içerir.
+*   **Komut Tampon Kaydedicisi (IBR - Instruction buffer register):**
+    *   Bir bellek kelimesinden gelen sağdaki (ikinci) komutu geçici olarak tutmak için kullanılır.
+*   **Program Sayacı (PC - Program counter):**
+    *   Bellekten getirilecek bir sonraki komut çiftinin adresini içerir.
+*   **Akümülatör (AC - Accumulator) ve Çarpan/Bölüm Kaydedicisi (MQ - Multiplier quotient):**
+    *   ALU işlemlerinin operandlarını ve sonuçlarını geçici olarak tutmak için kullanılır.
+
+*   **Ek Açıklama:** Bu kaydediciler, CPU'nun belleğe erişmesi, komutları işlemesi ve hesaplamaları yapması için kritik öneme sahip geçici depolama alanlarıdır. Her birinin belirli bir görevi vardır.
+
+---
+
+### IAS İşlemi Kısmi Akış Şeması
+
+**(Şekil 1.8 IAS İşlemi Kısmi Akış Şeması Açıklaması):**
+
+Bu akış şeması, IAS bilgisayarının temel **Getirme (Fetch)** ve **Yürütme (Execute)** döngüsünü gösterir:
+
+1.  **Başla (Start):**
+2.  **IBR'de sonraki komut var mı? (Is next instruction in IBR?)**
+    *   **Evet (Yes):** (Önceki fetch'ten kalan sağ komut kullanılır) -> Adım 5'e git.
+    *   **Hayır (No):** (Yeni komut çifti bellekten getirilmeli)
+3.  **Bellek erişimi gerekli değilse (No memory access required):** (Bu durum genellikle dallanma komutlarından sonra olur) -> Adım 5'e git.
+    *   **Bellek erişimi gerekliyse:**
+4.  **Fetch Döngüsü (Bellekten Komut Getirme):**
+    *   `MAR <- PC` (Program sayacındaki adres MAR'a yüklenir)
+    *   `MBR <- M(MAR)` (MAR'daki adresten bellek kelimesi okunur ve MBR'ye yüklenir)
+    *   **Sol komut mu gerekli? (Left instruction required?)** (Genellikle başlangıçta evet)
+        *   **Evet (Yes):**
+            *   `IR <- MBR(0:7)` (MBR'deki sol opcode IR'ye)
+            *   `MAR <- MBR(8:19)` (MBR'deki sol adres MAR'a)
+            *   `IBR <- MBR(20:39)` (MBR'deki sağ komut IBR'ye saklanır)
+        *   **Hayır (No):** (IBR'deki komut kullanılır)
+            *   `IR <- IBR(0:7)` (IBR'deki opcode IR'ye)
+            *   `MAR <- IBR(8:19)` (IBR'deki adres MAR'a)
+    *   `PC <- PC + 1` (Program sayacı bir sonraki kelimeye ilerletilir)
+5.  **Komutu IR'de Çöz (Decode instruction in IR):** Kontrol birimi komutun ne olduğunu anlar.
+6.  **Yürütme Döngüsü (Execute Cycle):**
+    *   Komutun türüne göre ilgili işlem yapılır. Örnekler:
+        *   **Veri Transferi (örn: LOAD M(X)):** `MBR <- M(MAR)`, `AC <- MBR`
+        *   **Aritmetik (örn: ADD M(X)):** `MBR <- M(MAR)`, `AC <- AC + MBR`
+        *   **Dallanma (Branch - örn: JUMP M(X, 0:19)):**
+            *   Koşul kontrol edilir (örn: `Is AC > 0?`)
+            *   Koşul sağlanırsa `PC <- MAR` (Program akışı belirtilen adrese atlar)
+7.  Döngü Başına Dön (Adım 2).
+
+*   **Notasyon:** `M(X)`: Adresi X olan bellek konumunun içeriği. `(i:j)`: i'den j'ye kadar olan bitler.
+*   **Ek Açıklama:** Bu şema, bir bilgisayarın en temel çalışma prensibi olan fetch-decode-execute (getir-çöz-yürüt) döngüsünü gösterir. Bilgisayar sürekli olarak bellekten komutları alır, ne anlama geldiklerini çözer ve ilgili işlemi yapar. IBR kullanımı, her bellek erişiminde iki komut getirerek süreci hızlandırma çabasıdır.
+
+---
+
+### IAS Komut Seti (Örnekler)
+
+| Komut Tipi           | Opcode   | Sembolik Gösterim | Açıklama                                                                                                  |
+| :------------------- | :------- | :---------------- | :-------------------------------------------------------------------------------------------------------- |
+| **Veri Transferi**   | 00001010 | LOAD MQ           | MQ kaydedicisinin içeriğini Akümülatöre (AC) aktar.                                                        |
+|                      | 00001001 | LOAD MQ,M(X)      | X bellek konumunun içeriğini MQ'ya aktar.                                                                  |
+|                      | 00100001 | STOR M(X)         | Akümülatörün (AC) içeriğini X bellek konumuna aktar/sakla.                                                 |
+|                      | 00000001 | LOAD M(X)         | M(X)'i Akümülatöre aktar.                                                                                  |
+|                      | 00000010 | LOAD -M(X)        | M(X)'in negatifini Akümülatöre aktar.                                                                      |
+|                      | 00000011 | LOAD \|M(X)\|     | M(X)'in mutlak değerini Akümülatöre aktar.                                                                 |
+| **Koşulsuz Dallanma**| 00001101 | JUMP M(X,0:19)    | Bir sonraki komutu M(X)'in sol yarısından al.                                                              |
+|                      | 00001110 | JUMP M(X,20:39)   | Bir sonraki komutu M(X)'in sağ yarısından al.                                                               |
+| **Koşullu Dallanma** | 00001111 | JUMP+ M(X,0:19)   | Eğer Akümülatördeki sayı negatif değilse, bir sonraki komutu M(X)'in sol yarısından al.                     |
+|                      | (Diğer)  | JUMP+ M(X,20:39)  | Eğer Akümülatördeki sayı negatif değilse, bir sonraki komutu M(X)'in sağ yarısından al.                     |
+| **Aritmetik**        | 00000101 | ADD M(X)          | M(X)'i AC'ye ekle; sonucu AC'ye koy.                                                                       |
+|                      | 00000111 | ADD \|M(X)\|      | \|M(X)\|'i AC'ye ekle; sonucu AC'ye koy.                                                                   |
+|                      | 00000110 | SUB M(X)          | M(X)'i AC'den çıkar; sonucu AC'ye koy.                                                                     |
+|                      | 00001011 | MUL M(X)          | M(X)'i MQ ile çarp; sonucun en anlamlı bitlerini AC'ye, en anlamsız bitlerini MQ'ya koy.                    |
+|                      | 00001100 | DIV M(X)          | AC'yi M(X)'e böl; bölümü MQ'ya, kalanı AC'ye koy.                                                         |
+|                      | 00010100 | LSH               | Akümülatörü 2 ile çarp; yani bir bit sola kaydır.                                                          |
+|                      | 00010101 | RSH               | Akümülatörü 2'ye böl; yani bir bit sağa kaydır.                                                            |
+| **Adres Değiştirme** | 00010010 | STOR M(X,8:19)    | M(X)'deki sol adres alanını AC'nin en sağdaki 12 bitiyle değiştir.                                        |
+|                      | 00010011 | STOR M(X,28:39)   | M(X)'deki sağ adres alanını AC'nin en sağdaki 12 bitiyle değiştir.                                        |
+
+*   **(Tablo ders kitabının 17. sayfasında bulunabilir.)**
+*   **Ek Açıklama:** Bu tablo, IAS bilgisayarının anlayabildiği komutlardan bazılarını göstermektedir. Her komutun kendine özgü bir sayısal kodu (opcode), programcıların daha kolay anlaması için sembolik bir adı ve ne iş yaptığını açıklayan bir tanımı vardır. Komutlar; veri taşıma, program akışını değiştirme (dallanma) ve hesaplama yapma gibi temel işlemleri kapsar.
+
+---
+
+#### İkinci Nesil: Transistörler (Second Generation: Transistors)
+
+*   Daha **küçük**.
+*   Daha **ucuz**.
+*   Vakum tüpünden **daha az ısı** yayar.
+*   Silikondan yapılmış bir **katı hal (solid state)** cihazıdır.
+*   1947'de Bell Laboratuvarları'nda icat edildi.
+*   Ancak tam olarak transistörlü bilgisayarların ticari olarak kullanılabilir hale gelmesi 1950'lerin sonlarını buldu.
+    *   **(Resim Açıklaması):** Sağdaki resim, modern elektronik devrelerde de kullanılan (ancak ilk nesil transistörlerden çok daha gelişmiş olan) birkaç transistör ve kapasitör gibi bileşeni göstermektedir.
+
+*   **Ek Açıklama:** Transistörün icadı, bilgisayar teknolojisinde devrim yaratmıştır. Vakum tüplerinin yerini alan transistörler sayesinde bilgisayarlar çok daha küçük, daha güvenilir, daha hızlı ve daha az enerji tüketen cihazlar haline gelmiştir. Bu, bilgisayarların yaygınlaşmasının önünü açmıştır.
+
+---
+
+### Tablo 1.2 Bilgisayar Nesilleri
+
+| Nesil | Yaklaşık Tarihler | Teknoloji                          | Tipik Hız (işlem/saniye) |
+| :---- | :---------------- | :--------------------------------- | :----------------------- |
+| 1     | 1946-1957         | Vakum tüpü                         | 40,000                   |
+| 2     | 1957-1964         | Transistör                         | 200,000                  |
+| 3     | 1965-1971         | Küçük ve orta ölçekli entegrasyon (SSI, MSI) | 1,000,000                |
+| 4     | 1972-1977         | Geniş ölçekli entegrasyon (LSI)      | 10,000,000               |
+| 5     | 1978-1991         | Çok geniş ölçekli entegrasyon (VLSI) | 100,000,000              |
+| 6     | 1991-             | Ultra geniş ölçekli entegrasyon (ULSI) | >1,000,000,000           |
+
+*   **Ek Açıklama:** Bu tablo, bilgisayar teknolojisindeki anahtar dönemleri (nesilleri) özetlemektedir. Her nesil, temel alınan elektronik bileşen (vakum tüpü, transistör, entegre devreler) ve entegrasyon seviyesindeki artışla tanımlanır. Bu gelişmeler, bilgisayarların hızında ve yeteneklerinde katlanarak artışa yol açmıştır. Entegrasyon seviyeleri (SSI, MSI, LSI, VLSI, ULSI), tek bir yonga üzerine yerleştirilebilen transistör sayısını ifade eder.
+
+---
+
+### İkinci Nesil Bilgisayarlar
+
+*   **Getirilen Yenilikler:**
+    *   Daha karmaşık aritmetik ve mantık birimleri (ALU) ve kontrol birimleri.
+    *   **Yüksek seviyeli programlama dillerinin** kullanımı (örn: FORTRAN, COBOL).
+    *   Aşağıdaki yetenekleri sağlayan **sistem yazılımlarının** sunulması:
+        *   Programları yükleme (Load programs).
+        *   Veriyi çevre birimlerine taşıma (Move data to peripherals).
+        *   Kütüphanelerin ortak hesaplamaları gerçekleştirmesi (Libraries perform common computations).
+    *   **(Resim Açıklaması):** Sağdaki çizim, klavye, monitör ve fare gibi çevre birimleriyle etkileşim kuran daha modern bir bilgisayar konseptini temsil ediyor, ki bu tür etkileşimler ikinci nesil sistem yazılımlarıyla kolaylaşmıştır.
+
+*   **Ek Açıklama:** Transistörler sadece donanımı iyileştirmekle kalmadı, aynı zamanda yazılım geliştirmeyi de kolaylaştırdı. Yüksek seviyeli diller sayesinde programcılar makine koduna göre çok daha kolay program yazabildiler. İşletim sistemlerinin ilk adımları olan sistem yazılımları, program çalıştırma ve donanım yönetimi gibi temel işlevleri otomatikleştirerek kullanıcıların işini kolaylaştırdı.
+
+---
+
+### IBM 7094 Konfigürasyonu
+
+**(Şekil 1.9 IBM 7094 Konfigürasyonu Açıklaması):**
+
+Bu şema, ikinci neslin önemli bilgisayarlarından biri olan IBM 7094'ün tipik bir yapılandırmasını göstermektedir:
+
+*   **IBM 7094 Bilgisayarı (Ana Ünite):**
+    *   **CPU (Merkezi İşlem Birimi)**
+    *   **Bellek (Memory)**
+    *   **Çoklayıcı (Multiplexor):** CPU ve bellek ile G/Ç kanalları arasındaki bağlantıyı yönetir.
+*   **Veri Kanalları (Data channel):** CPU'dan bağımsız olarak G/Ç işlemleri yapabilen özel işlemciler.
+*   **Çevre Birimleri (Peripheral devices):**
+    *   Manyetik Teyp Üniteleri (Mag tape units)
+    *   Kart Delici (Card punch)
+    *   Satır Yazıcı (Line printer)
+    *   Kart Okuyucu (Card reader)
+    *   Tambur Bellek (Drum) - Hızlı ikincil depolama
+    *   Disk Üniteleri (Disk) - Daha yavaş, daha yüksek kapasiteli depolama
+    *   Hyper-tapes (Yüksek hızlı teyp)
+    *   Tele-işlem Ekipmanı (Teleprocessing equipment) - Uzak bağlantı için.
+
+*   **Ek Açıklama:** Bu yapı, ikinci nesil bilgisayarların G/Ç işlemlerini nasıl yönettiklerini gösterir. Veri kanalları (Data Channels), CPU'yu G/Ç işlemlerinin detaylarından kurtararak ana işlem gücünün hesaplamaya odaklanmasını sağlar. Bu, sistem performansını artıran önemli bir yenilikti. Çoklayıcı ise birden fazla yavaş G/Ç cihazının tek bir hızlı kanala bağlanmasını sağlayabilir.
+
+---
+
+#### Üçüncü Nesil: Entegre Devreler (Third Generation: Integrated Circuits - ICs)
+
+*   **1958:** Entegre devrenin icadı.
+*   **Ayrık Bileşen (Discrete component):**
+    *   Tek, kendi başına bir transistör.
+    *   Ayrı ayrı üretilir, kendi kılıflarında paketlenir ve masonit benzeri devre kartlarına lehimlenir veya kablolanırdı.
+    *   Üretim süreci pahalı ve zahmetliydi.
+*   **Entegre Devre (Integrated Circuit - IC):** (Bkz. Slayt 39)
+    *   Tek bir silikon yonga üzerine çok sayıda transistörün ve diğer bileşenlerin (direnç, kondansatör) birlikte üretilmesi.
+*   Üçüncü neslin en önemli iki üyesi **IBM System/360** ve **DEC PDP-8** idi.
+    *   **(Resim Açıklaması):** Sağdaki resim, üçüncü neslin ikonik bilgisayarlarından biri olan DEC PDP-8'i göstermektedir. Ön panelindeki ışıklar ve anahtarlar dikkat çekicidir. Üstteki kısım muhtemelen ana işlem birimi, alttaki ise bellek veya G/Ç birimleridir.
+
+*   **Ek Açıklama:** Entegre devrenin (IC veya yonga/çip) icadı, bilgisayar teknolojisinde bir başka devrimdi. Tek bir yonga üzerine binlerce, hatta milyonlarca transistör sığdırılabilmesi, bilgisayarları daha da küçük, daha hızlı, daha ucuz ve daha güvenilir hale getirdi. IBM System/360 mainframe pazarını domine ederken, DEC PDP-8 "minicomputer" (mini bilgisayar) kavramını popülerleştirdi ve bilgisayarları daha geniş kitlelere ulaştırdı.
+
+---
+
+### PDP-8 Bellek Modülü
+
+*   **(Resim Açıklaması):** Bu resim, DEC PDP-8 minibilgisayarına ait bir bellek modülünü göstermektedir. Üzerinde üçüncü nesil teknolojinin karakteristik özelliği olan erken dönem entegre devreler (küçük siyah dikdörtgen paketler) ve hala kullanılan bazı ayrık bileşenler (dirençler, kondansatörler) görülmektedir. Bu kart, bilgisayarın ana belleğinin bir parçasını oluşturuyordu.
+
+*   **Ek Açıklama:** Bu tür modüler tasarımlar, bilgisayarların bakımını ve yükseltilmesini kolaylaştırıyordu. Arızalı bir modül kolayca değiştirilebilir veya bellek kapasitesini artırmak için yeni modüller eklenebilirdi.
+
+---
+
+### PDP-8 Panel Simülasyonu
+
+*   **(Resim Açıklaması):** Bu resim, PDP-8/I modelinin ön panelinin modern bir bilgisayar üzerinde çalışan bir simülasyonunu göstermektedir. Paneldeki ışıklar, çeşitli kaydedicilerin (Program Counter, Memory Address, Memory Buffer, Accumulator, Multiplier Quotient) ve veri/komut alanlarının anlık ikili (binary) değerlerini gösterir. Anahtarlar ise bilgisayarı başlatmak (Start), durdurmak (Stop), bellek içeriğini incelemek (Exam), değiştirmek (Dep) gibi temel kontrol işlevleri için kullanılır.
+
+*   **Ek Açıklama:** İlk bilgisayarlarda, programcılar ve operatörler bilgisayarın iç durumunu anlamak ve onu kontrol etmek için doğrudan bu tür fiziksel panellerle etkileşim kurarlardı. Bu paneller, bilgisayarın ham haliyle nasıl çalıştığına dair doğrudan bir görünüm sunardı.
+
+---
+
+### Temel Bilgisayar Elemanları
+
+**(Şekil 1.10 Temel Bilgisayar Elemanları Açıklaması):**
+
+*   **(a) Kapı (Gate):**
+    *   Giriş sinyallerine (Input) ve bir etkinleştirme sinyaline (Activate signal) dayalı olarak bir **Boolean mantık fonksiyonunu** (AND, OR, NOT vb.) gerçekleştirir ve bir çıkış (Output) üretir.
+    *   Bilgisayardaki **veri işleme** işlemleri için temel yapı taşıdır.
+*   **(b) Bellek Hücresi (Memory cell):**
+    *   Tek bir **bit** (0 veya 1) bilgiyi saklayabilen bir devredir.
+    *   Bir giriş (Input) değeri alır ve bir kontrol sinyali (Write) ile bu değeri saklar.
+    *   Başka bir kontrol sinyali (Read) ile sakladığı değeri çıkışa (Output) verir.
+    *   Bilgisayardaki **veri saklama** işlevi için temel yapı taşıdır.
+
+*   **Ek Açıklama:** Modern dijital bilgisayarların tamamı, temel olarak bu iki basit elemanın (mantık kapıları ve bellek hücreleri) milyonlarca veya milyarlarcasının bir araya getirilmesiyle oluşturulur. Mantık kapıları hesaplamaları yapar, bellek hücreleri ise sonuçları ve verileri saklar.
+
+---
+
+### Entegre Devreler (Integrated Circuits - ICs)
+
+*   Bir bilgisayar; **kapılar (gates)**, **bellek hücreleri (memory cells)** ve bunlar arasındaki **ara bağlantılardan (interconnections)** oluşur.
+*   Kapılar ve bellek hücreleri, basit dijital elektronik bileşenlerden (transistörler, dirençler, iletkenler vb.) yapılır.
+*   Entegre devreler, bu tür bileşenlerin silikon gibi bir **yarı iletken** malzeme üzerinde üretilebilmesi gerçeğinden yararlanır.
+    *   **Veri saklama:** Bellek hücreleri tarafından sağlanır.
+    *   **Veri işleme:** Kapılar tarafından sağlanır.
+    *   **Veri hareketi:** Bileşenler arasındaki yollar, veriyi bellekten belleğe ve bellekten kapılar aracılığıyla belleğe taşımak için kullanılır.
+    *   **Kontrol:** Bileşenler arasındaki yollar kontrol sinyallerini taşıyabilir.
+*   Tek bir silikon **disk (wafer)** üzerinde aynı anda çok sayıda transistör üretilebilir.
+*   Transistörler, devreleri oluşturmak için bir **işlemci metalleştirme** (processor metallization) katmanı ile birbirine bağlanabilir.
+
+*   **Ek Açıklama:** Entegre devreler, binlerce veya milyonlarca transistörü, direnci, kondansatörü ve aralarındaki bağlantıları tek bir küçük silikon yonga üzerine sığdırma teknolojisidir. Bu, bilgisayarların boyutunu, maliyetini ve güç tüketimini büyük ölçüde azaltırken hızını ve güvenilirliğini artırmıştır.
+
+---
+
+### Disk (Wafer), Yonga (Chip) ve Kapı (Gate) Arasındaki İlişki
+
+**(Şekil 1.11 İlişki Açıklaması):**
+
+1.  **Disk (Wafer):** Büyük, yuvarlak bir silikon dilimidir. Üzerinde aynı anda yüzlerce veya binlerce özdeş yonga (chip) üretilir.
+2.  **Yonga (Chip / Die):** Wafer kesilerek elde edilen küçük, genellikle kare veya dikdörtgen şeklindeki silikon parçasıdır. Tek bir entegre devreyi içerir (örneğin, bir işlemci veya bellek yongası).
+3.  **Paketlenmiş Yonga (Packaged chip):** Yonganın dış etkenlerden korunması ve anakarta bağlanabilmesi için plastik veya seramik bir kılıf içine yerleştirilmiş halidir. Bacakları (pins) veya temas noktaları (pads) bulunur.
+4.  **Kapı (Gate):** Yonganın içindeki en temel mantık elemanlarından biridir (örn: AND kapısı, NOT kapısı). Bir yonga milyonlarca veya milyarlarca kapı içerebilir.
+
+*   **Ek Açıklama:** Bu şema, entegre devre üretimindeki hiyerarşiyi gösterir. Üretim wafer seviyesinde başlar, wafer'dan chipler kesilir, chipler paketlenir ve her bir chip aslında çok sayıda temel mantık kapısından oluşur.
+
+---
+
+### Entegre Devrelerdeki Transistör Sayısındaki Artış (Moore Yasası)
+
+**(Şekil 1.12 Büyüme Grafiği Açıklaması):**
+
+*   Grafik, zaman içinde (1947'den 2011'e kadar) tek bir entegre devre (özellikle DRAM bellek yongaları için) üzerine yerleştirilebilen transistör sayısındaki logaritmik artışı göstermektedir.
+*   **Önemli Noktalar:**
+    *   **1947 civarı:** İlk çalışan transistör.
+    *   **1958 civarı:** Entegre devrenin icadı.
+    *   **1965 civarı:** Moore Yasası'nın ilan edilmesi.
+*   **Y Ekseni (Logaritmik):** Transistör sayısı (1'den 100 milyara kadar).
+*   **X Ekseni:** Yıllar.
+*   **Trend:** Grafikteki düz çizgiye yakın eğilim, transistör sayısının yaklaşık olarak **üstel (exponential)** bir şekilde arttığını göstermektedir.
+
+*   **Ek Açıklama:** Bu grafik, Moore Yasası'nın görsel bir temsilidir. Yonga üzerindeki transistör yoğunluğunun düzenli aralıklarla (başlangıçta her yıl, sonra yaklaşık her 18-24 ayda bir) ikiye katlanması, bilgisayar performansında ve yeteneklerinde sürekli ve öngörülebilir bir artışa yol açmıştır. Y ekseninin logaritmik olması, bu üstel büyümeyi düz bir çizgi olarak görmemizi sağlar.
+
+---
+
+### Moore Yasası
+
+*   **1965; Gordon Moore – Intel'in kurucu ortağı.**
+*   **Gözlem:** Tek bir yonga üzerine konulabilecek transistör sayısının **her yıl ikiye katlandığını** gözlemledi.
+*   **Güncelleme:** Hız 1970'lerde **her 18 ayda bir ikiye katlanmaya** yavaşladı, ancak bu oran o zamandan beri devam etti (yakın zamana kadar).
+*   **Moore Yasası'nın Sonuçları:**
+    *   Bilgisayar mantık ve bellek devresinin **maliyeti** dramatik bir oranda düştü.
+    *   Elektriksel **yol uzunluğu kısaldı**, çalışma **hızı arttı**.
+    *   Bilgisayar **küçüldü** ve çeşitli ortamlarda kullanımı daha **kullanışlı** hale geldi.
+    *   **Güç ve soğutma** gereksinimlerinde azalma oldu.
+    *   Yongalar arası **daha az bağlantı** gerekti (güvenilirlik arttı).
+
+*   **Ek Açıklama:** Moore Yasası, bir fizik kanunu olmaktan çok, yarı iletken endüstrisindeki teknolojik ilerlemenin hızına dair bir gözlem ve öngörüdür. Bu yasa, on yıllar boyunca bilgisayar endüstrisinin gelişimini yönlendirmiş ve teknolojik yenilikler için bir hedef oluşturmuştur. Günümüzde fiziksel sınırlara yaklaşıldığı için klasik Moore Yasası'nın yavaşladığı veya farklılaştığı tartışılmaktadır.
+
+---
+
+### IBM System/360
+
+*   1964'te duyuruldu.
+*   Ürün hattı, eski IBM makineleriyle **uyumsuzdu**.
+*   On yılın başarısı oldu ve IBM'i ezici bir şekilde **baskın bilgisayar satıcısı** olarak pekiştirdi.
+*   Mimari, günümüzde hala IBM'in **mainframe bilgisayarlarının mimarisi** olarak kalmıştır.
+*   Endüstrinin ilk planlanmış **bilgisayar ailesiydi**.
+
+*   **Ek Açıklama:** System/360, uyumluluk (aynı mimariye sahip farklı modeller), ölçeklenebilirlik (küçükten büyüğe modeller) ve genel amaçlı kullanım (hem bilimsel hem ticari) gibi modern bilgisayar kavramlarını tanıtan devrimci bir ürün ailesiydi. Eski sistemlerle uyumsuz olması büyük bir riskti, ancak başarısı bu riskin yerinde olduğunu gösterdi.
+
+---
+
+### Aile Özellikleri (IBM System/360 gibi)
+
+*   **Benzer veya özdeş komut seti:** Farklı modeller aynı programları çalıştırabilir.
+*   **Benzer veya özdeş işletim sistemi:** Kullanıcı ve programcı deneyimi tutarlıdır.
+*   **Artan hız:** Daha pahalı modeller daha hızlıdır.
+*   **Artan G/Ç bağlantı noktası sayısı:** Daha büyük modeller daha fazla çevre birimini destekler.
+*   **Artan bellek boyutu:** Daha büyük modeller daha fazla veriyi işleyebilir.
+*   **Artan maliyet:** Performans ve kapasite arttıkça fiyat da artar.
+
+*   **Ek Açıklama:** Bilgisayar ailesi konsepti, kullanıcıların ihtiyaçları değiştikçe sistemlerini kolayca yükseltmelerine veya farklı ölçeklerdeki işler için uygun maliyetli çözümler bulmalarına olanak tanır. Yazılım yatırımları korunur çünkü aynı programlar genellikle tüm aile üyelerinde çalışır.
+
+---
+
+### PDP-8 Veri Yolu (Bus) Yapısı
+
+**(Şekil 1.13 PDP-8 Veri Yolu Yapısı Açıklaması):**
+
+*   Bu şema, DEC PDP-8'in kullandığı **Omnibus** adı verilen veri yolu yapısını gösterir.
+*   **Bileşenler:**
+    *   Konsol denetleyicisi (Console controller) - Ön panel için
+    *   CPU (Merkezi İşlem Birimi)
+    *   Ana bellek (Main memory)
+    *   G/Ç modülleri (I/O module) - Birden fazla olabilir.
+*   **Omnibus:** Tüm bu bileşenlerin bağlandığı **tek, paylaşımlı** bir veri yoludur. Adres, veri ve kontrol sinyalleri aynı yol üzerinden taşınır.
+
+*   **Ek Açıklama:** Omnibus yapısı, basitliği ve düşük maliyeti nedeniyle PDP-8 gibi minibilgisayarlar için uygundu. Ancak, aynı anda sadece iki bileşen veri yolu üzerinden iletişim kurabildiği için modern yüksek performanslı sistemlere göre bir darboğaz oluşturabilir. Tüm bileşenler aynı sinyal setini paylaşır.
+
+---
+
+### Sonraki Nesiller (Later Generations)
+
+*   **LSI (Large Scale Integration - Geniş Ölçekli Entegrasyon):** Binlerce transistör/yonga.
+*   **VLSI (Very Large Scale Integration - Çok Geniş Ölçekli Entegrasyon):** On binlerce ila milyonlarca transistör/yonga.
+*   **ULSI (Ultra Large Scale Integration - Ultra Geniş Ölçekli Entegrasyon):** Milyonlarca ila milyarlarca transistör/yonga.
+*   **Anahtar Teknolojiler:**
+    *   **Yarı İletken Bellek (Semiconductor Memory):** Manyetik çekirdek belleğin yerini aldı.
+    *   **Mikroişlemci (Microprocessor):** Tüm CPU'nun tek bir yonga üzerine entegre edilmesi.
+    *   **(Resim Açıklaması):** Soldaki çizim, bir mikroişlemci yongasının karmaşık iç yapısını temsil etmektedir.
+
+*   **Ek Açıklama:** Üçüncü nesilden sonra, entegrasyon seviyeleri artmaya devam etti. LSI, VLSI ve ULSI dönemleri, yonga başına düşen transistör sayısındaki katlanarak artışı ifade eder. Bu dönemlerin en önemli iki teknolojik gelişmesi, hızlı ve ucuz yarı iletken belleklerin ve tek yongalı işlemcilerin (mikroişlemcilerin) ortaya çıkmasıdır.
+
+---
+
+### Yarı İletken Bellek (Semiconductor Memory)
+
+*   **1970:** Fairchild, ilk göreceli olarak **yüksek kapasiteli yarı iletken belleği** üretti.
+    *   Yonga yaklaşık tek bir çekirdek (manyetik çekirdek) boyutundaydı.
+    *   **256 bit** veri tutabiliyordu.
+    *   **Tahribatsız (Non-destructive)** okuma yapabiliyordu (manyetik çekirdeklerin aksine).
+    *   Çekirdek bellekten **çok daha hızlıydı**.
+*   **1974:** Yarı iletken belleğin **bit başına fiyatı**, çekirdek belleğin bit başına fiyatının **altına düştü**.
+*   Bellek maliyetinde sürekli ve hızlı bir düşüş yaşanırken, buna karşılık gelen fiziksel bellek yoğunluğunda (birim alana sığan bit sayısı) bir artış olmuştur.
+*   Bellek ve işlemci teknolojilerindeki gelişmeler, on yıldan kısa bir sürede bilgisayarların doğasını değiştirdi.
+*   **1970'den beri** yarı iletken bellek **yaklaşık 13 nesil** geçirmiştir.
+*   Her nesil, önceki neslin depolama yoğunluğunun **dört katını** sağlamış, buna bit başına düşen maliyetin azalması ve erişim süresinin kısalması eşlik etmiştir.
+
+*   **Ek Açıklama:** Yarı iletken belleklerin (RAM ve ROM gibi) geliştirilmesi, bilgisayarları daha hızlı, daha küçük ve daha ucuz hale getiren bir diğer kritik adımdı. Manyetik çekirdek belleklere göre hız, yoğunluk ve maliyet avantajları, kısa sürede endüstri standardı haline gelmelerini sağladı.
+
+---
+
+### Mikroişlemciler (Microprocessors)
+
+*   İşlemci yongalarındaki eleman yoğunluğu artmaya devam etti.
+    *   Tek bir bilgisayar işlemcisi oluşturmak için daha az yongaya ihtiyaç duyulacak şekilde her yongaya daha fazla eleman yerleştirildi.
+*   **1971: Intel 4004'ü geliştirdi.**
+    *   Bir CPU'nun tüm bileşenlerini **tek bir yongada** içeren ilk yonga.
+    *   **Mikroişlemcinin doğuşu.**
+*   **1972: Intel 8008'i geliştirdi.**
+    *   İlk **8-bit** mikroişlemci.
+*   **1974: Intel 8080'i geliştirdi.**
+    *   İlk **genel amaçlı** mikroişlemci.
+    *   Daha **hızlı**, daha **zengin bir komut setine** sahip, daha **geniş bir adresleme yeteneğine** sahip.
+    *   **(Resim Açıklaması):** Sağdaki resim, tarihi Intel 4004 mikroişlemcisini göstermektedir.
+
+*   **Ek Açıklama:** Mikroişlemcinin icadı, kişisel bilgisayar devriminin fitilini ateşledi. Tüm işlem biriminin tek, ucuz bir yongaya sığdırılması, bilgisayarların daha önce hayal bile edilemeyen uygulamalarda kullanılmasının önünü açtı. Intel 4004 başlangıçta bir hesap makinesi için tasarlanmıştı, ancak 8080 gibi sonraki modeller gerçek genel amaçlı bilgisayarların temelini oluşturdu.
+
+---
+
+### Intel Mikroişlemcilerinin Evrimi (a) 1970'ler
+
+| Özellik             | 4004    | 8008    | 8080   | 8086              | 8088           |
+| :------------------ | :------ | :------ | :----- | :---------------- | :------------- |
+| Tanıtım Yılı        | 1971    | 1972    | 1974   | 1978              | 1979           |
+| Saat Hızları        | 108 kHz | 108 kHz | 2 MHz  | 5 MHz, 8 MHz, 10 MHz | 5 MHz, 8 MHz   |
+| Veri Yolu Genişliği | 4 bit   | 8 bit   | 8 bit  | 16 bit            | 8 bit          |
+| Transistör Sayısı   | 2,300   | 3,500   | 6,000  | 29,000            | 29,000         |
+| Özellik Boyutu (µm) | 10      | 8       | 6      | 3                 | 6              |
+| Adreslenebilir Bellek| 640 Byte| 16 KB   | 64 KB  | 1 MB              | 1 MB           |
+
+*   **Ek Açıklama:** 1970'ler mikroişlemcilerin emekleme yıllarıydı. Veri yolu genişliği (tek seferde işlenebilen bit sayısı), saat hızı, transistör sayısı ve adreslenebilir bellek miktarı hızla arttı. 8086, ilk 16-bit işlemciydi ve modern x86 mimarisinin temelini attı. 8088 ise 8086'nın 8-bit veri yoluna sahip bir versiyonuydu ve IBM'in ilk kişisel bilgisayarında kullanılarak büyük popülerlik kazandı. Özellik boyutu (Feature size), yonga üzerindeki en küçük elemanın boyutunu ifade eder; küçülmesi daha fazla transistör sığdırılmasını sağlar.
+
+---
+
+### Intel Mikroişlemcilerinin Evrimi (b) 1980'ler
+
+| Özellik             | 80286          | 386TM DX       | 386TM SX       | 486TM DX CPU   |
+| :------------------ | :------------- | :------------- | :------------- | :------------- |
+| Tanıtım Yılı        | 1982           | 1985           | 1988           | 1989           |
+| Saat Hızları        | 6 MHz - 12.5 MHz| 16 MHz - 33 MHz| 16 MHz - 33 MHz| 25 MHz - 50 MHz|
+| Veri Yolu Genişliği | 16 bit         | 32 bit         | 16 bit         | 32 bit         |
+| Transistör Sayısı   | 134,000        | 275,000        | 275,000        | 1.2 milyon     |
+| Özellik Boyutu (µm) | 1.5            | 1              | 1              | 0.8 - 1        |
+| Adreslenebilir Bellek| 16 MB          | 4 GB           | 16 MB          | 4 GB           |
+| Sanal Bellek        | 1 GB           | 64 TB          | 64 TB          | 64 TB          |
+| Önbellek (Cache)    | —              | —              | —              | 8 kB           |
+
+*   **Ek Açıklama:** 1980'lerde 32-bit mimariye geçiş yapıldı (80386DX). Sanal bellek desteği standartlaştı. 486 ile birlikte ilk defa işlemci yongası üzerine önbellek (L1 cache) entegre edildi ve matematik işlemci (FPU - Floating Point Unit) bazı modellerde standart hale geldi. 386SX, 386DX'in daha ucuz, 16-bit veri yoluna sahip bir versiyonuydu. Transistör sayısı milyon seviyesine ulaştı.
+
+---
+
+### Intel Mikroişlemcilerinin Evrimi (c) 1990'lar
+
+| Özellik             | 486TM SX       | Pentium        | Pentium Pro    | Pentium II     |
+| :------------------ | :------------- | :------------- | :------------- | :------------- |
+| Tanıtım Yılı        | 1991           | 1993           | 1995           | 1997           |
+| Saat Hızları        | 16 MHz - 33 MHz| 60 MHz - 166 MHz| 150 MHz - 200 MHz| 200 MHz - 300 MHz|
+| Veri Yolu Genişliği | 32 bit         | 32 bit (dahili 64)| 64 bit         | 64 bit         |
+| Transistör Sayısı   | 1.185 milyon   | 3.1 milyon     | 5.5 milyon     | 7.5 milyon     |
+| Özellik Boyutu (µm) | 1              | 0.8            | 0.6            | 0.35           |
+| Adreslenebilir Bellek| 4 GB           | 4 GB           | 64 GB          | 64 GB          |
+| Sanal Bellek        | 64 TB          | 64 TB          | 64 TB          | 64 TB          |
+| Önbellek (Cache)    | 8 kB           | 8 kB (L1)      | 512 kB L1 ve 1 MB L2 | 512 kB L2      |
+
+*   **Ek Açıklama:** 1990'lar "Pentium" markasının doğuşuna tanık oldu. **Superscalar** mimariler (aynı anda birden fazla komut yürütebilme) yaygınlaştı. Pentium Pro ile **daha gelişmiş mimari teknikler** (register renaming, branch prediction, out-of-order execution) kullanıldı. Pentium II ile **MMX** (multimedya komutları) eklendi ve L2 önbellek işlemci paketine (ama ayrı yonga üzerine) entegre edildi. Saat hızları yüzlerce MHz'e ulaştı. Veri yolu genişliği 64 bite çıktı. 486SX, 486DX'in matematik işlemcisi olmayan daha ucuz versiyonuydu.
+
+---
+
+### Intel Mikroişlemcilerinin Evrimi (d) Yakın Dönem İşlemciler
+
+| Özellik             | Pentium III       | Pentium 4       | Core 2 Duo      | Core i7 EE 4960X |
+| :------------------ | :---------------- | :-------------- | :-------------- | :--------------- |
+| Tanıtım Yılı        | 1999              | 2000            | 2006            | 2013             |
+| Saat Hızları        | 450 - 660 MHz     | 1.3 - 1.8 GHz   | 1.06 - 1.2 GHz  | 4 GHz            |
+| Veri Yolu Genişliği | 64 bit            | 64 bit          | 64 bit          | 64 bit           |
+| Transistör Sayısı   | 9.5 milyon        | 42 milyon       | 167 milyon      | 1.86 milyar      |
+| Özellik Boyutu (nm) | 250               | 180             | 65              | 22               |
+| Adreslenebilir Bellek| 64 GB             | 64 GB           | 64 GB           | 64 GB            |
+| Sanal Bellek        | 64 TB             | 64 TB           | 64 TB           | 64 TB            |
+| Önbellek (Cache)    | 512 kB L2         | 256 kB L2       | 2 MB L2         | 1.5 MB L2/15 MB L3|
+| Çekirdek Sayısı     | 1                 | 1               | 2               | 6                |
+
+*   **Ek Açıklama:** 2000'ler ve sonrası, saat hızı yarışının yerini **çok çekirdekli (multi-core)** mimarilere bıraktığı dönemdir. Pentium III'e **SSE** (Streaming SIMD Extensions) komutları eklendi. Pentium 4, yüksek saat hızlarına odaklandı ancak güç tüketimi sorunları yaşadı. Core 2 Duo, daha verimli bir mimariyle çift çekirdeği yaygınlaştırdı. Core i7 serisi ise daha fazla çekirdek (örnekte 6), daha büyük L3 önbellek ve **Hyper-Threading** gibi teknolojilerle performansı artırdı. Özellik boyutu mikrometreden **nanometre (nm)** seviyesine indi. Transistör sayısı milyarlarla ifade edilmeye başlandı. Adreslenebilir fiziksel bellek limiti uzun süre 64 GB'da kaldı (pratik limitler ve yonga seti destekleri nedeniyle), ancak sanal bellek adres alanı (64 TB) çok daha büyüktü.
+
+---
+
+### Intel x86 Mimarisi'nin Evrimi
+
+*   İki ana işlemci ailesi **Intel x86** ve **ARM** mimarileridir.
+*   Mevcut x86 ürünleri, **karmaşık komut seti bilgisayarları (CISC - Complex Instruction Set Computers)** üzerine on yıllarca süren tasarım çabasının sonuçlarını temsil eder.
+*   İşlemci tasarımına alternatif bir yaklaşım, **azaltılmış komut seti bilgisayarıdır (RISC - Reduced Instruction Set Computer)**.
+*   **ARM mimarisi**, çok çeşitli **gömülü sistemlerde (embedded systems)** kullanılır ve piyasadaki en güçlü ve en iyi tasarlanmış RISC tabanlı sistemlerden biridir.
+
+*   **Ek Açıklama:** x86 (Intel ve AMD işlemcilerde kullanılır) ve ARM (çoğu akıllı telefon ve tablette kullanılır) günümüzün en baskın iki işlemci mimarisidir. x86, geriye dönük uyumluluğa önem veren, çok sayıda karmaşık komuta sahip bir CISC mimarisidir. ARM ise daha basit, sabit uzunlukta komutlara odaklanan, daha az komut içeren ancak bu komutları çok hızlı çalıştırmayı hedefleyen bir RISC mimarisidir. RISC genellikle daha düşük güç tüketimi ve daha basit tasarım avantajı sunarken, CISC karmaşık görevleri tek komutla yapabilme potansiyeline sahiptir.
+
+---
+
+### Intel Ürün Hattının Evrimindeki Önemli Noktalar (1/2)
+
+*   **8080:**
+    *   Dünyanın ilk genel amaçlı mikroişlemcisi.
+    *   8-bit makine, belleğe 8-bit veri yolu.
+    *   İlk kişisel bilgisayarda (Altair) kullanıldı.
+*   **8086:**
+    *   Daha güçlü 16-bit makine.
+    *   Yürütülmeden önce birkaç komutu önceden getiren bir komut önbelleği veya kuyruğu (instruction cache/queue) vardır.
+    *   x86 mimarisinin ilk görünümü.
+    *   8088, bu işlemcinin bir varyantıydı ve IBM'in ilk kişisel bilgisayarında kullanıldı (Intel'in başarısını güvence altına aldı).
+*   **80286:**
+    *   8086'nın uzantısı, sadece 1MB yerine 16MB belleği adresleyebilme yeteneği. (Protected Mode eklendi).
+*   **80386:**
+    *   Intel'in ilk 32-bit makinesi.
+    *   Çoklu görev (multitasking) desteği sunan ilk Intel işlemcisi.
+*   **80486:**
+    *   Çok daha sofistike ve güçlü önbellek teknolojisi ve sofistike komut boru hattı (instruction pipelining) kullanımını tanıttı.
+    *   Ayrıca yerleşik bir matematik işlemci (built-in math coprocessor - FPU) sundu.
+
+*   **Ek Açıklama:** Bu liste, x86 mimarisinin temel taşlarını ve her birinin getirdiği önemli yenilikleri özetler. 8080'den 486'ya kadar olan süreçte bit genişliği artmış, adresleme yetenekleri gelişmiş, önbellek ve boru hattı gibi performans artırıcı teknikler eklenmiştir.
+
+---
+
+### Intel Ürün Hattının Evrimindeki Önemli Noktalar (2/2)
+
+*   **Pentium:**
+    *   Intel, **süperskalar (superscalar)** tekniklerin kullanımını tanıttı; bu, birden fazla komutun paralel olarak yürütülmesine olanak tanır.
+*   **Pentium Pro:**
+    *   Kayıtçı yeniden adlandırma (register renaming), dallanma tahmini (branch prediction), veri akış analizi (data flow analysis) ve spekülatif yürütme (speculative execution) gibi agresif kullanımlarla süperskalar organizasyona geçişi sürdürdü.
+*   **Pentium II:**
+    *   Video, ses ve grafik verilerini verimli bir şekilde işlemek üzere özel olarak tasarlanmış Intel **MMX teknolojisini** içeriyordu.
+*   **Pentium III:**
+    *   Ek kayan nokta komutları içeriyordu.
+    *   **SSE (Streaming SIMD Extensions)** komutları eklendi.
+*   **Pentium 4:**
+    *   Ek kayan nokta ve multimedya için diğer geliştirmeleri içerir. (NetBurst mimarisi)
+*   **Core:**
+    *   İlk Intel x86 **mikro-çekirdek (micro-core)** mimarisi. (Daha verimli tasarım)
+*   **Core 2:**
+    *   Core mimarisini **64 bite** genişletir.
+    *   Core 2 Quad, tek bir yonga üzerinde **dört çekirdek** sağlar.
+    *   Daha yeni Core ürünleri yonga başına **10 çekirdeğe kadar** sunmuştur (sunumun yapıldığı tarih itibarıyla).
+    *   Mimariye önemli bir ekleme, **Advanced Vector Extensions (AVX)** komut setiydi.
+
+*   **Ek Açıklama:** Pentium serisiyle birlikte performans artışı sadece saat hızına değil, aynı zamanda mimari yeniliklere (süperskalar, gelişmiş yürütme teknikleri, özel komut setleri) dayandırılmaya başlandı. Core mimarisi, güç verimliliğini ön plana çıkararak çok çekirdekli tasarımlara geçişi hızlandırdı. AVX gibi vektör komut setleri, bilimsel hesaplamalar ve multimedya işlemleri için performansı önemli ölçüde artırdı.
+
+---
+
+### Gömülü Sistemler (Embedded Systems)
+
+*   Bir ürün içinde elektronik ve yazılımın kullanılması.
+*   Her yıl milyarlarca bilgisayar sistemi üretiliyor ve bunlar daha büyük cihazların içine **gömülü** olarak bulunuyor.
+*   Günümüzde elektrik gücü kullanan birçok cihazın gömülü bir bilgi işlem sistemi vardır.
+*   Gömülü sistemler genellikle çevreleriyle **sıkı bir şekilde eşleşiktir (tightly coupled)**.
+*   Bu durum, çevreyle etkileşim kurma ihtiyacının getirdiği **gerçek zamanlı kısıtlamalara (real-time constraints)** yol açabilir.
+    *   Gerekli hareket hızları, ölçüm hassasiyeti ve zaman süreleri gibi kısıtlamalar, yazılım işlemlerinin **zamanlamasını** belirler.
+*   Eğer birden fazla aktivitenin eş zamanlı olarak yönetilmesi gerekiyorsa, bu durum daha karmaşık gerçek zamanlı kısıtlamalar getirir.
+    *   **(Resim Açıklaması):** Slayttaki resimler (webcam, hesap makinesi, eski tip cep telefonu, çamaşır makinesi, fotoğraf makinesi, mikrodalga fırın) çeşitli gömülü sistem örneklerini göstermektedir.
+
+*   **Ek Açıklama:** Gömülü sistemler, belirli bir görevi yerine getirmek üzere tasarlanmış özel amaçlı bilgisayar sistemleridir ve genellikle daha büyük bir sistemin parçasıdırlar. Otomobillerdeki kontrol üniteleri, akıllı ev aletleri, tıbbi cihazlar, endüstriyel kontrolörler gibi sayısız örnek verilebilir. Gerçek zamanlı çalışmaları (belirli bir süre içinde yanıt verme zorunluluğu) en önemli özelliklerindendir.
+
+---
+
+### Gömülü Bir Sistemin Olası Organizasyonu
+
+**(Şekil 1.14 Olası Organizasyon Açıklaması):**
+
+Bu şema, tipik bir gömülü sistemin bileşenlerini ve aralarındaki bağlantıları gösterir:
+
+*   **İşlemci (Processor):** Sistemin beyni.
+*   **Bellek (Memory):** Program ve verileri saklar.
+*   **Özel Mantık (Custom logic):** Uygulamaya özel donanım fonksiyonları (FPGA veya ASIC olabilir).
+*   **Tanılama Portu (Diagnostic port):** Hata ayıklama ve test için kullanılır.
+*   **İnsan Arayüzü (Human interface):** Düğmeler, ekranlar, LED'ler vb.
+*   **Sensörler (Sensors):** Çevreden veri toplar (örn: sıcaklık, basınç).
+    *   **A/D dönüşümü (A/D conversion - Analog to Digital):** Sensörlerden gelen analog sinyalleri işlemcinin anlayabileceği dijital sinyallere çevirir.
+*   **Aktüatörler/Göstergeler (Actuators/indicators):** Çevreye etki eder (örn: motoru çalıştırma, ışığı yakma).
+    *   **D/A dönüşümü (D/A Conversion - Digital to Analog):** İşlemciden gelen dijital sinyalleri aktüatörlerin veya analog göstergelerin anlayabileceği analog sinyallere çevirir.
+
+*   **Ek Açıklama:** Gömülü sistemler genellikle genel amaçlı bilgisayarlardan daha az sayıda ve daha özelleşmiş bileşen içerir. Giriş (sensörler, insan arayüzü) ve çıkış (aktüatörler, göstergeler) birimleri sistemin temel işlevi için kritik öneme sahiptir.
+
+---
+
+### Nesnelerin İnterneti (IoT - The Internet of Things)
+
+*   Cihazlardan küçük sensörlere kadar uzanan akıllı cihazların genişleyen **ara bağlantısına** atıfta bulunan terimdir.
+*   Öncelikle **derinlemesine gömülü cihazlar (deeply embedded devices)** tarafından yönlendirilir.
+*   IoT ile sonuçlanan dağıtım nesilleri:
+    1.  **Bilgi Teknolojisi (IT - Information technology):**
+        *   PC'ler, sunucular, yönlendiriciler, güvenlik duvarları vb., kurumsal IT personeli tarafından IT cihazları olarak satın alınır ve öncelikle kablolu bağlantı kullanır.
+    2.  **Operasyonel Teknoloji (OT - Operational technology):**
+        *   Tıbbi makineler, SCADA, süreç kontrolü ve kiosklar gibi IT dışı şirketler tarafından üretilen gömülü IT içeren makineler/cihazlar, kurumsal OT personeli tarafından cihaz olarak satın alınır ve öncelikle kablolu bağlantı kullanır.
+    3.  **Kişisel Teknoloji (Personal technology):**
+        *   Akıllı telefonlar, tabletler ve e-kitap okuyucular, tüketiciler tarafından IT cihazları olarak satın alınır, yalnızca kablosuz bağlantı kullanır ve genellikle birden fazla kablosuz bağlantı biçimi içerir.
+    4.  **Sensör/Aktüatör Teknolojisi (Sensor/actuator technology):**
+        *   Tüketiciler, IT ve OT personeli tarafından satın alınan tek amaçlı cihazlar, yalnızca kablosuz bağlantı kullanır, genellikle tek bir formda ve daha büyük sistemlerin bir parçası olarak bulunur.
+*   Genellikle **dördüncü nesil** IoT olarak düşünülür ve **milyarlarca gömülü cihazın** kullanımıyla işaretlenir.
+
+*   **Ek Açıklama:** IoT, internete bağlanabilen ve birbirleriyle iletişim kurabilen "akıllı" nesnelerin (cihazlar, sensörler, aktüatörler) oluşturduğu devasa ağı ifade eder. Bu, ev otomasyonundan endüstriyel süreçlerin izlenmesine, akıllı şehirlerden giyilebilir teknolojilere kadar çok geniş bir uygulama alanına sahiptir. Temelinde yine gömülü sistemler yatar.
+
+---
+
+### Gömülü İşletim Sistemleri vs. Uygulama İşlemcileri vs. Adanmış İşlemciler
+
+**Gömülü İşletim Sistemleri (Embedded Operating Systems):**
+
+*   Gömülü bir işletim sistemi (OS) geliştirmek için iki genel yaklaşım vardır:
+    1.  Mevcut bir işletim sistemini alıp gömülü uygulama için **uyarlamak**.
+    2.  Yalnızca gömülü kullanım için tasarlanmış bir işletim sistemini **tasarlamak ve uygulamak**.
+
+**Uygulama İşlemcileri (Application Processors) vs. Adanmış İşlemciler (Dedicated Processors):**
+
+*   **Uygulama İşlemcileri:**
+    *   İşlemcinin **karmaşık işletim sistemlerini** yürütebilme yeteneği ile tanımlanır.
+    *   Doğası gereği **genel amaçlıdır**.
+    *   Bir örnek **akıllı telefondur** – gömülü sistem, çok sayıda uygulamayı desteklemek ve geniş bir işlev yelpazesi gerçekleştirmek üzere tasarlanmıştır.
+*   **Adanmış (Özel) İşlemci:**
+    *   Ana cihaz tarafından gereken **bir veya az sayıda belirli göreve** adanmıştır.
+    *   Böyle bir gömülü sistem belirli bir göreve veya görevlere adandığı için, işlemci ve ilişkili bileşenler **boyut ve maliyeti azaltmak** üzere tasarlanabilir.
+
+*   **Ek Açıklama:** Tüm gömülü sistemler aynı değildir. Akıllı telefon gibi karmaşık görevler yapanlar, genellikle standart bir işletim sisteminin (Android, iOS gibi) uyarlanmış bir sürümünü çalıştıran güçlü "Uygulama İşlemcileri" kullanır. Daha basit görevler yapanlar (örn: bir termostat) ise özel olarak tasarlanmış küçük bir işletim sistemi (veya hiç işletim sistemi olmadan) çalıştıran, daha ucuz ve daha az güç tüketen "Adanmış İşlemciler" (genellikle mikrodenetleyiciler) kullanır.
+
+---
+
+### Tipik Mikrodenetleyici Yongası Elemanları
+
+**(Şekil 1.15 Tipik Mikrodenetleyici Yongası Elemanları Açıklaması):**
+
+Bu şema, tek bir yonga üzerine entegre edilmiş tipik bir **mikrodenetleyicinin** (microcontroller) iç yapısını gösterir:
+
+*   **İşlemci (Processor):** CPU çekirdeği.
+*   **RAM (Random Access Memory):** Geçici veri depolama (program çalışırken kullanılır).
+*   **ROM (Read Only Memory) / Flash:** Program kodunu ve kalıcı verileri saklar.
+*   **EEPROM (Electrically Erasable Programmable Read-Only Memory):** Program çalışırken değiştirilebilen kalıcı verileri saklar (ayarlar vb.).
+*   **A/D dönüştürücü (Analog to Digital converter):** Analog girişleri (örn: sensörler) dijitale çevirir.
+*   **D/A dönüştürücü (Digital to Analog converter):** Dijital çıkışları analoga çevirir (örn: motor kontrolü).
+*   **Seri G/Ç portları (Serial I/O ports):** Diğer cihazlarla seri iletişim için (örn: UART, SPI, I2C).
+*   **Paralel G/Ç portları (Parallel I/O ports):** Dijital giriş/çıkış pinleri (örn: LED yakma, düğme okuma).
+*   **Zamanlayıcılar (Timer):** Zamanlama, sayma ve PWM (Pulse Width Modulation) gibi işlevler için.
+*   **Sistem Veri Yolu (System bus):** Tüm bu bileşenleri birbirine bağlar.
+
+*   **Ek Açıklama:** Mikrodenetleyici, "tek yongalı bilgisayar" olarak düşünülebilir. İşlemci, bellek ve çeşitli G/Ç birimlerini tek bir entegre devrede birleştirir. Bu, onları gömülü sistemler için çok uygun maliyetli ve kompakt bir çözüm haline getirir. Adanmış işlemciler genellikle mikrodenetleyici formundadır.
+
+---
+
+### ARM
+
+*   **RISC tasarım prensiplerinden** evrilmiş ve **gömülü sistemlerde** kullanılan bir işlemci mimarisine atıfta bulunur.
+*   ARM Holdings, Cambridge, İngiltere tarafından tasarlanan **RISC tabanlı mikroişlemci ve mikrodenetleyici ailesidir**.
+*   Yongalar, **küçük kalıp boyutları (die size)** ve **düşük güç gereksinimleri** ile bilinen yüksek hızlı işlemcilerdir.
+*   Muhtemelen en yaygın kullanılan gömülü işlemci mimarisi ve hatta dünyadaki her türden en yaygın kullanılan işlemci mimarisidir.
+*   **Açılımı:** Acorn RISC Machine / Advanced RISC Machine.
+
+*   **Ek Açıklama:** ARM, özellikle mobil cihazlar (akıllı telefonlar, tabletler) ve düşük güç tüketiminin önemli olduğu diğer gömülü sistemler pazarında baskın mimaridir. Intel'in x86'sından farklı olarak ARM, kendisi yonga üretmez; bunun yerine mimari lisansını Apple, Samsung, Qualcomm gibi şirketlere satar ve bu şirketler kendi ARM tabanlı yongalarını üretirler.
+
+---
+
+### ARM Ürünleri (Cortex Ailesi)
+
+*   **Cortex-A Serisi (Application):**
+    *   Yüksek performanslı uygulamalar, zengin işletim sistemleri (Linux, Android, Windows) için tasarlanmıştır.
+    *   Örnekler: Cortex-A50, ..., **Cortex-A78**
+        *   *Cortex-A78 Özellikleri (Örnek):* ~3.0GHz saat hızı, 64KB L1 önbellek, 512KB L2 önbellek, 4MB L3 önbellek (tipik yapılandırmalar).
+*   **Cortex-R Serisi (Real-time):**
+    *   Gerçek zamanlı uygulamalar, yüksek güvenilirlik ve hızlı yanıt süresi gerektiren sistemler için (otomotiv, depolama denetleyicileri).
+*   **Cortex-M Serisi (Microcontroller):**
+    *   Düşük maliyetli, düşük güç tüketimli mikrodenetleyici uygulamaları için optimize edilmiştir.
+    *   Örnekler: Cortex-M0, Cortex-M0+, Cortex-M3, Cortex-M4
+
+*   **Ek Açıklama:** ARM, farklı uygulama alanlarına yönelik olarak optimize edilmiş çeşitli işlemci çekirdeği aileleri (Cortex serisi) sunar. Cortex-A serisi akıllı telefonlar ve tabletlerde yaygınken, Cortex-M serisi daha basit gömülü cihazlarda ve mikrodenetleyicilerde kullanılır. Cortex-R ise güvenlik ve zamanlama açısından kritik sistemlere odaklanır.
+
+---
+
+### Cortex-M3 Tabanlı Tipik Mikrodenetleyici Yongası
+
+**(Şekil 1.16 Cortex-M3 Tabanlı Mikrodenetleyici Açıklaması):**
+
+Bu şema, ARM Cortex-M3 çekirdeğini temel alan daha detaylı bir mikrodenetleyici yapısını gösterir:
+
+*   **Mikrodenetleyici Yongası (Microcontroller Chip):**
+    *   **Çevre Birimleri (Peripherals):** Güvenlik (AES), Analog Arayüzler (ADC, DAC), Zamanlayıcılar, Paralel/Seri G/Ç Portları (USART, USB, UART).
+    *   **Sistem Yönetimi:** Voltaj regülatörü, Güç yönetimi, Saat yönetimi.
+    *   **Bellek:** Flash bellek, SRAM bellek, DMA denetleyici, Bellek koruma birimi.
+    *   **Cortex-M3 İşlemci (Cortex-M3 processor):** Ana işlem birimi.
+    *   **Çekirdek ve Bellek (Core and memory):** İşlemci çekirdeği ile bellek arasındaki ana bağlantı.
+    *   **32-bit Veri Yolu (32-bit bus):** Bileşenler arası iletişim.
+*   **Cortex-M3 İşlemci Detayı (Cortex-M3 Processor):**
+    *   **ICode/DCode/SRAM Arayüzleri:** Komut, veri ve SRAM erişimi için arayüzler.
+    *   **Veri Yolu Matrisi (Bus matrix):** Farklı bileşenlerin veri yoluna erişimini yönetir.
+    *   **Hata Ayıklama Mantığı (Debug logic):** DAP (Debug Access Port).
+    *   **Bellek Koruma Birimi (Memory protection unit):**
+    *   **NVIC (Nested Vectored Interrupt Controller):** Kesme (interrupt) yönetimini sağlar.
+    *   **ARM çekirdeği (ARM core):** Asıl işlemci mantığı.
+    *   **ETM (Embedded Trace Macrocell):** Gelişmiş hata ayıklama için izleme yeteneği.
+*   **Cortex-M3 Çekirdek Detayı (Cortex-M3 Core):**
+    *   **NVIC Arayüzü**
+    *   **ETM Arayüzü**
+    *   **32-bit ALU:** Aritmetik ve mantık işlemleri.
+    *   **Donanım Bölücü (Hardware divider):** Bölme işlemi için.
+    *   **32-bit Çarpan (32-bit multiplier):** Çarpma işlemi için.
+    *   **Kontrol Mantığı (Control logic):** Komutları yönetir.
+    *   **Thumb Kod Çözücü (Thumb decode):** ARM'ın sıkıştırılmış komut setini çözer.
+    *   **Komut Arayüzü (Instruction interface)**
+    *   **Veri Arayüzü (Data interface)**
+
+*   **Ek Açıklama:** Bu detaylı şema, modern bir mikrodenetleyicinin ne kadar karmaşık olabileceğini ve bir ARM Cortex-M3 çekirdeğinin iç yapısını gösterir. Birçok özelleşmiş donanım birimi (çarpıcı, bölücü, kesme denetleyici, hata ayıklama birimleri) tek bir yonga üzerine entegre edilmiştir.
+
+---
+
+### Bulut Bilişim (Cloud Computing)
+
+*   **NIST (Ulusal Standartlar ve Teknoloji Enstitüsü) bulut bilişimi şöyle tanımlar:**
+    > "Yapılandırılabilir bilgi işlem kaynaklarının (örn. ağlar, sunucular, depolama, uygulamalar ve hizmetler) paylaşılan bir havuzuna, istek üzerine ağ erişimi sağlayan, minimum yönetim çabası veya hizmet sağlayıcı etkileşimi ile hızla sağlanabilen ve serbest bırakılabilen **her yerde bulunabilen, kullanışlı bir modeldir**."
+*   **Avantajları:**
+    *   **Ölçek ekonomisi (Economies of scale):** Büyük altyapıların maliyet avantajı.
+    *   **Profesyonel ağ yönetimi:** Uzmanlar tarafından yönetilen ağ altyapısı.
+    *   **Profesyonel güvenlik yönetimi:** Uzmanlar tarafından sağlanan güvenlik.
+    *   Birey veya şirket yalnızca **ihtiyaç duyduğu depolama kapasitesi ve hizmetler için ödeme yapar** (Pay-as-you-go).
+    *   Bulut sağlayıcısı **güvenlikle ilgilenir**.
+    *   **(Resim Açıklaması):** Sağdaki bulut simgesi, internet üzerinden erişilen soyut bilgi işlem kaynaklarını temsil eder.
+
+*   **Ek Açıklama:** Bulut bilişim, bilgi işlem kaynaklarını (işlem gücü, depolama, yazılım) internet üzerinden bir hizmet olarak sunma modelidir. Kullanıcılar kendi sunucularını veya yazılımlarını satın almak ve yönetmek yerine, ihtiyaç duydukları kaynakları bir bulut sağlayıcısından (AWS, Azure, Google Cloud gibi) kiralarlar.
+
+---
+
+### Bulut Ağı (Cloud Networking) ve Bulut Depolama (Cloud Storage)
+
+**Bulut Ağı (Cloud Networking):**
+
+*   Bulut bilişimi etkinleştirmek için mevcut olması gereken **ağlara ve ağ yönetimi işlevselliğine** atıfta bulunur.
+*   Bir örnek, sağlayıcı ile abone arasında **yüksek performanslı ve/veya yüksek güvenilirlikli ağ bağlantısının** sağlanmasıdır.
+*   Bir buluta erişmek için gereken ağ yeteneklerinin toplanması; İnternet üzerinden özel hizmetlerin kullanılmasını, kurumsal veri merkezinin bir buluta bağlanmasını ve erişim güvenlik politikalarını uygulamak için kritik noktalarda güvenlik duvarları ve diğer ağ güvenlik cihazlarının kullanılmasını içerir.
+
+**Bulut Depolama (Cloud Storage):**
+
+*   Bulut bilişimin bir **alt kümesidir**.
+*   Uzakta, bulut sunucularında barındırılan **veritabanı depolama ve veritabanı uygulamalarından** oluşur.
+*   Küçük işletmelerin ve bireysel kullanıcıların, **ihtiyaçlarına göre ölçeklenen veri depolama** avantajından yararlanmalarını ve depolama varlıklarını satın almak, bakımını yapmak ve yönetmek zorunda kalmadan çeşitli veritabanı uygulamalarından yararlanmalarını sağlar.
+
+*   **Ek Açıklama:** Bulut bilişim, güçlü ağ bağlantıları (Cloud Networking) üzerine kuruludur. Kullanıcıların bulut kaynaklarına hızlı ve güvenli bir şekilde erişebilmesi gerekir. Cloud Storage ise verilerinizi yerel diskler yerine bulut sağlayıcısının sunucularında saklamanıza ve yönetmenize olanak tanır. Bu, ölçeklenebilirlik, erişilebilirlik ve yedekleme kolaylığı gibi avantajlar sunar.
+
+---
+
+### Alternatif Bilgi Teknolojisi Mimarileri
+
+**(Şekil 1.17 Mimariler Açıklaması):**
+
+Bu şema, geleneksel IT altyapısı ile bulut bilişim hizmet modellerini karşılaştırır ve her katmanın kim tarafından yönetildiğini gösterir (Müşteri - Managed by client vs. Sağlayıcı - Managed by CSP):
+
+*   **Katmanlar (Alttan Üste):**
+    *   Networking (Ağ)
+    *   Storage (Depolama)
+    *   Servers (Sunucular)
+    *   Virtualization (Sanallaştırma)
+    *   Operating system (İşletim sistemi)
+    *   Middleware (Ara katman yazılımı)
+    *   Runtime (Çalışma zamanı ortamı)
+    *   Data (Veri)
+    *   Applications (Uygulamalar)
+
+*   **Modeller:**
+    *   **Geleneksel IT (Traditional IT architecture):** Tüm katmanlar **müşteri** tarafından yönetilir.
+        *   *Özellikler:* Daha karmaşık, daha fazla ön yatırım maliyeti, daha az ölçeklenebilir, daha fazla özelleştirilebilir.
+    *   **Hizmet Olarak Altyapı (IaaS - Infrastructure as a Service):** Ağ, Depolama, Sunucular, Sanallaştırma **sağlayıcı** tarafından yönetilir. İşletim sistemi ve yukarısı **müşteri** tarafından yönetilir.
+    *   **Hizmet Olarak Platform (PaaS - Platform as a Service):** Ağ'dan Çalışma Zamanı Ortamı'na kadar olan katmanlar **sağlayıcı** tarafından yönetilir. Veri ve Uygulamalar **müşteri** tarafından yönetilir.
+    *   **Hizmet Olarak Yazılım (SaaS - Software as a Service):** Tüm katmanlar **sağlayıcı** tarafından yönetilir. Müşteri sadece uygulamayı kullanır.
+        *   *Özellikler:* Daha az karmaşık, daha düşük ön yatırım maliyeti, daha fazla ölçeklenebilir, daha az özelleştirilebilir.
+
+*   **Kısaltmalar:** IT = Bilişim Teknolojisi, CSP = Bulut Hizmet Sağlayıcısı.
+*   **Ek Açıklama:** Bu modeller, IT kaynaklarını kullanmanın farklı yollarını sunar. Geleneksel modelde her şeyi kendiniz yönetirsiniz. SaaS modelinde ise sadece yazılımı kullanırsınız, altyapıyla hiç ilgilenmezsiniz (örn: Gmail, Office 365). IaaS ve PaaS ise bu ikisi arasında farklı kontrol seviyeleri sunar. IaaS size sanal makineler sunarken (işletim sistemini siz kurarsınız), PaaS size uygulama geliştirme ve çalıştırma platformu sunar (altyapı ve işletim sistemiyle siz ilgilenmezsiniz).
+
+---
+
+### Özet - Bölüm 1: Temel Kavramlar ve Bilgisayar Evrimi
+
+*   **Organizasyon ve Mimari**
+    *   Yapı ve Fonksiyon
+*   **Bilgisayar Tarihinin Kısa Özeti**
+    *   Birinci Nesil: Vakum Tüpleri
+    *   İkinci Nesil: Transistörler
+    *   Üçüncü Nesil: Entegre Devreler
+    *   Sonraki Nesiller
+*   **Intel x86 Mimarisi'nin Evrimi**
+*   **Bulut Bilişim**
+    *   Temel Kavramlar
+    *   Bulut Hizmetleri (IaaS, PaaS, SaaS)
+*   **Gömülü Sistemler**
+    *   Nesnelerin İnterneti (IoT)
+    *   Gömülü İşletim Sistemleri
+    *   Uygulama İşlemcileri vs. Adanmış İşlemciler
+    *   Mikroişlemciler vs. Mikrodenetleyiciler
+    *   Gömülü vs. Derinlemesine Gömülü Sistemler
+*   **ARM Mimarisi**
+    *   ARM Evrimi
+    *   Komut Seti Mimarisi (RISC)
+    *   ARM Ürünleri (Cortex A/R/M)
+
+*   **Ek Açıklama:** Bu özet, ilk haftanın ve kitabın ilk bölümünün ana konularını listeler. Bilgisayarın temel yapı taşlarından başlayarak tarihsel gelişimini, önemli mimarileri (x86, ARM), modern trendleri (çok çekirdek, bulut, IoT) ve gömülü sistemleri kapsayan geniş bir giriş yapılmıştır.
+
+***
 
-◦
-
-Çip Organizasyonu ve Mimarisi (Chip Organization and Architecture): Çok çekirdekli (multi-core), MICs (Many Integrated Core), GPGPUs (General-Purpose computing on Graphics Processing Units) gibi teknolojiler performans artışında önemli rol oynar16 .
-
-•
-
-Performans Değerlendirme: Performansı ölçmek için kullanılan metrikler arasında saat hızı (clock speed), saniyedeki komut sayısı (instructions per second - IPS) ve benchmark testleri bulunur16 .
-
-Bilgisayar Sistemi - Üst Düzey Bakış ve Bağlantılar:
-
-•
-
-Bir bilgisayar sistemi temel olarak işlemci (CPU - Central Processing Unit), bellek (memory) ve giriş/çıkış (I/O) bileşenlerinden oluşur17 .... Bu bileşenlerin birbirleriyle veri ve kontrol sinyallerini alışverişi yapabilmesi için bağlantı yapılarına (interconnection structures) ihtiyaç vardır13 .... En yaygın bağlantı yapısı veri yoludur (bus)13 ....
-
-•
-
-Veri Yolu (Bus): Birden fazla cihazın aynı iletişim ortamını paylaştığı bir iletişim yoludur. Genellikle paralel elektriksel iletkenlerden oluşur19 . Bir veri yolu temel olarak şunlardan oluşur:
-
-◦
-
-Adres Yolu (Address Bus): Bellek veya G/Ç adreslerini taşır. Adres yolunun genişliği, adreslenebilir konum sayısını belirler20 ....
-
-◦
-
-Veri Yolu (Data Bus): Gerçek veriyi taşır. Veri yolunun genişliği, bir seferde taşınabilecek veri miktarını etkiler20 ....
-
-◦
-
-Kontrol Yolu (Control Bus): Komutları, zamanlama sinyallerini ve kontrol bilgilerini taşır20 ....
-
-•
-
-Veri yolu tipleri arasında dedicated (ayrılmış) veri yolları (belirli bir fonksiyon için ayrılmış) ve multiplexed (çoklanmış) veri yolları (adres ve verinin aynı hatlar üzerinden farklı zamanlarda taşındığı) bulunur20 .
-
-•
-
-Veri yolu erişimini kontrol etmek için arbitrasyon (arbitration) mekanizmaları kullanılır18 .... Bu mekanizmalar merkezi veya dağıtık olabilir.
-
-•
-
-PCI (Peripheral Component Interconnect): Yüksek performanslı çevre birimlerini bağlamak için yaygın olarak kullanılan bir standart bağlantı yoludur22 ....
-
-Önbellek (Cache) Bellek:
-
-•
-
-Bellek Hiyerarşisi: Bilgisayar sistemlerinde hız ve maliyet dengesini sağlamak için farklı hız ve kapasitelerde bellek katmanları kullanılır. Önbellek (cache), işlemciye en yakın ve en hızlı bellek katmanıdır24 ....
-
-•
-
-Önbellek Prensipleri: Önbellek, sık kullanılan verilere daha hızlı erişim sağlamak amacıyla çalışır. Temel önbellek tasarım unsurları şunlardır26 :
-
-◦
-
-Önbellek Boyutu (Cache Size): Önbellekte saklanabilecek veri miktarı.
-
-◦
-
-Eşleme Fonksiyonu (Mapping Function): Ana bellekteki bir bloğun önbellekte hangi satıra yerleştirileceğini belirler. Üç temel eşleme fonksiyonu vardır:
-
-▪
-
-Doğrudan Eşleme (Direct Mapping): Her ana bellek bloğunun önbellekte yalnızca bir olası konumu vardır26 ....
-
-▪
-
-Tam İlişkisel Eşleme (Associative Mapping): Bir ana bellek bloğu önbellekte herhangi bir yere yerleştirilebilir26 .
-
-▪
-
-Küme İlişkisel Eşleme (Set-Associative Mapping): Önbellek kümeler halinde düzenlenir ve bir ana bellek bloğu belirli bir küme içindeki herhangi bir satıra yerleştirilebilir28 ....
-
-◦
-
-Yer Değiştirme Algoritması (Replacement Algorithm): Önbellek dolu olduğunda ve yeni bir blok getirilmesi gerektiğinde hangi bloğun çıkarılacağını belirler (LRU - Least Recently Used, FIFO - First In First Out, Rastgele gibi)26 .
-
-◦
-
-Yazma Politikası (Write Policy): Veri önbellekte değiştirildiğinde ana belleğin ne zaman güncelleneceğini belirler (write-through, write-back)26 .
-
-◦
-
-Satır Boyutu (Line Size): Önbelleğe getirilen veri bloğunun boyutu.
-
-◦
-
-Önbellek Sayısı (Number of Caches): Tek seviyeli veya çok seviyeli önbellekler olabilir (L1, L2, L3 önbellekleri gibi)26 .
-
-Temel Bilgisayar Organizasyonu ve Tasarımı (M. Morris Mano Modeli):
-
-•
-
-Mano'nun basitleştirilmiş bilgisayar modeli, işlemci (CPU), bellek ve G/Ç birimlerinden oluşur30 .... Bu modelde temel bileşenler şunlardır:
-
-◦
-
-Bellek Birimi (Memory Unit): Komutları ve verileri saklar. Mano modelinde 4096 x 16 bitlik bir bellek varsayılır33 ....
-
-◦
-
-Yazmaçlar (Registers): İşlemci içinde hızlı erişilebilen depolama konumlarıdır. Mano modelinde kullanılan temel yazmaçlar şunlardır:
-
-▪
-
-AR (Address Register): Bellek adresini tutar34 ....
-
-▪
-
-PC (Program Counter): Bir sonraki çalıştırılacak komutun adresini tutar34 ....
-
-▪
-
-DR (Data Register): Bellekten okunan veya belleğe yazılacak veriyi geçici olarak tutar34 .
-
-▪
-
-AC (Accumulator): Aritmetik ve mantıksal işlemler için kullanılan temel yazmaç34 ....
-
-▪
-
-IR (Instruction Register): Bellekten getirilen mevcut komutu tutar33 ....
-
-▪
-
-Diğer yazmaçlar (TR, OUTR, INPR, SC)34 .
-
-◦
-
-Kontrol Birimi (Control Unit): Komutların alınmasını, çözülmesini ve yürütülmesini kontrol eder. Zamanlama sinyalleri (timing signals) ve kontrol sinyalleri (control signals) üretir33 ....
-
-◦
-
-ALU (Arithmetic Logic Unit): Aritmetik ve mantıksal işlemleri gerçekleştirir34 ....
-
-◦
-
-Veri Yolu (Bus): Bileşenler arasında veri transferini sağlar34 ....
-
-•
-
-Komut Formatı (Instruction Format): Bir komut genellikle bir işlem kodu (opcode) (yapılacak işlemi belirtir) ve bir adres (işlem için kullanılacak bellek konumlarını veya yazmaçları belirtir) olmak üzere iki kısımdan oluşur33 ....
-
-•
-
-Komut Seti (Instruction Set): Bir işlemcinin çalıştırabileceği tüm komutların kümesidir. Mano modelinde aritmetik, mantıksal, veri transferi ve kontrol komutları bulunur40 ....
-
-•
-
-Komut Döngüsü (Instruction Cycle): Bir komutun yürütülmesi için geçen adımlar dizisidir (fetch, decode, execute)42 ....
-
-•
-
-Mikroprogramlı Kontrol (Microprogrammed Control): Kontrol sinyallerinin bir kontrol belleğinde (control memory) saklanan mikrokomutlar aracılığıyla üretildiği bir kontrol birimi tasarım yöntemidir44 . Bu yöntemde mikrorutinler ve mikroişlemler kavramları önemlidir44 ....
-
-Paralel İşleme (Parallel Processing):
-
-•
-
-Birden fazla komutun veya verinin aynı anda işlenmesi prensibine dayanır. Farklı paralel işleme mimarileri mevcuttur:
-
-◦
-
-SISD (Single Instruction, Single Data): Tek komut akışı ve tek veri akışı (standart Von Neumann mimarisi)46 .
-
-◦
-
-MISD (Multiple Instruction, Single Data): Çoklu komut akışı ve tek veri akışı (günümüzde sınıflandırılabilecek bir bilgisayar yoktur)46 ....
-
-◦
-
-SIMD (Single Instruction, Multiple Data): Tek komut akışı ve çoklu veri akışı (dizi işlemciler, vektör işlemciler)46 ....
-
-◦
-
-MIMD (Multiple Instruction, Multiple Data): Çoklu komut akışı ve çoklu veri akışı (çok işlemcili sistemler)46 .
-
-•
-
-Boru Hattı (Pipelining): Bir ardışık işlemi alt işlemlere ayırarak her bir alt işlemin farklı bir donanım segmentinde eş zamanlı olarak yürütülmesini sağlayan bir tekniktir48 .
-
-•
-
-Vektör İşleme (Vector Processing): Aynı işlemi büyük veri dizileri üzerinde paralel olarak gerçekleştirmek için özel komutlar kullanan bir yöntemdir49 .
-
-•
-
-Çok İşlemcili Sistemler (Multiprocessor Systems): Birden fazla işlem birimine sahip sistemlerdir. Bellek paylaşımı ve önbellek tutarlılığı gibi konular önem kazanır50 .
-
-•
-
-Ara Bağlantı Ağları (Interconnection Networks): Çok işlemcili sistemlerde işlemciler ve bellekler arasındaki iletişimi sağlayan ağlardır (örneğin, banyan ağı, delta ağı)51 .
-
-Çıkmış Soru Tipleri:
-
-Verilen çıkmış sorulara bakıldığında, sınavlarda aşağıdaki gibi soru tipleriyle karşılaşılabilir:
-
-•
-
-Temel Kavramların Tanımı ve Açıklanması: Bilgisayar mimarisi ve organizasyonu arasındaki fark, veri yolu, önbellek, komut döngüsü gibi temel kavramların tanımlanması ve açıklanması istenebilir52 ....
-
-•
-
-Kısaltmaların Açılımı: MBR, MAR, ALU gibi bilgisayar organizasyonu bağlamında sıkça kullanılan kısaltmaların tam adlarının yazılması istenebilir35 ....
-
-•
-
-IAS Bilgisayar Yapısı: IAS bilgisayarının temel bileşenlerinin (aritmetik-lojik birim, kontrol birimi, bellek, G/Ç) ve bunlar arasındaki bağlantıların tanınması ve isimlendirilmesi istenebilir36 .... Şemalar üzerindeki numaralandırılmış kısımların ne anlama geldiği sorulabilir.
-
-•
-
-Assembly Diline Giriş: Basit assembly dili komutlarının ne işe yaradığının anlaşılmasına yönelik sorular olabilir (örneğin, belirli bir komutun etkilediği yazmaçlar veya bellek konumları)57 .
-
-•
-
-Önbellek Kavramları: Doğrudan eşleme, ilişkisel eşleme gibi önbellek eşleme tekniklerinin temel prensiplerinin anlaşılmasına yönelik sorular sorulabilir.
-
-•
-
-Bilgisayarın Evrimi: Bilgisayar nesilleri ve bu nesillerdeki temel teknolojik değişiklikler hakkında bilgi istenebilir. Moore Yasası'nın etkileri sorulabilir.
-
-# ENGLISH
-
-## English Notes
 
