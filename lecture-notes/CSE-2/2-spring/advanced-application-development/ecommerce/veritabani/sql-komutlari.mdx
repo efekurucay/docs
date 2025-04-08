@@ -1,0 +1,549 @@
+---
+title: 'SQL Komutları ve Örnek Veriler'
+description: 'E-Ticaret Web Uygulaması için SQL komutları ve örnek veriler'
+---
+
+# SQL Komutları ve Örnek Veriler
+
+Bu bölümde, e-ticaret web uygulaması için veritabanı tablolarını oluşturmak ve örnek veriler eklemek için gerekli SQL komutlarını detaylı olarak ele alacağız. Bu SQL komutları, veritabanı şemasını oluşturmak ve test etmek için kullanılabilir.
+
+## Veritabanı Oluşturma
+
+İlk olarak, e-ticaret uygulaması için bir veritabanı oluşturalım:
+
+```sql
+-- Veritabanı oluşturma
+CREATE DATABASE ecommerce CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Veritabanını kullanma
+USE ecommerce;
+```
+
+## Tablo Oluşturma Komutları
+
+Aşağıda, e-ticaret uygulaması için gerekli tabloları oluşturan SQL komutları bulunmaktadır. Bu komutlar, veritabanı şema tasarımında belirtilen tablo yapılarını ve ilişkileri oluşturur.
+
+### 1. USERS Tablosu
+
+```sql
+CREATE TABLE users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    phone VARCHAR(20),
+    is_active BOOLEAN DEFAULT TRUE,
+    role VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_username (username),
+    INDEX idx_email (email),
+    INDEX idx_role (role)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+### 2. CATEGORIES Tablosu
+
+```sql
+CREATE TABLE categories (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    parent_id BIGINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_name_parent (name, parent_id),
+    INDEX idx_parent_id (parent_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+### 3. PRODUCTS Tablosu
+
+```sql
+CREATE TABLE products (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    price DECIMAL(10,2) NOT NULL CHECK (price > 0),
+    stock_quantity INT NOT NULL DEFAULT 0 CHECK (stock_quantity >= 0),
+    image_url VARCHAR(255),
+    category_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
+    INDEX idx_category_id (category_id),
+    INDEX idx_name (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+### 4. PRODUCT_IMAGES Tablosu
+
+```sql
+CREATE TABLE product_images (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT NOT NULL,
+    image_url VARCHAR(255) NOT NULL,
+    is_primary BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    INDEX idx_product_id (product_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+### 5. ADDRESSES Tablosu
+
+```sql
+CREATE TABLE addresses (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    address_line1 VARCHAR(255) NOT NULL,
+    address_line2 VARCHAR(255),
+    city VARCHAR(100) NOT NULL,
+    state VARCHAR(100) NOT NULL,
+    postal_code VARCHAR(20) NOT NULL,
+    country VARCHAR(100) NOT NULL,
+    is_default BOOLEAN DEFAULT FALSE,
+    address_type VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+### 6. ORDERS Tablosu
+
+```sql
+CREATE TABLE orders (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_amount DECIMAL(10,2) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    shipping_addr_id BIGINT NOT NULL,
+    billing_addr_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (shipping_addr_id) REFERENCES addresses(id),
+    FOREIGN KEY (billing_addr_id) REFERENCES addresses(id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+### 7. ORDER_DETAILS Tablosu
+
+```sql
+CREATE TABLE order_details (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    quantity INT NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    INDEX idx_order_id (order_id),
+    INDEX idx_product_id (product_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+### 8. PAYMENTS Tablosu
+
+```sql
+CREATE TABLE payments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT NOT NULL,
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    payment_method VARCHAR(50) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    INDEX idx_order_id (order_id),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+### 9. REVIEWS Tablosu
+
+```sql
+CREATE TABLE reviews (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment TEXT,
+    review_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_product_id (product_id),
+    INDEX idx_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+## Örnek Veri Ekleme Komutları
+
+Veritabanı tablolarını oluşturduktan sonra, test ve geliştirme amaçlı olarak örnek veriler ekleyebiliriz. Aşağıda, her tablo için örnek veri ekleme komutları bulunmaktadır.
+
+### 1. USERS Tablosuna Örnek Veriler
+
+```sql
+-- Kullanıcılar (şifreler: 'password123' - gerçek uygulamada şifreler hash'lenmelidir)
+INSERT INTO users (username, email, password, first_name, last_name, phone, is_active, role) VALUES
+('admin', 'admin@example.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'Admin', 'User', '5551234567', TRUE, 'ADMIN'),
+('johndoe', 'john.doe@example.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'John', 'Doe', '5552345678', TRUE, 'USER'),
+('janedoe', 'jane.doe@example.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'Jane', 'Doe', '5553456789', TRUE, 'USER'),
+('bobsmith', 'bob.smith@example.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'Bob', 'Smith', '5554567890', TRUE, 'USER'),
+('alicejones', 'alice.jones@example.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', 'Alice', 'Jones', '5555678901', TRUE, 'USER');
+```
+
+### 2. CATEGORIES Tablosuna Örnek Veriler
+
+```sql
+-- Ana kategoriler
+INSERT INTO categories (name, description, parent_id) VALUES
+('Elektronik', 'Elektronik ürünler ve aksesuarlar', NULL),
+('Giyim', 'Erkek, kadın ve çocuk giyim ürünleri', NULL),
+('Ev & Yaşam', 'Ev dekorasyon ve yaşam ürünleri', NULL),
+('Kitap & Müzik', 'Kitaplar, müzik albümleri ve filmler', NULL),
+('Spor & Outdoor', 'Spor ekipmanları ve outdoor ürünler', NULL);
+
+-- Alt kategoriler (Elektronik)
+INSERT INTO categories (name, description, parent_id) VALUES
+('Telefonlar', 'Akıllı telefonlar ve aksesuarlar', 1),
+('Bilgisayarlar', 'Dizüstü ve masaüstü bilgisayarlar', 1),
+('Televizyonlar', 'Smart TV ve televizyon aksesuarları', 1),
+('Kulaklıklar', 'Kablolu ve kablosuz kulaklıklar', 1);
+
+-- Alt kategoriler (Giyim)
+INSERT INTO categories (name, description, parent_id) VALUES
+('Erkek Giyim', 'Erkekler için giyim ürünleri', 2),
+('Kadın Giyim', 'Kadınlar için giyim ürünleri', 2),
+('Çocuk Giyim', 'Çocuklar için giyim ürünleri', 2),
+('Ayakkabılar', 'Erkek, kadın ve çocuk ayakkabıları', 2);
+
+-- Alt kategoriler (Ev & Yaşam)
+INSERT INTO categories (name, description, parent_id) VALUES
+('Mobilya', 'Ev ve ofis mobilyaları', 3),
+('Mutfak', 'Mutfak gereçleri ve ekipmanları', 3),
+('Banyo', 'Banyo aksesuarları ve tekstil ürünleri', 3),
+('Dekorasyon', 'Ev dekorasyon ürünleri', 3);
+```
+
+### 3. PRODUCTS Tablosuna Örnek Veriler
+
+```sql
+-- Elektronik - Telefonlar kategorisindeki ürünler
+INSERT INTO products (name, description, price, stock_quantity, image_url, category_id) VALUES
+('iPhone 13', '6.1 inç Super Retina XDR ekran, A15 Bionic çip, 128GB depolama', 14999.99, 50, 'https://example.com/images/iphone13.jpg', 6),
+('Samsung Galaxy S21', '6.2 inç Dynamic AMOLED ekran, Exynos 2100 işlemci, 128GB depolama', 9999.99, 75, 'https://example.com/images/galaxys21.jpg', 6),
+('Xiaomi Redmi Note 10', '6.43 inç AMOLED ekran, Snapdragon 678 işlemci, 64GB depolama', 3999.99, 100, 'https://example.com/images/redminote10.jpg', 6);
+
+-- Elektronik - Bilgisayarlar kategorisindeki ürünler
+INSERT INTO products (name, description, price, stock_quantity, image_url, category_id) VALUES
+('MacBook Air M1', '13.3 inç Retina ekran, Apple M1 çip, 8GB RAM, 256GB SSD', 13999.99, 30, 'https://example.com/images/macbookair.jpg', 7),
+('Dell XPS 13', '13.4 inç FHD+ ekran, Intel Core i7, 16GB RAM, 512GB SSD', 17999.99, 25, 'https://example.com/images/dellxps13.jpg', 7),
+('Lenovo ThinkPad X1', '14 inç 4K ekran, Intel Core i7, 16GB RAM, 1TB SSD', 19999.99, 20, 'https://example.com/images/thinkpadx1.jpg', 7);
+
+-- Giyim - Erkek Giyim kategorisindeki ürünler
+INSERT INTO products (name, description, price, stock_quantity, image_url, category_id) VALUES
+('Slim Fit Gömlek', '%100 Pamuk, slim fit kesim, mavi renk', 199.99, 200, 'https://example.com/images/slimfitshirt.jpg', 10),
+('Klasik Pantolon', 'Rahat kesim, siyah renk, polyester karışım', 249.99, 150, 'https://example.com/images/classicpants.jpg', 10),
+('Deri Ceket', 'Gerçek deri, siyah renk, fermuarlı', 999.99, 50, 'https://example.com/images/leatherjacket.jpg', 10);
+
+-- Giyim - Kadın Giyim kategorisindeki ürünler
+INSERT INTO products (name, description, price, stock_quantity, image_url, category_id) VALUES
+('V Yaka Bluz', 'Hafif kumaş, v yaka, beyaz renk', 149.99, 200, 'https://example.com/images/vneckblouse.jpg', 11),
+('Skinny Jean', 'Yüksek bel, skinny fit, mavi renk', 299.99, 180, 'https://example.com/images/skinnyjeans.jpg', 11),
+('Trençkot', 'Klasik kesim, bej renk, kemerli', 599.99, 70, 'https://example.com/images/trenchcoat.jpg', 11);
+
+-- Ev & Yaşam - Mobilya kategorisindeki ürünler
+INSERT INTO products (name, description, price, stock_quantity, image_url, category_id) VALUES
+('3\'lü Koltuk Takımı', 'Modern tasarım, gri renk, yüksek konfor', 5999.99, 15, 'https://example.com/images/sofa.jpg', 14),
+('Yemek Masası Seti', '6 kişilik, ahşap, 6 sandalye dahil', 3999.99, 20, 'https://example.com/images/diningtable.jpg', 14),
+('Çalışma Masası', 'Kompakt tasarım, çekmeceli, beyaz renk', 999.99, 40, 'https://example.com/images/desk.jpg', 14);
+```
+
+### 4. PRODUCT_IMAGES Tablosuna Örnek Veriler
+
+```sql
+-- iPhone 13 için ürün görselleri
+INSERT INTO product_images (product_id, image_url, is_primary) VALUES
+(1, 'https://example.com/images/iphone13_front.jpg', TRUE),
+(1, 'https://example.com/images/iphone13_back.jpg', FALSE),
+(1, 'https://example.com/images/iphone13_side.jpg', FALSE);
+
+-- Samsung Galaxy S21 için ürün görselleri
+INSERT INTO product_images (product_id, image_url, is_primary) VALUES
+(2, 'https://example.com/images/galaxys21_front.jpg', TRUE),
+(2, 'https://example.com/images/galaxys21_back.jpg', FALSE),
+(2, 'https://example.com/images/galaxys21_side.jpg', FALSE);
+
+-- MacBook Air M1 için ürün görselleri
+INSERT INTO product_images (product_id, image_url, is_primary) VALUES
+(4, 'https://example.com/images/macbookair_front.jpg', TRUE),
+(4, 'https://example.com/images/macbookair_side.jpg', FALSE),
+(4, 'https://example.com/images/macbookair_keyboard.jpg', FALSE);
+```
+
+### 5. ADDRESSES Tablosuna Örnek Veriler
+
+```sql
+-- John Doe için adresler
+INSERT INTO addresses (user_id, address_line1, address_line2, city, state, postal_code, country, is_default, address_type) VALUES
+(2, 'Atatürk Caddesi No: 123', 'Daire: 5', 'İstanbul', 'Kadıköy', '34700', 'Türkiye', TRUE, 'SHIPPING'),
+(2, 'Atatürk Caddesi No: 123', 'Daire: 5', 'İstanbul', 'Kadıköy', '34700', 'Türkiye', TRUE, 'BILLING');
+
+-- Jane Doe için adresler
+INSERT INTO addresses (user_id, address_line1, address_line2, city, state, postal_code, country, is_default, address_type) VALUES
+(3, 'Cumhuriyet Caddesi No: 456', 'Kat: 3 Daire: 7', 'Ankara', 'Çankaya', '06690', 'Türkiye', TRUE, 'SHIPPING'),
+(3, 'İş Merkezi Blok B No: 10', NULL, 'Ankara', 'Çankaya', '06700', 'Türkiye', TRUE, 'BILLING');
+
+-- Bob Smith için adresler
+INSERT INTO addresses (user_id, address_line1, address_line2, city, state, postal_code, country, is_default, address_type) VALUES
+(4, 'İnönü Caddesi No: 789', 'Daire: 12', 'İzmir', 'Konak', '35000', 'Türkiye', TRUE, 'SHIPPING'),
+(4, 'İnönü Caddesi No: 789', 'Daire: 12', 'İzmir', 'Konak', '35000', 'Türkiye', TRUE, 'BILLING');
+```
+
+### 6. ORDERS Tablosuna Örnek Veriler
+
+```sql
+-- John Doe için siparişler
+INSERT INTO orders (user_id, order_date, total_amount, status, shipping_addr_id, billing_addr_id) VALUES
+(2, '2023-01-15 10:30:00', 14999.99, 'DELIVERED', 1, 2),
+(2, '2023-02-20 14:45:00', 13999.99, 'SHIPPED', 1, 2);
+
+-- Jane Doe için siparişler
+INSERT INTO orders (user_id, order_date, total_amount, status, shipping_addr_id, billing_addr_id) VALUES
+(3, '2023-01-25 09:15:00', 9999.99, 'DELIVERED', 3, 4),
+(3, '2023-03-10 16:20:00', 449.98, 'PROCESSING', 3, 4);
+
+-- Bob Smith için siparişler
+INSERT INTO orders (user_id, order_date, total_amount, status, shipping_addr_id, billing_addr_id) VALUES
+(4, '2023-02-05 11:00:00', 19999.99, 'DELIVERED', 5, 6),
+(4, '2023-03-15 13:30:00', 5999.99, 'PENDING', 5, 6);
+```
+
+### 7. ORDER_DETAILS Tablosuna Örnek Veriler
+
+```sql
+-- John Doe'nun ilk siparişinin detayları
+INSERT INTO order_details (order_id, product_id, quantity, price, subtotal) VALUES
+(1, 1, 1, 14999.99, 14999.99);
+
+-- John Doe'nun ikinci siparişinin detayları
+INSERT INTO order_details (order_id, product_id, quantity, price, subtotal) VALUES
+(2, 4, 1, 13999.99, 13999.99);
+
+-- Jane Doe'nun ilk siparişinin detayları
+INSERT INTO order_details (order_id, product_id, quantity, price, subtotal) VALUES
+(3, 2, 1, 9999.99, 9999.99);
+
+-- Jane Doe'nun ikinci siparişinin detayları
+INSERT INTO order_details (order_id, product_id, quantity, price, subtotal) VALUES
+(4, 7, 1, 199.99, 199.99),
+(4, 10, 1, 249.99, 249.99);
+
+-- Bob Smith'in ilk siparişinin detayları
+INSERT INTO order_details (order_id, product_id, quantity, price, subtotal) VALUES
+(5, 6, 1, 19999.99, 19999.99);
+
+-- Bob Smith'in ikinci siparişinin detayları
+INSERT INTO order_details (order_id, product_id, quantity, price, subtotal) VALUES
+(6, 13, 1, 5999.99, 5999.99);
+```
+
+### 8. PAYMENTS Tablosuna Örnek Veriler
+
+```sql
+-- John Doe'nun siparişleri için ödemeler
+INSERT INTO payments (order_id, payment_date, payment_method, amount, status) VALUES
+(1, '2023-01-15 10:35:00', 'CREDIT_CARD', 14999.99, 'COMPLETED'),
+(2, '2023-02-20 14:50:00', 'CREDIT_CARD', 13999.99, 'COMPLETED');
+
+-- Jane Doe'nun siparişleri için ödemeler
+INSERT INTO payments (order_id, payment_date, payment_method, amount, status) VALUES
+(3, '2023-01-25 09:20:00', 'PAYPAL', 9999.99, 'COMPLETED'),
+(4, '2023-03-10 16:25:00', 'CREDIT_CARD', 449.98, 'PENDING');
+
+-- Bob Smith'in siparişleri için ödemeler
+INSERT INTO payments (order_id, payment_date, payment_method, amount, status) VALUES
+(5, '2023-02-05 11:05:00', 'BANK_TRANSFER', 19999.99, 'COMPLETED'),
+(6, '2023-03-15 13:35:00', 'CREDIT_CARD', 5999.99, 'PENDING');
+```
+
+### 9. REVIEWS Tablosuna Örnek Veriler
+
+```sql
+-- John Doe'nun ürün değerlendirmeleri
+INSERT INTO reviews (product_id, user_id, rating, comment, review_date) VALUES
+(1, 2, 5, 'Harika bir telefon! Kamera kalitesi mükemmel ve pil ömrü çok iyi.', '2023-01-30 15:20:00'),
+(4, 2, 4, 'Çok hafif ve hızlı bir bilgisayar. Tek eksik daha fazla bağlantı noktası olabilirdi.', '2023-03-05 10:45:00');
+
+-- Jane Doe'nun ürün değerlendirmeleri
+INSERT INTO reviews (product_id, user_id, rating, comment, review_date) VALUES
+(2, 3, 4, 'Güzel bir telefon, kamera kalitesi iyi ama pil ömrü biraz daha iyi olabilirdi.', '2023-02-10 14:30:00'),
+(7, 3, 5, 'Kaliteli kumaş ve mükemmel kesim. Kesinlikle tavsiye ederim.', '2023-03-20 09:15:00');
+
+-- Bob Smith'in ürün değerlendirmeleri
+INSERT INTO reviews (product_id, user_id, rating, comment, review_date) VALUES
+(6, 4, 5, 'Mükemmel performans ve ekran kalitesi. İş için ideal bir bilgisayar.', '2023-02-20 16:40:00'),
+(13, 4, 3, 'Koltuk rahat ama montajı biraz zordu.', '2023-03-25 11:20:00');
+```
+
+## Faydalı SQL Sorgular
+
+Aşağıda, e-ticaret uygulaması için faydalı olabilecek bazı SQL sorguları bulunmaktadır. Bu sorgular, veritabanından çeşitli bilgileri almak için kullanılabilir.
+
+### 1. Kategori ve Alt Kategorileri Listeleme
+
+```sql
+-- Tüm kategorileri ve alt kategorileri hiyerarşik olarak listeleme
+WITH RECURSIVE category_tree AS (
+    SELECT id, name, parent_id, 0 AS level, name AS path
+    FROM categories
+    WHERE parent_id IS NULL
+    UNION ALL
+    SELECT c.id, c.name, c.parent_id, ct.level + 1, CONCAT(ct.path, ' > ', c.name)
+    FROM categories c
+    JOIN category_tree ct ON c.parent_id = ct.id
+)
+SELECT id, name, parent_id, level, path
+FROM category_tree
+ORDER BY path;
+```
+
+### 2. En Çok Satan Ürünleri Listeleme
+
+```sql
+-- En çok satan 10 ürünü listeleme
+SELECT p.id, p.name, p.price, SUM(od.quantity) AS total_sold
+FROM products p
+JOIN order_details od ON p.id = od.product_id
+JOIN orders o ON od.order_id = o.id
+WHERE o.status IN ('SHIPPED', 'DELIVERED')
+GROUP BY p.id, p.name, p.price
+ORDER BY total_sold DESC
+LIMIT 10;
+```
+
+### 3. Kullanıcıların Sipariş Geçmişi
+
+```sql
+-- Kullanıcıların sipariş geçmişini listeleme
+SELECT u.id AS user_id, u.username, u.email, o.id AS order_id, o.order_date, o.total_amount, o.status
+FROM users u
+JOIN orders o ON u.id = o.user_id
+ORDER BY u.id, o.order_date DESC;
+```
+
+### 4. Sipariş Detayları
+
+```sql
+-- Belirli bir siparişin detaylarını listeleme
+SELECT o.id AS order_id, o.order_date, o.status, p.id AS product_id, p.name AS product_name, 
+       od.quantity, od.price, od.subtotal
+FROM orders o
+JOIN order_details od ON o.id = od.order_id
+JOIN products p ON od.product_id = p.id
+WHERE o.id = 1;
+```
+
+### 5. Ürün Değerlendirmeleri
+
+```sql
+-- Belirli bir ürünün değerlendirmelerini listeleme
+SELECT r.id, u.username, r.rating, r.comment, r.review_date
+FROM reviews r
+JOIN users u ON r.user_id = u.id
+WHERE r.product_id = 1
+ORDER BY r.review_date DESC;
+```
+
+### 6. Stok Durumu Kritik Olan Ürünler
+
+```sql
+-- Stok durumu kritik olan ürünleri listeleme (stok miktarı 10'dan az)
+SELECT id, name, price, stock_quantity, category_id
+FROM products
+WHERE stock_quantity < 10
+ORDER BY stock_quantity;
+```
+
+### 7. Aylık Satış Raporu
+
+```sql
+-- Aylık satış raporu
+SELECT DATE_FORMAT(o.order_date, '%Y-%m') AS month, 
+       COUNT(DISTINCT o.id) AS total_orders, 
+       SUM(o.total_amount) AS total_sales
+FROM orders o
+WHERE o.status IN ('SHIPPED', 'DELIVERED')
+GROUP BY DATE_FORMAT(o.order_date, '%Y-%m')
+ORDER BY month DESC;
+```
+
+### 8. Kategori Bazında Ürün Sayısı
+
+```sql
+-- Kategori bazında ürün sayısı
+SELECT c.id, c.name, COUNT(p.id) AS product_count
+FROM categories c
+LEFT JOIN products p ON c.id = p.category_id
+GROUP BY c.id, c.name
+ORDER BY product_count DESC;
+```
+
+## Veritabanı Bakım Komutları
+
+Veritabanının düzenli bakımı, performansı ve veri bütünlüğünü korumak için önemlidir. Aşağıda, bazı temel veritabanı bakım komutları bulunmaktadır.
+
+### 1. Tablo Optimizasyonu
+
+```sql
+-- Tüm tabloları optimize etme
+OPTIMIZE TABLE users, categories, products, product_images, addresses, orders, order_details, payments, reviews;
+```
+
+### 2. Tablo Analizi
+
+```sql
+-- Tüm tabloları analiz etme
+ANALYZE TABLE users, categories, products, product_images, addresses, orders, order_details, payments, reviews;
+```
+
+### 3. Veritabanı İstatistiklerini Güncelleme
+
+```sql
+-- Veritabanı istatistiklerini güncelleme
+FLUSH TABLES;
+```
+
+### 4. Tablo Yapısını Kontrol Etme
+
+```sql
+-- Tüm tabloların yapısını kontrol etme
+CHECK TABLE users, categories, products, product_images, addresses, orders, order_details, payments, reviews;
+```
+
+### 5. Tablo Onarımı
+
+```sql
+-- Tüm tabloları onarma (gerekirse)
+REPAIR TABLE users, categories, products, product_images, addresses, orders, order_details, payments, reviews;
+```
+
+## Sonuç
+
+Bu bölümde, e-ticaret web uygulaması için veritabanı tablolarını oluşturmak ve örnek veriler eklemek için gerekli SQL komutlarını detaylı olarak ele aldık. Ayrıca, veritabanından çeşitli bilgileri almak için faydalı SQL sorguları ve veritabanı bakımı için temel komutlar da sunuldu. Bu SQL komutları, veritabanı şemasını oluşturmak, test etmek ve yönetmek için kullanılabilir.
+
+Bir sonraki bölümde, Spring Boot ile backend geliştirme konusunu ele alacağız.

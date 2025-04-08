@@ -1,0 +1,279 @@
+---
+title: 'MySQL Kurulum ve Yapılandırma'
+description: 'E-Ticaret Web Uygulaması için MySQL kurulum ve yapılandırma talimatları'
+---
+
+# MySQL Kurulum ve Yapılandırma
+
+Bu bölümde, e-ticaret web uygulaması için MySQL veritabanının kurulumu ve yapılandırması adım adım anlatılacaktır. MySQL, açık kaynaklı, güçlü ve güvenilir bir ilişkisel veritabanı yönetim sistemidir.
+
+## MySQL Kurulumu
+
+MySQL'in kurulumu, işletim sistemine göre farklılık gösterir. Aşağıda, farklı işletim sistemleri için MySQL kurulum adımları verilmiştir.
+
+### Windows için MySQL Kurulumu
+
+1. [MySQL İndirme Sayfası](https://dev.mysql.com/downloads/installer/) adresine gidin ve MySQL Installer for Windows'u indirin.
+2. İndirilen kurulum dosyasını çalıştırın.
+3. "Developer Default" (Geliştirici Varsayılanı) kurulum tipini seçin ve "Next" (İleri) düğmesine tıklayın.
+4. Gerekli bağımlılıkların kontrolü yapıldıktan sonra "Execute" (Çalıştır) düğmesine tıklayın.
+5. Kurulum tamamlandıktan sonra "Next" (İleri) düğmesine tıklayın.
+6. Yapılandırma adımında, "Standalone MySQL Server" (Bağımsız MySQL Sunucusu) seçeneğini seçin ve "Next" (İleri) düğmesine tıklayın.
+7. "Development Computer" (Geliştirme Bilgisayarı) seçeneğini seçin ve "Next" (İleri) düğmesine tıklayın.
+8. Kimlik doğrulama yöntemi olarak "Use Strong Password Encryption" (Güçlü Şifre Şifrelemesi Kullan) seçeneğini seçin ve "Next" (İleri) düğmesine tıklayın.
+9. MySQL root kullanıcısı için bir şifre belirleyin ve "Next" (İleri) düğmesine tıklayın.
+10. Windows servisi ayarlarını varsayılan olarak bırakın ve "Next" (İleri) düğmesine tıklayın.
+11. Yapılandırmayı uygulamak için "Execute" (Çalıştır) düğmesine tıklayın.
+12. Kurulum tamamlandıktan sonra "Finish" (Bitir) düğmesine tıklayın.
+13. MySQL Workbench kurulumu için "Next" (İleri) düğmesine tıklayın ve kurulumu tamamlayın.
+
+### macOS için MySQL Kurulumu
+
+1. [MySQL İndirme Sayfası](https://dev.mysql.com/downloads/mysql/) adresine gidin ve macOS için olan DMG dosyasını indirin.
+2. İndirilen .dmg dosyasını açın ve kurulum paketini çalıştırın.
+3. Ekrandaki talimatları izleyerek kurulumu tamamlayın.
+4. Kurulum sırasında, MySQL root kullanıcısı için bir şifre belirlemeniz istenecektir. Bu şifreyi not alın, çünkü veritabanına bağlanmak için gerekli olacaktır.
+5. Kurulum tamamlandıktan sonra, Sistem Tercihleri'nde MySQL öğesi görünecektir. Buradan MySQL sunucusunu başlatabilir veya durdurabilirsiniz.
+
+### Linux (Ubuntu) için MySQL Kurulumu
+
+1. Terminal uygulamasını açın.
+2. Paket listesini güncelleyin:
+
+```bash
+sudo apt update
+```
+
+3. MySQL sunucusunu kurun:
+
+```bash
+sudo apt install mysql-server
+```
+
+4. MySQL güvenlik ayarlarını yapılandırın:
+
+```bash
+sudo mysql_secure_installation
+```
+
+5. Bu komut, aşağıdaki güvenlik ayarlarını yapmanızı isteyecektir:
+   - Validate Password Plugin (Şifre Doğrulama Eklentisi) kurulumu
+   - Root şifresi belirleme
+   - Anonim kullanıcıları kaldırma
+   - Root kullanıcısının uzaktan erişimini devre dışı bırakma
+   - Test veritabanını ve erişimini kaldırma
+   - Ayrıcalık tablolarını yeniden yükleme
+
+6. MySQL sunucusunun durumunu kontrol edin:
+
+```bash
+sudo systemctl status mysql
+```
+
+## MySQL Veritabanı Oluşturma
+
+E-ticaret uygulaması için bir veritabanı oluşturmamız gerekmektedir. Aşağıdaki adımları izleyerek veritabanını oluşturabilirsiniz:
+
+### MySQL Command Line Client ile Veritabanı Oluşturma
+
+1. MySQL Command Line Client'ı açın:
+   - Windows: Başlat menüsünden MySQL Command Line Client'ı arayın ve açın.
+   - macOS/Linux: Terminal uygulamasını açın ve aşağıdaki komutu çalıştırın:
+
+```bash
+mysql -u root -p
+```
+
+2. MySQL root şifrenizi girin.
+3. E-ticaret uygulaması için bir veritabanı oluşturun:
+
+```sql
+CREATE DATABASE ecommerce CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+4. Uygulama için bir kullanıcı oluşturun ve gerekli izinleri verin:
+
+```sql
+CREATE USER 'ecommerceuser'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON ecommerce.* TO 'ecommerceuser'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+5. Veritabanının oluşturulduğunu doğrulayın:
+
+```sql
+SHOW DATABASES;
+```
+
+6. MySQL'den çıkın:
+
+```sql
+EXIT;
+```
+
+### MySQL Workbench ile Veritabanı Oluşturma
+
+1. MySQL Workbench'i açın.
+2. Sol taraftaki "MySQL Connections" (MySQL Bağlantıları) bölümünden, yerel MySQL sunucunuza tıklayın.
+3. MySQL root şifrenizi girin.
+4. "Navigator" (Gezgin) panelinde, "Schemas" (Şemalar) sekmesine tıklayın.
+5. Boş bir alana sağ tıklayın ve "Create Schema..." (Şema Oluştur...) seçeneğini seçin.
+6. Şema adı olarak "ecommerce" girin ve "Apply" (Uygula) düğmesine tıklayın.
+7. "Apply SQL Script to Database" (SQL Komut Dosyasını Veritabanına Uygula) penceresinde "Apply" (Uygula) düğmesine tıklayın.
+8. Uygulama için bir kullanıcı oluşturmak için, "Administration" (Yönetim) sekmesine tıklayın ve "Users and Privileges" (Kullanıcılar ve Ayrıcalıklar) seçeneğini seçin.
+9. "Add Account" (Hesap Ekle) düğmesine tıklayın.
+10. "Login Name" (Giriş Adı) alanına "ecommerceuser" girin.
+11. "Authentication Type" (Kimlik Doğrulama Türü) olarak "Standard" (Standart) seçeneğini seçin.
+12. "Password" (Şifre) ve "Confirm Password" (Şifreyi Onayla) alanlarına şifrenizi girin.
+13. "Schema Privileges" (Şema Ayrıcalıkları) sekmesine tıklayın.
+14. "Add Entry..." (Giriş Ekle...) düğmesine tıklayın.
+15. "Selected schema" (Seçilen şema) seçeneğini seçin ve "ecommerce" şemasını seçin.
+16. "OK" (Tamam) düğmesine tıklayın.
+17. Tüm ayrıcalıkları seçin ve "Apply" (Uygula) düğmesine tıklayın.
+
+## MySQL Karakter Seti ve Sıralama Düzeni
+
+Türkçe karakterleri doğru şekilde desteklemek için, MySQL veritabanının karakter seti ve sıralama düzeni ayarlarını yapılandırmamız gerekmektedir. Aşağıdaki adımları izleyerek bu ayarları yapabilirsiniz:
+
+1. MySQL yapılandırma dosyasını açın:
+   - Windows: `C:\ProgramData\MySQL\MySQL Server 8.0\my.ini`
+   - macOS: `/usr/local/mysql/my.cnf`
+   - Linux: `/etc/mysql/my.cnf` veya `/etc/mysql/mysql.conf.d/mysqld.cnf`
+
+2. `[mysqld]` bölümüne aşağıdaki satırları ekleyin:
+
+```ini
+[mysqld]
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+```
+
+3. `[client]` bölümüne aşağıdaki satırı ekleyin:
+
+```ini
+[client]
+default-character-set = utf8mb4
+```
+
+4. MySQL sunucusunu yeniden başlatın:
+   - Windows: Hizmetler (Services) uygulamasını açın, MySQL hizmetini bulun, sağ tıklayın ve "Restart" (Yeniden Başlat) seçeneğini seçin.
+   - macOS: Sistem Tercihleri > MySQL > Stop MySQL Server, ardından Start MySQL Server.
+   - Linux: `sudo systemctl restart mysql`
+
+5. Karakter seti ve sıralama düzeni ayarlarını doğrulayın:
+
+```sql
+SHOW VARIABLES LIKE 'character_set%';
+SHOW VARIABLES LIKE 'collation%';
+```
+
+## MySQL Bağlantı Ayarları
+
+Spring Boot uygulamasının MySQL veritabanına bağlanabilmesi için, bağlantı ayarlarını yapılandırmamız gerekmektedir. Bu ayarlar, `application.properties` dosyasında tanımlanır.
+
+1. Spring Boot projesinin `src/main/resources` dizinindeki `application.properties` dosyasını açın.
+2. Aşağıdaki bağlantı ayarlarını ekleyin:
+
+```properties
+# Veritabanı Bağlantı Ayarları
+spring.datasource.url=jdbc:mysql://localhost:3306/ecommerce?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8
+spring.datasource.username=ecommerceuser
+spring.datasource.password=password
+
+# Hibernate Ayarları
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.jpa.properties.hibernate.format_sql=true
+```
+
+Bu ayarlar, Spring Boot uygulamasının MySQL veritabanına bağlanmasını sağlar. `spring.jpa.hibernate.ddl-auto=update` ayarı, uygulama başlatıldığında Hibernate'in veritabanı şemasını otomatik olarak güncellemesini sağlar.
+
+## MySQL Performans Ayarları
+
+MySQL'in performansını artırmak için, bazı temel performans ayarlarını yapılandırabilirsiniz. Bu ayarlar, veritabanı sunucusunun donanım özelliklerine göre değişiklik gösterebilir.
+
+1. MySQL yapılandırma dosyasını açın.
+2. `[mysqld]` bölümüne aşağıdaki satırları ekleyin:
+
+```ini
+[mysqld]
+# InnoDB Ayarları
+innodb_buffer_pool_size = 1G
+innodb_log_file_size = 256M
+innodb_flush_log_at_trx_commit = 2
+innodb_flush_method = O_DIRECT
+
+# Sorgu Önbelleği
+query_cache_type = 1
+query_cache_size = 64M
+
+# Bağlantı Ayarları
+max_connections = 200
+```
+
+Bu ayarlar, MySQL'in performansını artırmak için temel optimizasyonları içerir. `innodb_buffer_pool_size` değeri, sunucunuzun RAM miktarına göre ayarlanmalıdır (genellikle toplam RAM'in %70-80'i).
+
+## MySQL Yedekleme ve Geri Yükleme
+
+Veritabanınızı düzenli olarak yedeklemek, veri kaybını önlemek için önemlidir. Aşağıda, MySQL veritabanını yedekleme ve geri yükleme adımları verilmiştir.
+
+### Veritabanı Yedekleme
+
+1. Komut satırını (Command Prompt, Terminal) açın.
+2. Aşağıdaki komutu çalıştırarak veritabanını yedekleyin:
+
+```bash
+# Windows
+"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysqldump" -u root -p ecommerce > ecommerce_backup.sql
+
+# macOS/Linux
+mysqldump -u root -p ecommerce > ecommerce_backup.sql
+```
+
+3. MySQL root şifrenizi girin.
+4. Yedekleme dosyası (`ecommerce_backup.sql`), çalıştığınız dizinde oluşturulacaktır.
+
+### Veritabanı Geri Yükleme
+
+1. Komut satırını açın.
+2. Aşağıdaki komutu çalıştırarak veritabanını geri yükleyin:
+
+```bash
+# Windows
+"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql" -u root -p ecommerce < ecommerce_backup.sql
+
+# macOS/Linux
+mysql -u root -p ecommerce < ecommerce_backup.sql
+```
+
+3. MySQL root şifrenizi girin.
+4. Veritabanı, yedekleme dosyasından geri yüklenecektir.
+
+## MySQL Güvenlik Ayarları
+
+MySQL veritabanınızın güvenliğini sağlamak için, aşağıdaki temel güvenlik önlemlerini alabilirsiniz:
+
+1. Güçlü şifreler kullanın:
+   - Root ve diğer kullanıcılar için güçlü şifreler belirleyin.
+   - Şifrelerin en az 12 karakter uzunluğunda olmasını ve büyük/küçük harfler, rakamlar ve özel karakterler içermesini sağlayın.
+
+2. Uzaktan erişimi kısıtlayın:
+   - Geliştirme ortamında, MySQL sunucusuna sadece localhost üzerinden erişim izni verin.
+   - Üretim ortamında, sadece belirli IP adreslerinden erişime izin verin.
+
+3. Kullanıcı ayrıcalıklarını sınırlayın:
+   - Her kullanıcıya sadece ihtiyaç duyduğu ayrıcalıkları verin.
+   - Uygulama kullanıcısına sadece gerekli veritabanı ve tablolar üzerinde izin verin.
+
+4. Düzenli güncellemeler yapın:
+   - MySQL sunucusunu düzenli olarak güncelleyin.
+   - Güvenlik yamaları yayınlandığında hemen uygulayın.
+
+5. Veritabanı trafiğini şifreleyin:
+   - SSL/TLS kullanarak veritabanı bağlantılarını şifreleyin.
+   - Spring Boot uygulamasında SSL bağlantısını etkinleştirin.
+
+## Sonuç
+
+Bu bölümde, e-ticaret web uygulaması için MySQL veritabanının kurulumu ve yapılandırması adım adım anlatıldı. Veritabanı oluşturma, karakter seti ayarları, bağlantı yapılandırması, performans optimizasyonu, yedekleme ve güvenlik konuları ele alındı. Bir sonraki bölümde, veritabanı tablolarını oluşturmak ve örnek veriler eklemek için SQL komutlarını inceleyeceğiz.

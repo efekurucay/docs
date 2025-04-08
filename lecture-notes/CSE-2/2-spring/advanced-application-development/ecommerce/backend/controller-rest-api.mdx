@@ -1,0 +1,1031 @@
+---
+title: Controller ve REST API
+description: Spring Boot ile e-ticaret uygulaması için controller katmanı ve REST API endpointleri oluşturma
+---
+
+# Controller ve REST API
+
+Bu bölümde, e-ticaret uygulaması için controller katmanını ve REST API endpoint'lerini oluşturmayı detaylı olarak ele alacağız. Controller katmanı, HTTP isteklerini karşılayan ve uygun service metodlarını çağırarak yanıt döndüren katmandır.
+
+## REST API Nedir?
+
+REST (Representational State Transfer), web servisleri için bir mimari stildir. REST API, HTTP protokolünü kullanarak kaynaklar üzerinde işlem yapmanızı sağlar. REST API'ler, aşağıdaki özelliklere sahiptir:
+
+1. **Durumsuz (Stateless)**: Her istek, sunucunun önceki istekler hakkında bilgi sahibi olmasını gerektirmez.
+2. **İstemci-Sunucu Mimarisi**: İstemci ve sunucu birbirinden bağımsızdır.
+3. **Önbelleğe Alınabilir (Cacheable)**: İstekler ve yanıtlar önbelleğe alınabilir.
+4. **Katmanlı Sistem (Layered System)**: İstemci, doğrudan son sunucuya bağlı olmayabilir.
+5. **Uniform Interface**: Kaynaklar üzerinde standart bir arayüz sağlar.
+
+## HTTP Metodları
+
+REST API'ler, HTTP metodlarını kullanarak kaynaklar üzerinde işlem yapar. Temel HTTP metodları şunlardır:
+
+- **GET**: Kaynak bilgilerini almak için kullanılır.
+- **POST**: Yeni bir kaynak oluşturmak için kullanılır.
+- **PUT**: Mevcut bir kaynağı güncellemek için kullanılır.
+- **DELETE**: Bir kaynağı silmek için kullanılır.
+- **PATCH**: Bir kaynağın bir kısmını güncellemek için kullanılır.
+
+## Controller Sınıfları Oluşturma
+
+E-ticaret uygulaması için controller sınıflarını oluşturalım. Her entity için bir controller sınıfı oluşturacağız.
+
+### UserController
+
+```java
+package com.example.ecommerce.controller;
+
+import com.example.ecommerce.dto.UserDto;
+import com.example.ecommerce.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/users")
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService userService;
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<UserDto> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#id)")
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+        UserDto user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/username/{username}")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUsername(#username)")
+    public ResponseEntity<UserDto> getUserByUsername(@PathVariable String username) {
+        UserDto user = userService.getUserByUsername(username);
+        return ResponseEntity.ok(user);
+    }
+
+    @PostMapping
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
+        UserDto createdUser = userService.createUser(userDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#id)")
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserDto userDto) {
+        UserDto updatedUser = userService.updateUser(id, userDto);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> changeUserStatus(@PathVariable Long id, @RequestParam boolean isActive) {
+        userService.changeUserStatus(id, isActive);
+        return ResponseEntity.noContent().build();
+    }
+}
+```
+
+Bu controller sınıfı, `User` entity'si için CRUD işlemlerini gerçekleştiren endpoint'leri tanımlar. `@PreAuthorize` anotasyonu, endpoint'lere erişim yetkilerini belirler.
+
+### CategoryController
+
+```java
+package com.example.ecommerce.controller;
+
+import com.example.ecommerce.dto.CategoryDto;
+import com.example.ecommerce.service.CategoryService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/categories")
+@RequiredArgsConstructor
+public class CategoryController {
+
+    private final CategoryService categoryService;
+
+    @GetMapping
+    public ResponseEntity<List<CategoryDto>> getAllCategories() {
+        List<CategoryDto> categories = categoryService.getAllCategories();
+        return ResponseEntity.ok(categories);
+    }
+
+    @GetMapping("/parent")
+    public ResponseEntity<List<CategoryDto>> getParentCategories() {
+        List<CategoryDto> parentCategories = categoryService.getParentCategories();
+        return ResponseEntity.ok(parentCategories);
+    }
+
+    @GetMapping("/subcategories/{parentId}")
+    public ResponseEntity<List<CategoryDto>> getSubcategories(@PathVariable Long parentId) {
+        List<CategoryDto> subcategories = categoryService.getSubcategories(parentId);
+        return ResponseEntity.ok(subcategories);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoryDto> getCategoryById(@PathVariable Long id) {
+        CategoryDto category = categoryService.getCategoryById(id);
+        return ResponseEntity.ok(category);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CategoryDto> createCategory(@Valid @RequestBody CategoryDto categoryDto) {
+        CategoryDto createdCategory = categoryService.createCategory(categoryDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryDto categoryDto) {
+        CategoryDto updatedCategory = categoryService.updateCategory(id, categoryDto);
+        return ResponseEntity.ok(updatedCategory);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+```
+
+Bu controller sınıfı, `Category` entity'si için CRUD işlemlerini gerçekleştiren endpoint'leri tanımlar. Kategori listeleme işlemleri herkes tarafından erişilebilirken, kategori oluşturma, güncelleme ve silme işlemleri sadece admin rolüne sahip kullanıcılar tarafından erişilebilir.
+
+### ProductController
+
+```java
+package com.example.ecommerce.controller;
+
+import com.example.ecommerce.dto.ProductDto;
+import com.example.ecommerce.service.ProductService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/products")
+@RequiredArgsConstructor
+public class ProductController {
+
+    private final ProductService productService;
+
+    @GetMapping
+    public ResponseEntity<Page<ProductDto>> getAllProducts(
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        Page<ProductDto> products = productService.getAllProducts(pageable);
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
+        ProductDto product = productService.getProductById(id);
+        return ResponseEntity.ok(product);
+    }
+
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<Page<ProductDto>> getProductsByCategory(
+            @PathVariable Long categoryId,
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        Page<ProductDto> products = productService.getProductsByCategory(categoryId, pageable);
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/price")
+    public ResponseEntity<List<ProductDto>> getProductsByPriceRange(
+            @RequestParam BigDecimal minPrice,
+            @RequestParam BigDecimal maxPrice) {
+        List<ProductDto> products = productService.getProductsByPriceRange(minPrice, maxPrice);
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<ProductDto>> searchProducts(
+            @RequestParam String keyword,
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        Page<ProductDto> products = productService.searchProducts(keyword, pageable);
+        return ResponseEntity.ok(products);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductDto productDto) {
+        ProductDto createdProduct = productService.createProduct(productDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDto productDto) {
+        ProductDto updatedProduct = productService.updateProduct(id, productDto);
+        return ResponseEntity.ok(updatedProduct);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/stock")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> updateProductStock(@PathVariable Long id, @RequestParam Integer quantity) {
+        productService.updateProductStock(id, quantity);
+        return ResponseEntity.noContent().build();
+    }
+}
+```
+
+Bu controller sınıfı, `Product` entity'si için CRUD işlemlerini gerçekleştiren endpoint'leri tanımlar. Ürün listeleme ve arama işlemleri herkes tarafından erişilebilirken, ürün oluşturma, güncelleme ve silme işlemleri sadece admin rolüne sahip kullanıcılar tarafından erişilebilir.
+
+### OrderController
+
+```java
+package com.example.ecommerce.controller;
+
+import com.example.ecommerce.dto.OrderDto;
+import com.example.ecommerce.service.OrderService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/orders")
+@RequiredArgsConstructor
+public class OrderController {
+
+    private final OrderService orderService;
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<OrderDto>> getAllOrders(
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        Page<OrderDto> orders = orderService.getAllOrders(pageable);
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @orderSecurity.isOrderOwner(#id)")
+    public ResponseEntity<OrderDto> getOrderById(@PathVariable Long id) {
+        OrderDto order = orderService.getOrderById(id);
+        return ResponseEntity.ok(order);
+    }
+
+    @GetMapping("/user/{userId}")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#userId)")
+    public ResponseEntity<Page<OrderDto>> getOrdersByUser(
+            @PathVariable Long userId,
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        Page<OrderDto> orders = orderService.getOrdersByUser(userId, pageable);
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/status/{status}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<OrderDto>> getOrdersByStatus(@PathVariable String status) {
+        List<OrderDto> orders = orderService.getOrdersByStatus(status);
+        return ResponseEntity.ok(orders);
+    }
+
+    @PostMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<OrderDto> createOrder(@Valid @RequestBody OrderDto orderDto) {
+        OrderDto createdOrder = orderService.createOrder(orderDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
+    }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<OrderDto> updateOrderStatus(@PathVariable Long id, @RequestParam String status) {
+        OrderDto updatedOrder = orderService.updateOrderStatus(id, status);
+        return ResponseEntity.ok(updatedOrder);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
+        orderService.deleteOrder(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+```
+
+Bu controller sınıfı, `Order` entity'si için CRUD işlemlerini gerçekleştiren endpoint'leri tanımlar. Sipariş oluşturma işlemi kimlik doğrulaması yapılmış kullanıcılar tarafından erişilebilirken, sipariş listeleme, güncelleme ve silme işlemleri sadece admin rolüne sahip kullanıcılar veya siparişin sahibi tarafından erişilebilir.
+
+### PaymentController
+
+```java
+package com.example.ecommerce.controller;
+
+import com.example.ecommerce.dto.PaymentDto;
+import com.example.ecommerce.service.PaymentService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/payments")
+@RequiredArgsConstructor
+public class PaymentController {
+
+    private final PaymentService paymentService;
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<PaymentDto>> getAllPayments() {
+        List<PaymentDto> payments = paymentService.getAllPayments();
+        return ResponseEntity.ok(payments);
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @paymentSecurity.isPaymentOwner(#id)")
+    public ResponseEntity<PaymentDto> getPaymentById(@PathVariable Long id) {
+        PaymentDto payment = paymentService.getPaymentById(id);
+        return ResponseEntity.ok(payment);
+    }
+
+    @GetMapping("/order/{orderId}")
+    @PreAuthorize("hasRole('ADMIN') or @orderSecurity.isOrderOwner(#orderId)")
+    public ResponseEntity<PaymentDto> getPaymentByOrderId(@PathVariable Long orderId) {
+        PaymentDto payment = paymentService.getPaymentByOrderId(orderId);
+        return ResponseEntity.ok(payment);
+    }
+
+    @PostMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<PaymentDto> createPayment(@Valid @RequestBody PaymentDto paymentDto) {
+        PaymentDto createdPayment = paymentService.createPayment(paymentDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPayment);
+    }
+
+    @PostMapping("/{id}/process")
+    @PreAuthorize("hasRole('ADMIN') or @paymentSecurity.isPaymentOwner(#id)")
+    public ResponseEntity<PaymentDto> processPayment(@PathVariable Long id) {
+        PaymentDto processedPayment = paymentService.processPayment(id);
+        return ResponseEntity.ok(processedPayment);
+    }
+
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PaymentDto> updatePaymentStatus(@PathVariable Long id, @RequestParam String status) {
+        PaymentDto updatedPayment = paymentService.updatePaymentStatus(id, status);
+        return ResponseEntity.ok(updatedPayment);
+    }
+}
+```
+
+Bu controller sınıfı, `Payment` entity'si için CRUD işlemlerini gerçekleştiren endpoint'leri tanımlar. Ödeme oluşturma ve işleme işlemleri kimlik doğrulaması yapılmış kullanıcılar tarafından erişilebilirken, ödeme listeleme ve güncelleme işlemleri sadece admin rolüne sahip kullanıcılar veya ödemenin sahibi tarafından erişilebilir.
+
+### ReviewController
+
+```java
+package com.example.ecommerce.controller;
+
+import com.example.ecommerce.dto.ReviewDto;
+import com.example.ecommerce.service.ReviewService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/reviews")
+@RequiredArgsConstructor
+public class ReviewController {
+
+    private final ReviewService reviewService;
+
+    @GetMapping
+    public ResponseEntity<List<ReviewDto>> getAllReviews() {
+        List<ReviewDto> reviews = reviewService.getAllReviews();
+        return ResponseEntity.ok(reviews);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ReviewDto> getReviewById(@PathVariable Long id) {
+        ReviewDto review = reviewService.getReviewById(id);
+        return ResponseEntity.ok(review);
+    }
+
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<Page<ReviewDto>> getReviewsByProduct(
+            @PathVariable Long productId,
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        Page<ReviewDto> reviews = reviewService.getReviewsByProduct(productId, pageable);
+        return ResponseEntity.ok(reviews);
+    }
+
+    @GetMapping("/user/{userId}")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#userId)")
+    public ResponseEntity<List<ReviewDto>> getReviewsByUser(@PathVariable Long userId) {
+        List<ReviewDto> reviews = reviewService.getReviewsByUser(userId);
+        return ResponseEntity.ok(reviews);
+    }
+
+    @GetMapping("/product/{productId}/rating")
+    public ResponseEntity<Double> getAverageRatingByProduct(@PathVariable Long productId) {
+        Double averageRating = reviewService.getAverageRatingByProduct(productId);
+        return ResponseEntity.ok(averageRating);
+    }
+
+    @PostMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ReviewDto> createReview(@Valid @RequestBody ReviewDto reviewDto) {
+        ReviewDto createdReview = reviewService.createReview(reviewDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdReview);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @reviewSecurity.isReviewOwner(#id)")
+    public ResponseEntity<ReviewDto> updateReview(@PathVariable Long id, @Valid @RequestBody ReviewDto reviewDto) {
+        ReviewDto updatedReview = reviewService.updateReview(id, reviewDto);
+        return ResponseEntity.ok(updatedReview);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @reviewSecurity.isReviewOwner(#id)")
+    public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
+        reviewService.deleteReview(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+```
+
+Bu controller sınıfı, `Review` entity'si için CRUD işlemlerini gerçekleştiren endpoint'leri tanımlar. Değerlendirme listeleme işlemleri herkes tarafından erişilebilirken, değerlendirme oluşturma işlemi kimlik doğrulaması yapılmış kullanıcılar tarafından, değerlendirme güncelleme ve silme işlemleri ise sadece admin rolüne sahip kullanıcılar veya değerlendirmenin sahibi tarafından erişilebilir.
+
+### AddressController
+
+```java
+package com.example.ecommerce.controller;
+
+import com.example.ecommerce.dto.AddressDto;
+import com.example.ecommerce.service.AddressService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/addresses")
+@RequiredArgsConstructor
+public class AddressController {
+
+    private final AddressService addressService;
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<AddressDto>> getAllAddresses() {
+        List<AddressDto> addresses = addressService.getAllAddresses();
+        return ResponseEntity.ok(addresses);
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @addressSecurity.isAddressOwner(#id)")
+    public ResponseEntity<AddressDto> getAddressById(@PathVariable Long id) {
+        AddressDto address = addressService.getAddressById(id);
+        return ResponseEntity.ok(address);
+    }
+
+    @GetMapping("/user/{userId}")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#userId)")
+    public ResponseEntity<List<AddressDto>> getAddressesByUser(@PathVariable Long userId) {
+        List<AddressDto> addresses = addressService.getAddressesByUser(userId);
+        return ResponseEntity.ok(addresses);
+    }
+
+    @GetMapping("/user/{userId}/default")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#userId)")
+    public ResponseEntity<AddressDto> getDefaultAddressByUser(@PathVariable Long userId) {
+        AddressDto address = addressService.getDefaultAddressByUser(userId);
+        return ResponseEntity.ok(address);
+    }
+
+    @PostMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<AddressDto> createAddress(@Valid @RequestBody AddressDto addressDto) {
+        AddressDto createdAddress = addressService.createAddress(addressDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdAddress);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @addressSecurity.isAddressOwner(#id)")
+    public ResponseEntity<AddressDto> updateAddress(@PathVariable Long id, @Valid @RequestBody AddressDto addressDto) {
+        AddressDto updatedAddress = addressService.updateAddress(id, addressDto);
+        return ResponseEntity.ok(updatedAddress);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @addressSecurity.isAddressOwner(#id)")
+    public ResponseEntity<Void> deleteAddress(@PathVariable Long id) {
+        addressService.deleteAddress(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/default")
+    @PreAuthorize("hasRole('ADMIN') or @addressSecurity.isAddressOwner(#id)")
+    public ResponseEntity<Void> setDefaultAddress(@PathVariable Long id) {
+        addressService.setDefaultAddress(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+```
+
+Bu controller sınıfı, `Address` entity'si için CRUD işlemlerini gerçekleştiren endpoint'leri tanımlar. Adres oluşturma işlemi kimlik doğrulaması yapılmış kullanıcılar tarafından erişilebilirken, adres listeleme, güncelleme ve silme işlemleri sadece admin rolüne sahip kullanıcılar veya adresin sahibi tarafından erişilebilir.
+
+### AuthController
+
+```java
+package com.example.ecommerce.controller;
+
+import com.example.ecommerce.dto.AuthRequestDto;
+import com.example.ecommerce.dto.AuthResponseDto;
+import com.example.ecommerce.dto.UserDto;
+import com.example.ecommerce.security.JwtTokenProvider;
+import com.example.ecommerce.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody AuthRequestDto authRequestDto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        authRequestDto.getUsername(),
+                        authRequestDto.getPassword()
+                )
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtTokenProvider.generateToken(authentication);
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UserDto userDto = userService.getUserByUsername(userDetails.getUsername());
+
+        AuthResponseDto authResponseDto = new AuthResponseDto(jwt, userDto);
+        return ResponseEntity.ok(authResponseDto);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserDto> register(@Valid @RequestBody UserDto userDto) {
+        UserDto createdUser = userService.createUser(userDto);
+        return ResponseEntity.ok(createdUser);
+    }
+}
+```
+
+Bu controller sınıfı, kullanıcı kimlik doğrulama ve kayıt işlemlerini gerçekleştiren endpoint'leri tanımlar. `/api/auth/login` endpoint'i, kullanıcı adı ve şifre ile kimlik doğrulama yapar ve JWT token döndürür. `/api/auth/register` endpoint'i, yeni bir kullanıcı oluşturur.
+
+## Request ve Response DTO'ları
+
+Controller sınıfları, request ve response DTO'larını kullanarak HTTP isteklerini ve yanıtlarını işler. Bu DTO'lar, entity'lerin sadece gerekli alanlarını içerir ve entity'lerin iç yapısını gizler.
+
+### AuthRequestDto
+
+```java
+package com.example.ecommerce.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotBlank;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class AuthRequestDto {
+    @NotBlank
+    private String username;
+    @NotBlank
+    private String password;
+}
+```
+
+### AuthResponseDto
+
+```java
+package com.example.ecommerce.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class AuthResponseDto {
+    private String token;
+    private UserDto user;
+}
+```
+
+## Güvenlik Kontrolleri
+
+Controller sınıflarında, `@PreAuthorize` anotasyonu ile güvenlik kontrolleri yapılır. Bu anotasyon, Spring Security'nin SpEL (Spring Expression Language) ifadelerini kullanarak, endpoint'lere erişim yetkilerini belirler.
+
+### UserSecurity
+
+```java
+package com.example.ecommerce.security;
+
+import com.example.ecommerce.model.User;
+import com.example.ecommerce.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class UserSecurity {
+
+    private final UserRepository userRepository;
+
+    public boolean isCurrentUser(Long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof UserDetails)) {
+            return false;
+        }
+
+        String username = ((UserDetails) principal).getUsername();
+        User user = userRepository.findByUsername(username).orElse(null);
+        return user != null && user.getId().equals(userId);
+    }
+
+    public boolean isCurrentUsername(String username) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof UserDetails)) {
+            return false;
+        }
+
+        return ((UserDetails) principal).getUsername().equals(username);
+    }
+}
+```
+
+### OrderSecurity
+
+```java
+package com.example.ecommerce.security;
+
+import com.example.ecommerce.model.Order;
+import com.example.ecommerce.model.User;
+import com.example.ecommerce.repository.OrderRepository;
+import com.example.ecommerce.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class OrderSecurity {
+
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
+
+    public boolean isOrderOwner(Long orderId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof UserDetails)) {
+            return false;
+        }
+
+        String username = ((UserDetails) principal).getUsername();
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null) {
+            return false;
+        }
+
+        Order order = orderRepository.findById(orderId).orElse(null);
+        return order != null && order.getUser().getId().equals(user.getId());
+    }
+}
+```
+
+## CORS Yapılandırması
+
+Cross-Origin Resource Sharing (CORS), farklı kaynaklardan gelen HTTP isteklerine izin veren bir mekanizmadır. Spring Boot, CORS yapılandırması için `WebMvcConfigurer` arayüzünü sağlar.
+
+```java
+package com.example.ecommerce.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:4200")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true)
+                .maxAge(3600);
+    }
+}
+```
+
+Bu yapılandırma, `http://localhost:4200` kaynağından gelen HTTP isteklerine izin verir. Bu, Angular uygulamasının backend API'sine erişmesini sağlar.
+
+## Swagger Dokümantasyonu
+
+Swagger, REST API'leri belgelemek ve test etmek için kullanılan bir araçtır. Spring Boot, Swagger entegrasyonu için `springdoc-openapi` kütüphanesini kullanabilir.
+
+### Maven Bağımlılığı
+
+```xml
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-ui</artifactId>
+    <version>1.6.9</version>
+</dependency>
+```
+
+### Swagger Yapılandırması
+
+```java
+package com.example.ecommerce.config;
+
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SwaggerConfig {
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        final String securitySchemeName = "bearerAuth";
+        return new OpenAPI()
+                .info(new Info()
+                        .title("E-Commerce API")
+                        .version("1.0.0")
+                        .description("E-Commerce Web Application API"))
+                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
+                .components(new Components()
+                        .addSecuritySchemes(securitySchemeName,
+                                new SecurityScheme()
+                                        .name(securitySchemeName)
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")));
+    }
+}
+```
+
+Bu yapılandırma, Swagger UI'da API dokümantasyonu oluşturur ve JWT token kimlik doğrulaması için bir güvenlik şeması ekler.
+
+### Swagger UI
+
+Swagger UI, API dokümantasyonunu görsel olarak sunar ve API'leri test etmenizi sağlar. Swagger UI'a erişmek için, uygulamayı başlattıktan sonra aşağıdaki URL'yi ziyaret edebilirsiniz:
+
+```
+http://localhost:8080/swagger-ui.html
+```
+
+## Controller Sınıflarının Test Edilmesi
+
+Controller sınıfları, unit testler ve integration testler ile test edilebilir. Unit testler, controller sınıflarının bağımlılıklarını mock'layarak, controller sınıflarının davranışlarını test eder. Integration testler, gerçek bağımlılıkları kullanarak, controller sınıflarının davranışlarını test eder.
+
+### Unit Test Örneği
+
+```java
+package com.example.ecommerce.controller;
+
+import com.example.ecommerce.dto.ProductDto;
+import com.example.ecommerce.service.ProductService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(ProductController.class)
+public class ProductControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    private ProductService productService;
+
+    private ProductDto productDto;
+    private List<ProductDto> productDtos;
+    private Page<ProductDto> productDtoPage;
+
+    @BeforeEach
+    void setUp() {
+        productDto = ProductDto.builder()
+                .id(1L)
+                .name("iPhone 13")
+                .description("Apple iPhone 13")
+                .price(new BigDecimal("14999.99"))
+                .stockQuantity(50)
+                .imageUrl("https://example.com/images/iphone13.jpg")
+                .categoryId(1L)
+                .categoryName("Electronics")
+                .build();
+
+        productDtos = Arrays.asList(productDto);
+        productDtoPage = new PageImpl<>(productDtos);
+    }
+
+    @Test
+    @WithMockUser
+    void getAllProducts_ReturnsProductDtoPage() throws Exception {
+        when(productService.getAllProducts(any(Pageable.class))).thenReturn(productDtoPage);
+
+        mockMvc.perform(get("/api/products"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content[0].id").value(productDto.getId()))
+                .andExpect(jsonPath("$.content[0].name").value(productDto.getName()))
+                .andExpect(jsonPath("$.content[0].price").value(productDto.getPrice().doubleValue()));
+    }
+
+    @Test
+    @WithMockUser
+    void getProductById_ExistingId_ReturnsProductDto() throws Exception {
+        when(productService.getProductById(1L)).thenReturn(productDto);
+
+        mockMvc.perform(get("/api/products/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(productDto.getId()))
+                .andExpect(jsonPath("$.name").value(productDto.getName()))
+                .andExpect(jsonPath("$.price").value(productDto.getPrice().doubleValue()));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void createProduct_ValidProductDto_ReturnsCreatedProductDto() throws Exception {
+        when(productService.createProduct(any(ProductDto.class))).thenReturn(productDto);
+
+        mockMvc.perform(post("/api/products")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(productDto)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(productDto.getId()))
+                .andExpect(jsonPath("$.name").value(productDto.getName()))
+                .andExpect(jsonPath("$.price").value(productDto.getPrice().doubleValue()));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void updateProduct_ValidIdAndProductDto_ReturnsUpdatedProductDto() throws Exception {
+        when(productService.updateProduct(eq(1L), any(ProductDto.class))).thenReturn(productDto);
+
+        mockMvc.perform(put("/api/products/1")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(productDto)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(productDto.getId()))
+                .andExpect(jsonPath("$.name").value(productDto.getName()))
+                .andExpect(jsonPath("$.price").value(productDto.getPrice().doubleValue()));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deleteProduct_ValidId_ReturnsNoContent() throws Exception {
+        mockMvc.perform(delete("/api/products/1")
+                .with(csrf()))
+                .andExpect(status().isNoContent());
+    }
+}
+```
+
+Bu unit test örneği, `ProductController` sınıfının `getAllProducts`, `getProductById`, `createProduct`, `updateProduct` ve `deleteProduct` metodlarını test eder. Test sınıfı, `@WebMvcTest` anotasyonu ile controller sınıfını test eder ve `@MockBean` anotasyonu ile service sınıfını mock'lar.
+
+## Sonuç
+
+Bu bölümde, e-ticaret uygulaması için controller katmanını ve REST API endpoint'lerini oluşturmayı detaylı olarak ele aldık. Controller katmanı, HTTP isteklerini karşılayan ve uygun service metodlarını çağırarak yanıt döndüren katmandır. REST API, HTTP protokolünü kullanarak kaynaklar üzerinde işlem yapmanızı sağlar.
+
+Bir sonraki bölümde, Spring Security ile kimlik doğrulama ve yetkilendirme konusunu ele alacağız.

@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "b7a77cad16dc3284",
+        "id": "b81c625dcaad0be8",
         "type": "tabs",
         "children": [
           {
-            "id": "3c5ead0e7ea5be0f",
+            "id": "a0460b72f024dc67",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "lecture-notes/CSE-2/2-spring/computer-organization/computer-organization.mdx",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "computer-organization"
+              "title": "Yeni sekme"
             }
           }
         ]
@@ -78,7 +74,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200
+    "width": 450.5
   },
   "right": {
     "id": "f1ba78a1543eb384",
@@ -167,19 +163,22 @@
       "publish:Değişiklikleri yayınla": false
     }
   },
-  "active": "3c5ead0e7ea5be0f",
+  "active": "a0460b72f024dc67",
   "lastOpenFiles": [
-    "lecture-notes/About-Lecture-Notes.mdx",
-    "lecture-notes/CSE-2/2-spring/computer-organization/computer-organization.mdx",
-    "lecture-notes/CSE-2/cse-2-lectures.mdx",
-    "lecture-notes/CSE-2/2-spring/cse-2-spring.mdx",
-    "lecture-notes/CSE-1/CSE-1-Lectures.mdx",
-    "lecture-notes/CSE-1/1-fall/natural-sciences/Natural-Sciences.mdx",
-    "lecture-notes/CSE-1/1-fall/CSE-1-Fall-Lectures.mdx",
-    "lecture-notes/CSE-2/2-spring/linear-algebra/linear-algebra.mdx",
-    "blog/blog.mdx",
-    "blog",
-    "efe/services - Kopya.mdx",
+    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/sql-komutlari.mdx",
+    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/sema-tasarimi.mdx",
+    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/mysql-kurulumu.mdx",
+    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/ortam-kurulumu/ide-ve-araclar.mdx",
+    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/ortam-kurulumu/frontend-kurulumu.mdx",
+    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/ortam-kurulumu/backend-kurulumu.mdx",
+    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/ui-tasarim.mdx",
+    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/servisler-dependency-injection.mdx",
+    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/rxjs.mdx",
+    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/routing.mdx",
+    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/reactive-forms.mdx",
+    "deployment.md",
+    "lecture-notes/CSE-2/2-spring/advanced-application-development/e-ticaret-dokumantasyon/todo.md",
+    "frontend.md",
     "de.md",
     "node_modules/picomatch/README.md",
     "node_modules/braces/README.md",

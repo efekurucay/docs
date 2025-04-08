@@ -1,0 +1,1442 @@
+---
+title: 'Service Katmanı'
+description: 'Spring Boot ile e-ticaret uygulaması için service katmanı oluşturma'
+---
+
+# Service Katmanı
+
+Bu bölümde, e-ticaret uygulaması için service katmanını oluşturmayı detaylı olarak ele alacağız. Service katmanı, iş mantığını içeren ve controller ile repository katmanları arasında bir köprü görevi gören katmandır.
+
+## Service Katmanı Nedir?
+
+Service katmanı, uygulamanın iş mantığını içeren ve veritabanı işlemlerini soyutlayan bir katmandır. Bu katman, controller'ların doğrudan repository'lere erişmesini önler ve iş kurallarının uygulanmasını sağlar. Service katmanı, ayrıca transaction yönetimi, güvenlik kontrolleri ve veri doğrulama gibi işlemleri de gerçekleştirir.
+
+## Service Katmanının Avantajları
+
+Service katmanı kullanmanın bazı avantajları şunlardır:
+
+1. **Sorumlulukların Ayrılması**: İş mantığı, controller ve repository katmanlarından ayrılır.
+2. **Kod Tekrarının Önlenmesi**: Ortak iş mantığı, service sınıflarında toplanır ve tekrar kullanılabilir.
+3. **Transaction Yönetimi**: Service metodları, transaction sınırlarını belirler.
+4. **Testedilebilirlik**: Service sınıfları, bağımlılıkları enjekte edilerek kolayca test edilebilir.
+5. **Güvenlik**: Güvenlik kontrolleri, service katmanında gerçekleştirilebilir.
+
+## Service Sınıfları Oluşturma
+
+E-ticaret uygulaması için service sınıflarını oluşturalım. Her entity için bir service sınıfı oluşturacağız.
+
+### UserService
+
+```java
+package com.example.ecommerce.service;
+
+import com.example.ecommerce.dto.UserDto;
+import com.example.ecommerce.exception.ResourceNotFoundException;
+import com.example.ecommerce.model.User;
+import com.example.ecommerce.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Transactional(readOnly = true)
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public UserDto getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        return convertToDto(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserDto getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+        return convertToDto(user);
+    }
+
+    @Transactional
+    public UserDto createUser(UserDto userDto) {
+        // Kullanıcı adı ve e-posta kontrolü
+        if (userRepository.existsByUsername(userDto.getUsername())) {
+            throw new IllegalArgumentException("Username is already taken");
+        }
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new IllegalArgumentException("Email is already in use");
+        }
+
+        // Kullanıcı oluşturma
+        User user = convertToEntity(userDto);
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setActive(true);
+        User savedUser = userRepository.save(user);
+        return convertToDto(savedUser);
+    }
+
+    @Transactional
+    public UserDto updateUser(Long id, UserDto userDto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        // Kullanıcı adı ve e-posta kontrolü (eğer değiştiyse)
+        if (!user.getUsername().equals(userDto.getUsername()) && userRepository.existsByUsername(userDto.getUsername())) {
+            throw new IllegalArgumentException("Username is already taken");
+        }
+        if (!user.getEmail().equals(userDto.getEmail()) && userRepository.existsByEmail(userDto.getEmail())) {
+            throw new IllegalArgumentException("Email is already in use");
+        }
+
+        // Kullanıcı güncelleme
+        user.setUsername(userDto.getUsername());
+        user.setEmail(userDto.getEmail());
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        user.setPhone(userDto.getPhone());
+        
+        // Şifre güncelleme (eğer yeni şifre verildiyse)
+        if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        }
+
+        User updatedUser = userRepository.save(user);
+        return convertToDto(updatedUser);
+    }
+
+    @Transactional
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        userRepository.delete(user);
+    }
+
+    @Transactional
+    public void changeUserStatus(Long id, boolean isActive) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        user.setActive(isActive);
+        userRepository.save(user);
+    }
+
+    // Entity -> DTO dönüşümü
+    private UserDto convertToDto(User user) {
+        return UserDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phone(user.getPhone())
+                .isActive(user.isActive())
+                .role(user.getRole())
+                .build();
+    }
+
+    // DTO -> Entity dönüşümü
+    private User convertToEntity(UserDto userDto) {
+        return User.builder()
+                .username(userDto.getUsername())
+                .email(userDto.getEmail())
+                .password(userDto.getPassword()) // Şifre service katmanında encode edilecek
+                .firstName(userDto.getFirstName())
+                .lastName(userDto.getLastName())
+                .phone(userDto.getPhone())
+                .isActive(userDto.isActive())
+                .role(userDto.getRole())
+                .build();
+    }
+}
+```
+
+Bu service sınıfı, `User` entity'si için CRUD işlemlerini gerçekleştirir ve kullanıcı adı ve e-posta benzersizliği gibi iş kurallarını uygular.
+
+### CategoryService
+
+```java
+package com.example.ecommerce.service;
+
+import com.example.ecommerce.dto.CategoryDto;
+import com.example.ecommerce.exception.ResourceNotFoundException;
+import com.example.ecommerce.model.Category;
+import com.example.ecommerce.repository.CategoryRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class CategoryService {
+
+    private final CategoryRepository categoryRepository;
+
+    @Transactional(readOnly = true)
+    public List<CategoryDto> getAllCategories() {
+        return categoryRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<CategoryDto> getParentCategories() {
+        return categoryRepository.findByParentIsNull().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<CategoryDto> getSubcategories(Long parentId) {
+        return categoryRepository.findByParentId(parentId).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public CategoryDto getCategoryById(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+        return convertToDto(category);
+    }
+
+    @Transactional
+    public CategoryDto createCategory(CategoryDto categoryDto) {
+        Category category = convertToEntity(categoryDto);
+        
+        // Eğer üst kategori ID'si verildiyse, üst kategoriyi ayarla
+        if (categoryDto.getParentId() != null) {
+            Category parentCategory = categoryRepository.findById(categoryDto.getParentId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Parent category not found with id: " + categoryDto.getParentId()));
+            category.setParent(parentCategory);
+        }
+        
+        Category savedCategory = categoryRepository.save(category);
+        return convertToDto(savedCategory);
+    }
+
+    @Transactional
+    public CategoryDto updateCategory(Long id, CategoryDto categoryDto) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+        
+        category.setName(categoryDto.getName());
+        category.setDescription(categoryDto.getDescription());
+        
+        // Eğer üst kategori ID'si verildiyse, üst kategoriyi ayarla
+        if (categoryDto.getParentId() != null) {
+            // Döngüsel bağımlılık kontrolü
+            if (categoryDto.getParentId().equals(id)) {
+                throw new IllegalArgumentException("A category cannot be its own parent");
+            }
+            
+            Category parentCategory = categoryRepository.findById(categoryDto.getParentId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Parent category not found with id: " + categoryDto.getParentId()));
+            category.setParent(parentCategory);
+        } else {
+            category.setParent(null);
+        }
+        
+        Category updatedCategory = categoryRepository.save(category);
+        return convertToDto(updatedCategory);
+    }
+
+    @Transactional
+    public void deleteCategory(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+        categoryRepository.delete(category);
+    }
+
+    // Entity -> DTO dönüşümü
+    private CategoryDto convertToDto(Category category) {
+        CategoryDto categoryDto = CategoryDto.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .description(category.getDescription())
+                .build();
+        
+        if (category.getParent() != null) {
+            categoryDto.setParentId(category.getParent().getId());
+            categoryDto.setParentName(category.getParent().getName());
+        }
+        
+        return categoryDto;
+    }
+
+    // DTO -> Entity dönüşümü
+    private Category convertToEntity(CategoryDto categoryDto) {
+        return Category.builder()
+                .name(categoryDto.getName())
+                .description(categoryDto.getDescription())
+                .build();
+    }
+}
+```
+
+Bu service sınıfı, `Category` entity'si için CRUD işlemlerini gerçekleştirir ve kategori hiyerarşisi gibi iş kurallarını uygular.
+
+### ProductService
+
+```java
+package com.example.ecommerce.service;
+
+import com.example.ecommerce.dto.ProductDto;
+import com.example.ecommerce.exception.ResourceNotFoundException;
+import com.example.ecommerce.model.Category;
+import com.example.ecommerce.model.Product;
+import com.example.ecommerce.model.ProductImage;
+import com.example.ecommerce.repository.CategoryRepository;
+import com.example.ecommerce.repository.ProductImageRepository;
+import com.example.ecommerce.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class ProductService {
+
+    private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+    private final ProductImageRepository productImageRepository;
+
+    @Transactional(readOnly = true)
+    public List<ProductDto> getAllProducts() {
+        return productRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductDto> getAllProducts(Pageable pageable) {
+        return productRepository.findAll(pageable)
+                .map(this::convertToDto);
+    }
+
+    @Transactional(readOnly = true)
+    public ProductDto getProductById(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+        return convertToDto(product);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductDto> getProductsByCategory(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductDto> getProductsByCategory(Long categoryId, Pageable pageable) {
+        return productRepository.findByCategoryId(categoryId, pageable)
+                .map(this::convertToDto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductDto> getProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
+        return productRepository.findByPriceBetween(minPrice, maxPrice).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductDto> searchProducts(String keyword, Pageable pageable) {
+        return productRepository.searchProducts(keyword, pageable)
+                .map(this::convertToDto);
+    }
+
+    @Transactional
+    public ProductDto createProduct(ProductDto productDto) {
+        // Kategori kontrolü
+        Category category = categoryRepository.findById(productDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + productDto.getCategoryId()));
+        
+        // Ürün oluşturma
+        Product product = convertToEntity(productDto);
+        product.setCategory(category);
+        Product savedProduct = productRepository.save(product);
+        
+        // Ürün görselleri ekleme
+        if (productDto.getImages() != null && !productDto.getImages().isEmpty()) {
+            for (String imageUrl : productDto.getImages()) {
+                ProductImage productImage = new ProductImage();
+                productImage.setProduct(savedProduct);
+                productImage.setImageUrl(imageUrl);
+                productImage.setPrimary(false);
+                productImageRepository.save(productImage);
+            }
+        }
+        
+        // Ana görsel ayarlama
+        if (productDto.getImageUrl() != null && !productDto.getImageUrl().isEmpty()) {
+            ProductImage primaryImage = new ProductImage();
+            primaryImage.setProduct(savedProduct);
+            primaryImage.setImageUrl(productDto.getImageUrl());
+            primaryImage.setPrimary(true);
+            productImageRepository.save(primaryImage);
+        }
+        
+        return convertToDto(savedProduct);
+    }
+
+    @Transactional
+    public ProductDto updateProduct(Long id, ProductDto productDto) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+        
+        // Kategori kontrolü
+        Category category = categoryRepository.findById(productDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + productDto.getCategoryId()));
+        
+        // Ürün güncelleme
+        product.setName(productDto.getName());
+        product.setDescription(productDto.getDescription());
+        product.setPrice(productDto.getPrice());
+        product.setStockQuantity(productDto.getStockQuantity());
+        product.setImageUrl(productDto.getImageUrl());
+        product.setCategory(category);
+        
+        Product updatedProduct = productRepository.save(product);
+        return convertToDto(updatedProduct);
+    }
+
+    @Transactional
+    public void deleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+        productRepository.delete(product);
+    }
+
+    @Transactional
+    public void updateProductStock(Long id, Integer quantity) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+        
+        // Stok kontrolü
+        if (product.getStockQuantity() + quantity < 0) {
+            throw new IllegalArgumentException("Not enough stock for product: " + product.getName());
+        }
+        
+        product.setStockQuantity(product.getStockQuantity() + quantity);
+        productRepository.save(product);
+    }
+
+    // Entity -> DTO dönüşümü
+    private ProductDto convertToDto(Product product) {
+        ProductDto productDto = ProductDto.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .stockQuantity(product.getStockQuantity())
+                .imageUrl(product.getImageUrl())
+                .categoryId(product.getCategory().getId())
+                .categoryName(product.getCategory().getName())
+                .build();
+        
+        // Ürün görsellerini ekleme
+        List<String> images = product.getImages().stream()
+                .filter(image -> !image.isPrimary())
+                .map(ProductImage::getImageUrl)
+                .collect(Collectors.toList());
+        productDto.setImages(images);
+        
+        return productDto;
+    }
+
+    // DTO -> Entity dönüşümü
+    private Product convertToEntity(ProductDto productDto) {
+        return Product.builder()
+                .name(productDto.getName())
+                .description(productDto.getDescription())
+                .price(productDto.getPrice())
+                .stockQuantity(productDto.getStockQuantity())
+                .imageUrl(productDto.getImageUrl())
+                .build();
+    }
+}
+```
+
+Bu service sınıfı, `Product` entity'si için CRUD işlemlerini gerçekleştirir ve ürün stok yönetimi gibi iş kurallarını uygular.
+
+### OrderService
+
+```java
+package com.example.ecommerce.service;
+
+import com.example.ecommerce.dto.OrderDetailDto;
+import com.example.ecommerce.dto.OrderDto;
+import com.example.ecommerce.exception.ResourceNotFoundException;
+import com.example.ecommerce.model.*;
+import com.example.ecommerce.model.enums.OrderStatus;
+import com.example.ecommerce.repository.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final OrderDetailRepository orderDetailRepository;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+    private final AddressRepository addressRepository;
+    private final ProductService productService;
+
+    @Transactional(readOnly = true)
+    public List<OrderDto> getAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OrderDto> getAllOrders(Pageable pageable) {
+        return orderRepository.findAll(pageable)
+                .map(this::convertToDto);
+    }
+
+    @Transactional(readOnly = true)
+    public OrderDto getOrderById(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
+        return convertToDto(order);
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderDto> getOrdersByUser(Long userId) {
+        return orderRepository.findByUserId(userId).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OrderDto> getOrdersByUser(Long userId, Pageable pageable) {
+        return orderRepository.findByUserId(userId, pageable)
+                .map(this::convertToDto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderDto> getOrdersByStatus(String status) {
+        return orderRepository.findByStatus(status).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public OrderDto createOrder(OrderDto orderDto) {
+        // Kullanıcı kontrolü
+        User user = userRepository.findById(orderDto.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + orderDto.getUserId()));
+        
+        // Adres kontrolü
+        Address shippingAddress = addressRepository.findById(orderDto.getShippingAddressId())
+                .orElseThrow(() -> new ResourceNotFoundException("Shipping address not found with id: " + orderDto.getShippingAddressId()));
+        
+        Address billingAddress = addressRepository.findById(orderDto.getBillingAddressId())
+                .orElseThrow(() -> new ResourceNotFoundException("Billing address not found with id: " + orderDto.getBillingAddressId()));
+        
+        // Sipariş oluşturma
+        Order order = new Order();
+        order.setUser(user);
+        order.setOrderDate(LocalDateTime.now());
+        order.setStatus(OrderStatus.PENDING.name());
+        order.setShippingAddress(shippingAddress);
+        order.setBillingAddress(billingAddress);
+        order.setOrderDetails(new ArrayList<>());
+        
+        // Sipariş detayları oluşturma
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (OrderDetailDto detailDto : orderDto.getOrderDetails()) {
+            Product product = productRepository.findById(detailDto.getProductId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + detailDto.getProductId()));
+            
+            // Stok kontrolü
+            if (product.getStockQuantity() < detailDto.getQuantity()) {
+                throw new IllegalArgumentException("Not enough stock for product: " + product.getName());
+            }
+            
+            // Stok güncelleme
+            productService.updateProductStock(product.getId(), -detailDto.getQuantity());
+            
+            // Sipariş detayı oluşturma
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setOrder(order);
+            orderDetail.setProduct(product);
+            orderDetail.setQuantity(detailDto.getQuantity());
+            orderDetail.setPrice(product.getPrice());
+            orderDetail.setSubtotal(product.getPrice().multiply(BigDecimal.valueOf(detailDto.getQuantity())));
+            
+            order.getOrderDetails().add(orderDetail);
+            totalAmount = totalAmount.add(orderDetail.getSubtotal());
+        }
+        
+        order.setTotalAmount(totalAmount);
+        Order savedOrder = orderRepository.save(order);
+        
+        return convertToDto(savedOrder);
+    }
+
+    @Transactional
+    public OrderDto updateOrderStatus(Long id, String status) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
+        
+        // Sipariş durumu güncelleme
+        order.setStatus(status);
+        Order updatedOrder = orderRepository.save(order);
+        
+        return convertToDto(updatedOrder);
+    }
+
+    @Transactional
+    public void deleteOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
+        
+        // Sipariş silinirken stok güncelleme
+        for (OrderDetail orderDetail : order.getOrderDetails()) {
+            productService.updateProductStock(orderDetail.getProduct().getId(), orderDetail.getQuantity());
+        }
+        
+        orderRepository.delete(order);
+    }
+
+    // Entity -> DTO dönüşümü
+    private OrderDto convertToDto(Order order) {
+        OrderDto orderDto = OrderDto.builder()
+                .id(order.getId())
+                .userId(order.getUser().getId())
+                .username(order.getUser().getUsername())
+                .orderDate(order.getOrderDate())
+                .totalAmount(order.getTotalAmount())
+                .status(order.getStatus())
+                .shippingAddressId(order.getShippingAddress().getId())
+                .billingAddressId(order.getBillingAddress().getId())
+                .build();
+        
+        // Sipariş detaylarını ekleme
+        List<OrderDetailDto> orderDetailDtos = order.getOrderDetails().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+        orderDto.setOrderDetails(orderDetailDtos);
+        
+        return orderDto;
+    }
+
+    // OrderDetail Entity -> DTO dönüşümü
+    private OrderDetailDto convertToDto(OrderDetail orderDetail) {
+        return OrderDetailDto.builder()
+                .id(orderDetail.getId())
+                .productId(orderDetail.getProduct().getId())
+                .productName(orderDetail.getProduct().getName())
+                .quantity(orderDetail.getQuantity())
+                .price(orderDetail.getPrice())
+                .subtotal(orderDetail.getSubtotal())
+                .build();
+    }
+}
+```
+
+Bu service sınıfı, `Order` entity'si için CRUD işlemlerini gerçekleştirir ve sipariş oluşturma, stok güncelleme ve toplam tutar hesaplama gibi iş kurallarını uygular.
+
+### PaymentService
+
+```java
+package com.example.ecommerce.service;
+
+import com.example.ecommerce.dto.PaymentDto;
+import com.example.ecommerce.exception.ResourceNotFoundException;
+import com.example.ecommerce.model.Order;
+import com.example.ecommerce.model.Payment;
+import com.example.ecommerce.model.enums.OrderStatus;
+import com.example.ecommerce.model.enums.PaymentStatus;
+import com.example.ecommerce.repository.OrderRepository;
+import com.example.ecommerce.repository.PaymentRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class PaymentService {
+
+    private final PaymentRepository paymentRepository;
+    private final OrderRepository orderRepository;
+    private final OrderService orderService;
+
+    @Transactional(readOnly = true)
+    public List<PaymentDto> getAllPayments() {
+        return paymentRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public PaymentDto getPaymentById(Long id) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id: " + id));
+        return convertToDto(payment);
+    }
+
+    @Transactional(readOnly = true)
+    public PaymentDto getPaymentByOrderId(Long orderId) {
+        Payment payment = paymentRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found for order with id: " + orderId));
+        return convertToDto(payment);
+    }
+
+    @Transactional
+    public PaymentDto createPayment(PaymentDto paymentDto) {
+        // Sipariş kontrolü
+        Order order = orderRepository.findById(paymentDto.getOrderId())
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + paymentDto.getOrderId()));
+        
+        // Ödeme oluşturma
+        Payment payment = new Payment();
+        payment.setOrder(order);
+        payment.setPaymentDate(LocalDateTime.now());
+        payment.setPaymentMethod(paymentDto.getPaymentMethod());
+        payment.setAmount(order.getTotalAmount());
+        payment.setStatus(PaymentStatus.PENDING.name());
+        
+        Payment savedPayment = paymentRepository.save(payment);
+        
+        return convertToDto(savedPayment);
+    }
+
+    @Transactional
+    public PaymentDto processPayment(Long id) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id: " + id));
+        
+        // Ödeme işleme
+        // Gerçek bir ödeme işlemi burada yapılır (kredi kartı, PayPal vb.)
+        // Bu örnekte, ödeme başarılı olarak kabul ediyoruz
+        
+        payment.setStatus(PaymentStatus.COMPLETED.name());
+        Payment updatedPayment = paymentRepository.save(payment);
+        
+        // Sipariş durumunu güncelleme
+        orderService.updateOrderStatus(payment.getOrder().getId(), OrderStatus.PROCESSING.name());
+        
+        return convertToDto(updatedPayment);
+    }
+
+    @Transactional
+    public PaymentDto updatePaymentStatus(Long id, String status) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id: " + id));
+        
+        // Ödeme durumu güncelleme
+        payment.setStatus(status);
+        Payment updatedPayment = paymentRepository.save(payment);
+        
+        // Eğer ödeme tamamlandıysa, sipariş durumunu güncelleme
+        if (PaymentStatus.COMPLETED.name().equals(status)) {
+            orderService.updateOrderStatus(payment.getOrder().getId(), OrderStatus.PROCESSING.name());
+        }
+        // Eğer ödeme başarısız olduysa, sipariş durumunu güncelleme
+        else if (PaymentStatus.FAILED.name().equals(status)) {
+            orderService.updateOrderStatus(payment.getOrder().getId(), OrderStatus.PENDING.name());
+        }
+        
+        return convertToDto(updatedPayment);
+    }
+
+    // Entity -> DTO dönüşümü
+    private PaymentDto convertToDto(Payment payment) {
+        return PaymentDto.builder()
+                .id(payment.getId())
+                .orderId(payment.getOrder().getId())
+                .paymentDate(payment.getPaymentDate())
+                .paymentMethod(payment.getPaymentMethod())
+                .amount(payment.getAmount())
+                .status(payment.getStatus())
+                .build();
+    }
+}
+```
+
+Bu service sınıfı, `Payment` entity'si için CRUD işlemlerini gerçekleştirir ve ödeme işleme ve sipariş durumu güncelleme gibi iş kurallarını uygular.
+
+### ReviewService
+
+```java
+package com.example.ecommerce.service;
+
+import com.example.ecommerce.dto.ReviewDto;
+import com.example.ecommerce.exception.ResourceNotFoundException;
+import com.example.ecommerce.model.Product;
+import com.example.ecommerce.model.Review;
+import com.example.ecommerce.model.User;
+import com.example.ecommerce.repository.ProductRepository;
+import com.example.ecommerce.repository.ReviewRepository;
+import com.example.ecommerce.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class ReviewService {
+
+    private final ReviewRepository reviewRepository;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+
+    @Transactional(readOnly = true)
+    public List<ReviewDto> getAllReviews() {
+        return reviewRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public ReviewDto getReviewById(Long id) {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found with id: " + id));
+        return convertToDto(review);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewDto> getReviewsByProduct(Long productId) {
+        return reviewRepository.findByProductId(productId).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReviewDto> getReviewsByProduct(Long productId, Pageable pageable) {
+        return reviewRepository.findByProductId(productId, pageable)
+                .map(this::convertToDto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewDto> getReviewsByUser(Long userId) {
+        return reviewRepository.findByUserId(userId).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Double getAverageRatingByProduct(Long productId) {
+        return reviewRepository.getAverageRatingByProductId(productId);
+    }
+
+    @Transactional
+    public ReviewDto createReview(ReviewDto reviewDto) {
+        // Ürün kontrolü
+        Product product = productRepository.findById(reviewDto.getProductId())
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + reviewDto.getProductId()));
+        
+        // Kullanıcı kontrolü
+        User user = userRepository.findById(reviewDto.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + reviewDto.getUserId()));
+        
+        // Kullanıcının daha önce bu ürün için değerlendirme yapıp yapmadığını kontrol etme
+        reviewRepository.findByProductIdAndUserId(reviewDto.getProductId(), reviewDto.getUserId())
+                .ifPresent(r -> {
+                    throw new IllegalArgumentException("User has already reviewed this product");
+                });
+        
+        // Değerlendirme oluşturma
+        Review review = new Review();
+        review.setProduct(product);
+        review.setUser(user);
+        review.setRating(reviewDto.getRating());
+        review.setComment(reviewDto.getComment());
+        review.setReviewDate(LocalDateTime.now());
+        
+        Review savedReview = reviewRepository.save(review);
+        
+        return convertToDto(savedReview);
+    }
+
+    @Transactional
+    public ReviewDto updateReview(Long id, ReviewDto reviewDto) {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found with id: " + id));
+        
+        // Değerlendirme güncelleme
+        review.setRating(reviewDto.getRating());
+        review.setComment(reviewDto.getComment());
+        
+        Review updatedReview = reviewRepository.save(review);
+        
+        return convertToDto(updatedReview);
+    }
+
+    @Transactional
+    public void deleteReview(Long id) {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found with id: " + id));
+        reviewRepository.delete(review);
+    }
+
+    // Entity -> DTO dönüşümü
+    private ReviewDto convertToDto(Review review) {
+        return ReviewDto.builder()
+                .id(review.getId())
+                .productId(review.getProduct().getId())
+                .productName(review.getProduct().getName())
+                .userId(review.getUser().getId())
+                .username(review.getUser().getUsername())
+                .rating(review.getRating())
+                .comment(review.getComment())
+                .reviewDate(review.getReviewDate())
+                .build();
+    }
+}
+```
+
+Bu service sınıfı, `Review` entity'si için CRUD işlemlerini gerçekleştirir ve kullanıcının bir ürünü birden fazla değerlendirmemesi gibi iş kurallarını uygular.
+
+## DTO (Data Transfer Object) Sınıfları
+
+Service katmanı, entity'leri doğrudan controller'lara göndermek yerine, DTO (Data Transfer Object) sınıflarını kullanır. DTO'lar, entity'lerin sadece gerekli alanlarını içerir ve entity'lerin iç yapısını gizler.
+
+### UserDto
+
+```java
+package com.example.ecommerce.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserDto {
+    private Long id;
+    private String username;
+    private String email;
+    private String password; // Sadece oluşturma ve güncelleme işlemlerinde kullanılır
+    private String firstName;
+    private String lastName;
+    private String phone;
+    private boolean isActive;
+    private String role;
+}
+```
+
+### CategoryDto
+
+```java
+package com.example.ecommerce.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CategoryDto {
+    private Long id;
+    private String name;
+    private String description;
+    private Long parentId;
+    private String parentName;
+}
+```
+
+### ProductDto
+
+```java
+package com.example.ecommerce.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProductDto {
+    private Long id;
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private Integer stockQuantity;
+    private String imageUrl;
+    private Long categoryId;
+    private String categoryName;
+    private List<String> images;
+}
+```
+
+### OrderDto
+
+```java
+package com.example.ecommerce.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderDto {
+    private Long id;
+    private Long userId;
+    private String username;
+    private LocalDateTime orderDate;
+    private BigDecimal totalAmount;
+    private String status;
+    private Long shippingAddressId;
+    private Long billingAddressId;
+    private List<OrderDetailDto> orderDetails;
+}
+```
+
+### OrderDetailDto
+
+```java
+package com.example.ecommerce.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderDetailDto {
+    private Long id;
+    private Long productId;
+    private String productName;
+    private Integer quantity;
+    private BigDecimal price;
+    private BigDecimal subtotal;
+}
+```
+
+### PaymentDto
+
+```java
+package com.example.ecommerce.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class PaymentDto {
+    private Long id;
+    private Long orderId;
+    private LocalDateTime paymentDate;
+    private String paymentMethod;
+    private BigDecimal amount;
+    private String status;
+}
+```
+
+### ReviewDto
+
+```java
+package com.example.ecommerce.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReviewDto {
+    private Long id;
+    private Long productId;
+    private String productName;
+    private Long userId;
+    private String username;
+    private Integer rating;
+    private String comment;
+    private LocalDateTime reviewDate;
+}
+```
+
+### AddressDto
+
+```java
+package com.example.ecommerce.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AddressDto {
+    private Long id;
+    private Long userId;
+    private String addressLine1;
+    private String addressLine2;
+    private String city;
+    private String state;
+    private String postalCode;
+    private String country;
+    private boolean isDefault;
+    private String addressType;
+}
+```
+
+## Transaction Yönetimi
+
+Spring Boot, transaction yönetimi için `@Transactional` anotasyonunu sağlar. Bu anotasyon, bir metodun veya sınıfın transaction içinde çalışmasını sağlar.
+
+### @Transactional Anotasyonu
+
+`@Transactional` anotasyonu, bir metodun veya sınıfın transaction içinde çalışmasını sağlar. Bu anotasyon, aşağıdaki özelliklere sahiptir:
+
+- **readOnly**: Sadece okuma işlemleri için transaction oluşturur. Varsayılan değeri `false`'dur.
+- **propagation**: Transaction'ın nasıl yayılacağını belirtir. Varsayılan değeri `Propagation.REQUIRED`'dır.
+- **isolation**: Transaction'ın izolasyon seviyesini belirtir. Varsayılan değeri `Isolation.DEFAULT`'dur.
+- **timeout**: Transaction'ın zaman aşımı süresini belirtir. Varsayılan değeri `-1`'dir (zaman aşımı yok).
+- **rollbackFor**: Transaction'ın geri alınmasına neden olacak istisnaları belirtir. Varsayılan olarak, `RuntimeException` ve `Error` türündeki istisnalar için transaction geri alınır.
+- **noRollbackFor**: Transaction'ın geri alınmamasına neden olacak istisnaları belirtir.
+
+### Transaction Yönetimi Örneği
+
+```java
+@Service
+@RequiredArgsConstructor
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final ProductService productService;
+
+    @Transactional
+    public OrderDto createOrder(OrderDto orderDto) {
+        // Sipariş oluşturma işlemleri
+        // ...
+        
+        // Stok güncelleme işlemleri
+        for (OrderDetailDto detailDto : orderDto.getOrderDetails()) {
+            productService.updateProductStock(detailDto.getProductId(), -detailDto.getQuantity());
+        }
+        
+        // Sipariş kaydetme işlemleri
+        // ...
+        
+        return convertToDto(savedOrder);
+    }
+}
+```
+
+Bu örnekte, `createOrder` metodu bir transaction içinde çalışır. Eğer stok güncelleme işlemi sırasında bir hata oluşursa, tüm işlemler geri alınır ve sipariş oluşturulmaz.
+
+## Exception Handling
+
+Service katmanı, iş kurallarını uygularken çeşitli istisnalar fırlatabilir. Bu istisnalar, controller katmanında yakalanarak uygun HTTP yanıtlarına dönüştürülür.
+
+### ResourceNotFoundException
+
+```java
+package com.example.ecommerce.exception;
+
+public class ResourceNotFoundException extends RuntimeException {
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+}
+```
+
+### IllegalArgumentException
+
+```java
+// Java'nın yerleşik IllegalArgumentException sınıfı kullanılır
+```
+
+### Exception Handling Örneği
+
+```java
+@Service
+@RequiredArgsConstructor
+public class ProductService {
+
+    private final ProductRepository productRepository;
+
+    @Transactional
+    public void updateProductStock(Long id, Integer quantity) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+        
+        // Stok kontrolü
+        if (product.getStockQuantity() + quantity < 0) {
+            throw new IllegalArgumentException("Not enough stock for product: " + product.getName());
+        }
+        
+        product.setStockQuantity(product.getStockQuantity() + quantity);
+        productRepository.save(product);
+    }
+}
+```
+
+Bu örnekte, `updateProductStock` metodu, ürün bulunamazsa `ResourceNotFoundException` fırlatır ve stok yetersizse `IllegalArgumentException` fırlatır.
+
+## Bağımlılık Enjeksiyonu
+
+Spring Boot, bağımlılık enjeksiyonu için çeşitli anotasyonlar sağlar. Service sınıfları, genellikle constructor injection kullanarak bağımlılıklarını enjekte eder.
+
+### Constructor Injection
+
+```java
+@Service
+@RequiredArgsConstructor
+public class ProductService {
+
+    private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+    private final ProductImageRepository productImageRepository;
+
+    // ...
+}
+```
+
+Bu örnekte, `ProductService` sınıfı, `ProductRepository`, `CategoryRepository` ve `ProductImageRepository` bağımlılıklarını constructor injection ile enjekte eder. `@RequiredArgsConstructor` anotasyonu, `final` alanlar için bir constructor oluşturur.
+
+## Service Katmanının Test Edilmesi
+
+Service katmanı, unit testler ve integration testler ile test edilebilir. Unit testler, service sınıflarının bağımlılıklarını mock'layarak, service sınıflarının davranışlarını test eder. Integration testler, gerçek bağımlılıkları kullanarak, service sınıflarının davranışlarını test eder.
+
+### Unit Test Örneği
+
+```java
+package com.example.ecommerce.service;
+
+import com.example.ecommerce.dto.ProductDto;
+import com.example.ecommerce.exception.ResourceNotFoundException;
+import com.example.ecommerce.model.Category;
+import com.example.ecommerce.model.Product;
+import com.example.ecommerce.repository.CategoryRepository;
+import com.example.ecommerce.repository.ProductImageRepository;
+import com.example.ecommerce.repository.ProductRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.math.BigDecimal;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+public class ProductServiceTest {
+
+    @Mock
+    private ProductRepository productRepository;
+
+    @Mock
+    private CategoryRepository categoryRepository;
+
+    @Mock
+    private ProductImageRepository productImageRepository;
+
+    @InjectMocks
+    private ProductService productService;
+
+    private Product product;
+    private Category category;
+    private ProductDto productDto;
+
+    @BeforeEach
+    void setUp() {
+        category = new Category();
+        category.setId(1L);
+        category.setName("Electronics");
+
+        product = new Product();
+        product.setId(1L);
+        product.setName("iPhone 13");
+        product.setDescription("Apple iPhone 13");
+        product.setPrice(new BigDecimal("14999.99"));
+        product.setStockQuantity(50);
+        product.setImageUrl("https://example.com/images/iphone13.jpg");
+        product.setCategory(category);
+
+        productDto = ProductDto.builder()
+                .id(1L)
+                .name("iPhone 13")
+                .description("Apple iPhone 13")
+                .price(new BigDecimal("14999.99"))
+                .stockQuantity(50)
+                .imageUrl("https://example.com/images/iphone13.jpg")
+                .categoryId(1L)
+                .build();
+    }
+
+    @Test
+    void getProductById_ExistingId_ReturnsProductDto() {
+        // Arrange
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        // Act
+        ProductDto result = productService.getProductById(1L);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(product.getId(), result.getId());
+        assertEquals(product.getName(), result.getName());
+        assertEquals(product.getPrice(), result.getPrice());
+        assertEquals(product.getCategory().getId(), result.getCategoryId());
+    }
+
+    @Test
+    void getProductById_NonExistingId_ThrowsResourceNotFoundException() {
+        // Arrange
+        when(productRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> {
+            productService.getProductById(99L);
+        });
+    }
+
+    @Test
+    void createProduct_ValidProductDto_ReturnsCreatedProductDto() {
+        // Arrange
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        // Act
+        ProductDto result = productService.createProduct(productDto);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(productDto.getName(), result.getName());
+        assertEquals(productDto.getPrice(), result.getPrice());
+        assertEquals(productDto.getCategoryId(), result.getCategoryId());
+        verify(productRepository, times(1)).save(any(Product.class));
+    }
+
+    @Test
+    void createProduct_NonExistingCategory_ThrowsResourceNotFoundException() {
+        // Arrange
+        when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
+        productDto.setCategoryId(99L);
+
+        // Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> {
+            productService.createProduct(productDto);
+        });
+        verify(productRepository, never()).save(any(Product.class));
+    }
+
+    @Test
+    void updateProductStock_ValidIdAndQuantity_UpdatesStock() {
+        // Arrange
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        // Act
+        productService.updateProductStock(1L, 10);
+
+        // Assert
+        assertEquals(60, product.getStockQuantity());
+        verify(productRepository, times(1)).save(product);
+    }
+
+    @Test
+    void updateProductStock_NotEnoughStock_ThrowsIllegalArgumentException() {
+        // Arrange
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> {
+            productService.updateProductStock(1L, -60);
+        });
+        verify(productRepository, never()).save(any(Product.class));
+    }
+}
+```
+
+Bu unit test örneği, `ProductService` sınıfının `getProductById`, `createProduct` ve `updateProductStock` metodlarını test eder. Test sınıfı, `@Mock` anotasyonu ile bağımlılıkları mock'lar ve `@InjectMocks` anotasyonu ile service sınıfına enjekte eder.
+
+## Sonuç
+
+Bu bölümde, e-ticaret uygulaması için service katmanını oluşturmayı detaylı olarak ele aldık. Service katmanı, iş mantığını içeren ve controller ile repository katmanları arasında bir köprü görevi gören katmandır. Service katmanı, transaction yönetimi, güvenlik kontrolleri ve veri doğrulama gibi işlemleri gerçekleştirir.
+
+Bir sonraki bölümde, controller katmanını ve REST API endpoint'lerini oluşturmayı ele alacağız.

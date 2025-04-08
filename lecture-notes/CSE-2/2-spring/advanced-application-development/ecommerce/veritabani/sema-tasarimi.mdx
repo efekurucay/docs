@@ -1,0 +1,297 @@
+---
+title: 'Veritabanı Şema Tasarımı'
+description: 'E-Ticaret Web Uygulaması için veritabanı şema tasarımı ve ER diyagramı'
+---
+
+# Veritabanı Şema Tasarımı
+
+Bu bölümde, e-ticaret web uygulaması için veritabanı şema tasarımını detaylı olarak ele alacağız. Veritabanı şeması, uygulamanın veri yapısını tanımlar ve tablolar arasındaki ilişkileri gösterir.
+
+## Entity İlişki Diyagramı (ERD)
+
+Aşağıda, e-ticaret uygulaması için tasarlanan veritabanı şemasının Entity İlişki Diyagramı (ERD) bulunmaktadır. Bu diyagram, tablolar arasındaki ilişkileri görsel olarak temsil eder.
+
+```
++----------------+       +----------------+       +----------------+
+|     USERS      |       |   CATEGORIES   |       |    PRODUCTS    |
++----------------+       +----------------+       +----------------+
+| PK: id         |       | PK: id         |       | PK: id         |
+| username       |       | name           |       | name           |
+| email          |       | description    |       | description    |
+| password       |       | parent_id (FK) |       | price          |
+| first_name     |       +----------------+       | stock_quantity |
+| last_name      |                                | image_url      |
+| phone          |                                | category_id(FK)|
+| is_active      |                                +----------------+
+| role           |                                        |
++----------------+                                        |
+        |                                                 |
+        |                                                 |
+        v                                                 v
++----------------+       +----------------+       +----------------+
+|    ADDRESSES   |       |     ORDERS     |       | PRODUCT_IMAGES |
++----------------+       +----------------+       +----------------+
+| PK: id         |       | PK: id         |       | PK: id         |
+| user_id (FK)   |<----->| user_id (FK)   |       | product_id (FK)|
+| address_line1  |       | order_date     |       | image_url      |
+| address_line2  |       | total_amount   |       | is_primary     |
+| city           |       | status         |       +----------------+
+| state          |       | shipping_addr_id|
+| postal_code    |       | billing_addr_id |
+| country        |       +----------------+
+| is_default     |               |
+| address_type   |               |
++----------------+               |
+                                 v
++----------------+       +----------------+       +----------------+
+|    PAYMENTS    |       | ORDER_DETAILS  |       |    REVIEWS     |
++----------------+       +----------------+       +----------------+
+| PK: id         |       | PK: id         |       | PK: id         |
+| order_id (FK)  |<------| order_id (FK)  |       | product_id (FK)|
+| payment_date   |       | product_id (FK)|<------| user_id (FK)   |
+| payment_method |       | quantity       |       | rating         |
+| amount         |       | price          |       | comment        |
+| status         |       | subtotal       |       | review_date    |
++----------------+       +----------------+       +----------------+
+```
+
+## Tablo Yapıları
+
+Aşağıda, e-ticaret uygulaması için tasarlanan veritabanı tablolarının detaylı açıklamaları bulunmaktadır.
+
+### 1. USERS Tablosu
+
+Bu tablo, sistemdeki kullanıcıları temsil eder. Müşteriler ve yöneticiler gibi farklı kullanıcı türleri bu tabloda saklanır.
+
+| Alan Adı    | Veri Tipi     | Açıklama                                      |
+|-------------|---------------|-----------------------------------------------|
+| id          | BIGINT        | Birincil anahtar, otomatik artan              |
+| username    | VARCHAR(50)   | Kullanıcı adı, benzersiz                      |
+| email       | VARCHAR(100)  | E-posta adresi, benzersiz                     |
+| password    | VARCHAR(255)  | Şifrelenmiş parola                            |
+| first_name  | VARCHAR(50)   | Kullanıcının adı                              |
+| last_name   | VARCHAR(50)   | Kullanıcının soyadı                           |
+| phone       | VARCHAR(20)   | Telefon numarası                              |
+| is_active   | BOOLEAN       | Hesabın aktif olup olmadığı                   |
+| role        | VARCHAR(20)   | Kullanıcı rolü (ADMIN, USER, vb.)             |
+| created_at  | TIMESTAMP     | Hesabın oluşturulma tarihi                    |
+| updated_at  | TIMESTAMP     | Hesabın son güncellenme tarihi                |
+
+### 2. CATEGORIES Tablosu
+
+Bu tablo, ürün kategorilerini temsil eder. Kategoriler hiyerarşik bir yapıda olabilir (ana kategoriler ve alt kategoriler).
+
+| Alan Adı     | Veri Tipi     | Açıklama                                      |
+|--------------|---------------|-----------------------------------------------|
+| id           | BIGINT        | Birincil anahtar, otomatik artan              |
+| name         | VARCHAR(100)  | Kategori adı                                  |
+| description  | TEXT          | Kategori açıklaması                           |
+| parent_id    | BIGINT        | Üst kategori ID'si (NULL ise ana kategoridir) |
+| created_at   | TIMESTAMP     | Kategorinin oluşturulma tarihi                |
+| updated_at   | TIMESTAMP     | Kategorinin son güncellenme tarihi            |
+
+### 3. PRODUCTS Tablosu
+
+Bu tablo, sistemdeki ürünleri temsil eder.
+
+| Alan Adı        | Veri Tipi     | Açıklama                                      |
+|-----------------|---------------|-----------------------------------------------|
+| id              | BIGINT        | Birincil anahtar, otomatik artan              |
+| name            | VARCHAR(255)  | Ürün adı                                      |
+| description     | TEXT          | Ürün açıklaması                               |
+| price           | DECIMAL(10,2) | Ürün fiyatı                                   |
+| stock_quantity  | INT           | Stok miktarı                                  |
+| image_url       | VARCHAR(255)  | Ana ürün görselinin URL'si                    |
+| category_id     | BIGINT        | Kategori ID'si (Yabancı anahtar)              |
+| created_at      | TIMESTAMP     | Ürünün oluşturulma tarihi                     |
+| updated_at      | TIMESTAMP     | Ürünün son güncellenme tarihi                 |
+
+### 4. PRODUCT_IMAGES Tablosu
+
+Bu tablo, ürünlere ait görselleri temsil eder. Bir ürünün birden fazla görseli olabilir.
+
+| Alan Adı     | Veri Tipi     | Açıklama                                      |
+|--------------|---------------|-----------------------------------------------|
+| id           | BIGINT        | Birincil anahtar, otomatik artan              |
+| product_id   | BIGINT        | Ürün ID'si (Yabancı anahtar)                  |
+| image_url    | VARCHAR(255)  | Görsel URL'si                                 |
+| is_primary   | BOOLEAN       | Ana görsel olup olmadığı                      |
+| created_at   | TIMESTAMP     | Görselin oluşturulma tarihi                   |
+
+### 5. ADDRESSES Tablosu
+
+Bu tablo, kullanıcılara ait adresleri temsil eder. Bir kullanıcının birden fazla adresi olabilir.
+
+| Alan Adı       | Veri Tipi     | Açıklama                                      |
+|----------------|---------------|-----------------------------------------------|
+| id             | BIGINT        | Birincil anahtar, otomatik artan              |
+| user_id        | BIGINT        | Kullanıcı ID'si (Yabancı anahtar)             |
+| address_line1  | VARCHAR(255)  | Adres satırı 1                                |
+| address_line2  | VARCHAR(255)  | Adres satırı 2 (opsiyonel)                    |
+| city           | VARCHAR(100)  | Şehir                                         |
+| state          | VARCHAR(100)  | Eyalet/İl                                     |
+| postal_code    | VARCHAR(20)   | Posta kodu                                    |
+| country        | VARCHAR(100)  | Ülke                                          |
+| is_default     | BOOLEAN       | Varsayılan adres olup olmadığı                |
+| address_type   | VARCHAR(20)   | Adres tipi (SHIPPING, BILLING)                |
+| created_at     | TIMESTAMP     | Adresin oluşturulma tarihi                    |
+| updated_at     | TIMESTAMP     | Adresin son güncellenme tarihi                |
+
+### 6. ORDERS Tablosu
+
+Bu tablo, kullanıcılar tarafından verilen siparişleri temsil eder.
+
+| Alan Adı          | Veri Tipi     | Açıklama                                      |
+|-------------------|---------------|-----------------------------------------------|
+| id                | BIGINT        | Birincil anahtar, otomatik artan              |
+| user_id           | BIGINT        | Kullanıcı ID'si (Yabancı anahtar)             |
+| order_date        | TIMESTAMP     | Sipariş tarihi                                |
+| total_amount      | DECIMAL(10,2) | Toplam sipariş tutarı                         |
+| status            | VARCHAR(20)   | Sipariş durumu (PENDING, SHIPPED, DELIVERED)  |
+| shipping_addr_id  | BIGINT        | Teslimat adresi ID'si (Yabancı anahtar)       |
+| billing_addr_id   | BIGINT        | Fatura adresi ID'si (Yabancı anahtar)         |
+| created_at        | TIMESTAMP     | Siparişin oluşturulma tarihi                  |
+| updated_at        | TIMESTAMP     | Siparişin son güncellenme tarihi              |
+
+### 7. ORDER_DETAILS Tablosu
+
+Bu tablo, siparişlerdeki ürünleri ve miktarlarını temsil eder.
+
+| Alan Adı     | Veri Tipi     | Açıklama                                      |
+|--------------|---------------|-----------------------------------------------|
+| id           | BIGINT        | Birincil anahtar, otomatik artan              |
+| order_id     | BIGINT        | Sipariş ID'si (Yabancı anahtar)               |
+| product_id   | BIGINT        | Ürün ID'si (Yabancı anahtar)                  |
+| quantity     | INT           | Ürün miktarı                                  |
+| price        | DECIMAL(10,2) | Birim fiyat (sipariş anındaki)                |
+| subtotal     | DECIMAL(10,2) | Alt toplam (miktar * birim fiyat)             |
+| created_at   | TIMESTAMP     | Kaydın oluşturulma tarihi                     |
+
+### 8. PAYMENTS Tablosu
+
+Bu tablo, siparişlere ait ödeme bilgilerini temsil eder.
+
+| Alan Adı        | Veri Tipi     | Açıklama                                      |
+|-----------------|---------------|-----------------------------------------------|
+| id              | BIGINT        | Birincil anahtar, otomatik artan              |
+| order_id        | BIGINT        | Sipariş ID'si (Yabancı anahtar)               |
+| payment_date    | TIMESTAMP     | Ödeme tarihi                                  |
+| payment_method  | VARCHAR(50)   | Ödeme yöntemi (CREDIT_CARD, PAYPAL, vb.)      |
+| amount          | DECIMAL(10,2) | Ödeme tutarı                                  |
+| status          | VARCHAR(20)   | Ödeme durumu (PENDING, COMPLETED, FAILED)     |
+| created_at      | TIMESTAMP     | Kaydın oluşturulma tarihi                     |
+| updated_at      | TIMESTAMP     | Kaydın son güncellenme tarihi                 |
+
+### 9. REVIEWS Tablosu
+
+Bu tablo, kullanıcıların ürünlere yaptığı değerlendirmeleri ve yorumları temsil eder.
+
+| Alan Adı     | Veri Tipi     | Açıklama                                      |
+|--------------|---------------|-----------------------------------------------|
+| id           | BIGINT        | Birincil anahtar, otomatik artan              |
+| product_id   | BIGINT        | Ürün ID'si (Yabancı anahtar)                  |
+| user_id      | BIGINT        | Kullanıcı ID'si (Yabancı anahtar)             |
+| rating       | INT           | Değerlendirme puanı (1-5)                     |
+| comment      | TEXT          | Yorum metni                                   |
+| review_date  | TIMESTAMP     | Değerlendirme tarihi                          |
+| created_at   | TIMESTAMP     | Kaydın oluşturulma tarihi                     |
+| updated_at   | TIMESTAMP     | Kaydın son güncellenme tarihi                 |
+
+## İlişkiler ve Kısıtlamalar
+
+Veritabanı tablolarının birbirleriyle olan ilişkileri ve kısıtlamaları aşağıda açıklanmıştır:
+
+### Birincil Anahtarlar (Primary Keys)
+
+Her tabloda, `id` alanı birincil anahtar olarak tanımlanmıştır. Bu alan, otomatik artan bir değere sahiptir ve her kayıt için benzersizdir.
+
+### Yabancı Anahtarlar (Foreign Keys)
+
+1. **CATEGORIES Tablosu**:
+   - `parent_id` -> `CATEGORIES.id` (Kendi kendine referans - self-reference)
+
+2. **PRODUCTS Tablosu**:
+   - `category_id` -> `CATEGORIES.id`
+
+3. **PRODUCT_IMAGES Tablosu**:
+   - `product_id` -> `PRODUCTS.id`
+
+4. **ADDRESSES Tablosu**:
+   - `user_id` -> `USERS.id`
+
+5. **ORDERS Tablosu**:
+   - `user_id` -> `USERS.id`
+   - `shipping_addr_id` -> `ADDRESSES.id`
+   - `billing_addr_id` -> `ADDRESSES.id`
+
+6. **ORDER_DETAILS Tablosu**:
+   - `order_id` -> `ORDERS.id`
+   - `product_id` -> `PRODUCTS.id`
+
+7. **PAYMENTS Tablosu**:
+   - `order_id` -> `ORDERS.id`
+
+8. **REVIEWS Tablosu**:
+   - `product_id` -> `PRODUCTS.id`
+   - `user_id` -> `USERS.id`
+
+### Benzersizlik Kısıtlamaları (Unique Constraints)
+
+1. **USERS Tablosu**:
+   - `username` alanı benzersiz olmalıdır.
+   - `email` alanı benzersiz olmalıdır.
+
+2. **CATEGORIES Tablosu**:
+   - `name` alanı, aynı `parent_id` değerine sahip kategoriler arasında benzersiz olmalıdır.
+
+### Diğer Kısıtlamalar
+
+1. **PRODUCTS Tablosu**:
+   - `price` alanı sıfırdan büyük olmalıdır.
+   - `stock_quantity` alanı sıfır veya daha büyük olmalıdır.
+
+2. **REVIEWS Tablosu**:
+   - `rating` alanı 1 ile 5 arasında olmalıdır.
+
+3. **ORDERS Tablosu**:
+   - `status` alanı yalnızca belirli değerleri alabilir (PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED).
+
+4. **PAYMENTS Tablosu**:
+   - `status` alanı yalnızca belirli değerleri alabilir (PENDING, COMPLETED, FAILED, REFUNDED).
+
+## İndeksler
+
+Veritabanı performansını artırmak için aşağıdaki indeksler oluşturulacaktır:
+
+1. **USERS Tablosu**:
+   - `username` ve `email` alanları için benzersiz indeksler.
+
+2. **PRODUCTS Tablosu**:
+   - `category_id` alanı için indeks.
+   - `name` alanı için indeks (arama işlemleri için).
+
+3. **ORDERS Tablosu**:
+   - `user_id` alanı için indeks.
+   - `status` alanı için indeks (filtreleme işlemleri için).
+
+4. **ORDER_DETAILS Tablosu**:
+   - `order_id` ve `product_id` alanları için indeksler.
+
+5. **REVIEWS Tablosu**:
+   - `product_id` alanı için indeks.
+
+## Normalizasyon
+
+Veritabanı şeması, aşağıdaki normalizasyon kurallarına uygun olarak tasarlanmıştır:
+
+1. **Birinci Normal Form (1NF)**: Tüm tablolardaki alanlar atomiktir (bölünemez).
+
+2. **İkinci Normal Form (2NF)**: Tüm tablolar 1NF'dedir ve tüm alanlar birincil anahtara tam bağımlıdır.
+
+3. **Üçüncü Normal Form (3NF)**: Tüm tablolar 2NF'dedir ve birincil anahtar olmayan alanlar, birincil anahtara geçişsiz olarak bağımlıdır.
+
+Bu normalizasyon kuralları, veri tekrarını en aza indirir ve veri bütünlüğünü sağlar.
+
+## Sonuç
+
+Bu bölümde, e-ticaret web uygulaması için veritabanı şema tasarımını detaylı olarak ele aldık. Tablolar, alanlar, ilişkiler ve kısıtlamalar, uygulamanın gereksinimlerini karşılayacak şekilde tasarlanmıştır. Bir sonraki bölümde, MySQL kurulumu ve yapılandırması konusunu ele alacağız.

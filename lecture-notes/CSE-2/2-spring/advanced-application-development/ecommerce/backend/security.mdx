@@ -1,0 +1,799 @@
+---
+title: 'Spring Security ile Kimlik Doğrulama ve Yetkilendirme'
+description: 'Spring Boot ile e-ticaret uygulaması için güvenlik yapılandırması'
+---
+
+# Spring Security ile Kimlik Doğrulama ve Yetkilendirme
+
+Bu bölümde, e-ticaret uygulaması için Spring Security kullanarak kimlik doğrulama ve yetkilendirme yapılandırmasını detaylı olarak ele alacağız. Spring Security, Java uygulamaları için kapsamlı bir güvenlik çerçevesidir ve kimlik doğrulama, yetkilendirme ve diğer güvenlik özelliklerini sağlar.
+
+## Spring Security Nedir?
+
+Spring Security, Spring Framework'ün bir parçası olarak, Java uygulamaları için kapsamlı bir güvenlik çözümü sunar. Spring Security, aşağıdaki özellikleri sağlar:
+
+1. **Kimlik Doğrulama (Authentication)**: Kullanıcının kimliğini doğrulama.
+2. **Yetkilendirme (Authorization)**: Kullanıcının belirli kaynaklara erişim yetkisini kontrol etme.
+3. **Oturum Yönetimi (Session Management)**: Kullanıcı oturumlarını yönetme.
+4. **CSRF Koruması (Cross-Site Request Forgery Protection)**: CSRF saldırılarına karşı koruma.
+5. **CORS Yapılandırması (Cross-Origin Resource Sharing Configuration)**: Farklı kaynaklardan gelen istekleri yönetme.
+6. **Şifreleme (Encryption)**: Şifreleri güvenli bir şekilde saklama.
+
+## Maven Bağımlılıkları
+
+Spring Security'yi kullanmak için, aşağıdaki Maven bağımlılıklarını `pom.xml` dosyasına eklememiz gerekir:
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-api</artifactId>
+    <version>0.11.5</version>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-impl</artifactId>
+    <version>0.11.5</version>
+    <scope>runtime</scope>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-jackson</artifactId>
+    <version>0.11.5</version>
+    <scope>runtime</scope>
+</dependency>
+```
+
+## Güvenlik Yapılandırması
+
+Spring Security'yi yapılandırmak için, bir yapılandırma sınıfı oluşturmamız gerekir. Bu sınıf, `WebSecurityConfigurerAdapter` sınıfını genişletir ve güvenlik yapılandırmasını tanımlar.
+
+```java
+package com.example.ecommerce.config;
+
+import com.example.ecommerce.security.JwtAuthenticationEntryPoint;
+import com.example.ecommerce.security.JwtAuthenticationFilter;
+import com.example.ecommerce.security.JwtTokenProvider;
+import com.example.ecommerce.service.CustomUserDetailsService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final CustomUserDetailsService customUserDetailsService;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService);
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .cors().and().csrf().disable()
+            .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+            .authorizeRequests()
+                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/products/**", "/api/categories/**").permitAll()
+                .antMatchers("/api/reviews/product/**").permitAll()
+                .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .anyRequest().authenticated();
+
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
+}
+```
+
+Bu yapılandırma sınıfı, aşağıdaki özellikleri sağlar:
+
+1. **CORS ve CSRF**: CORS'u etkinleştirir ve CSRF korumasını devre dışı bırakır (JWT token kullanıldığı için).
+2. **Oturum Yönetimi**: Oturum oluşturmayı devre dışı bırakır (JWT token kullanıldığı için).
+3. **URL Erişim Kuralları**: Hangi URL'lerin kimlik doğrulaması gerektirdiğini belirtir.
+4. **JWT Filtresi**: JWT token'ları doğrulamak için bir filtre ekler.
+
+## Kullanıcı Detayları Servisi
+
+Spring Security, kullanıcı kimlik doğrulaması için bir `UserDetailsService` arayüzü sağlar. Bu arayüzü uygulayan bir sınıf oluşturmamız gerekir.
+
+```java
+package com.example.ecommerce.service;
+
+import com.example.ecommerce.model.User;
+import com.example.ecommerce.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class CustomUserDetailsService implements UserDetailsService {
+
+    private final UserRepository userRepository;
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                user.isActive(),
+                true,
+                true,
+                true,
+                getAuthorities(user)
+        );
+    }
+
+    private Collection<? extends GrantedAuthority> getAuthorities(User user) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+        return authorities;
+    }
+}
+```
+
+Bu sınıf, `UserDetailsService` arayüzünü uygular ve `loadUserByUsername` metodunu override eder. Bu metod, kullanıcı adına göre kullanıcıyı veritabanından alır ve Spring Security'nin `UserDetails` nesnesine dönüştürür.
+
+## JWT Token Sağlayıcısı
+
+JWT (JSON Web Token), kimlik doğrulama ve bilgi alışverişi için kompakt ve bağımsız bir yöntemdir. JWT token'ları, kullanıcı kimliğini ve yetkilerini içerir ve dijital olarak imzalanır.
+
+```java
+package com.example.ecommerce.security;
+
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+
+@Component
+@Slf4j
+public class JwtTokenProvider {
+
+    @Value("${app.jwt.secret}")
+    private String jwtSecret;
+
+    @Value("${app.jwt.expiration}")
+    private int jwtExpirationInMs;
+
+    public String generateToken(Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+
+        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+
+        return Jwts.builder()
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(key)
+                .compact();
+    }
+
+    public String getUsernameFromJWT(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
+    }
+
+    public boolean validateToken(String authToken) {
+        try {
+            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(authToken);
+            return true;
+        } catch (MalformedJwtException ex) {
+            log.error("Invalid JWT token");
+        } catch (ExpiredJwtException ex) {
+            log.error("Expired JWT token");
+        } catch (UnsupportedJwtException ex) {
+            log.error("Unsupported JWT token");
+        } catch (IllegalArgumentException ex) {
+            log.error("JWT claims string is empty");
+        }
+        return false;
+    }
+}
+```
+
+Bu sınıf, JWT token'larını oluşturmak, doğrulamak ve token'dan kullanıcı adını çıkarmak için metodlar sağlar.
+
+## JWT Kimlik Doğrulama Filtresi
+
+JWT token'larını doğrulamak için bir filtre oluşturmamız gerekir. Bu filtre, her HTTP isteğini yakalar ve JWT token'ını doğrular.
+
+```java
+package com.example.ecommerce.security;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@Slf4j
+@RequiredArgsConstructor
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserDetailsService userDetailsService;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        try {
+            String jwt = getJwtFromRequest(request);
+
+            if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
+                String username = jwtTokenProvider.getUsernameFromJWT(jwt);
+
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (Exception ex) {
+            log.error("Could not set user authentication in security context", ex);
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private String getJwtFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+}
+```
+
+Bu filtre, her HTTP isteğini yakalar, "Authorization" başlığından JWT token'ını alır, token'ı doğrular ve kullanıcı kimliğini güvenlik bağlamına ayarlar.
+
+## JWT Kimlik Doğrulama Giriş Noktası
+
+Kimlik doğrulama hatası durumunda, uygun bir hata yanıtı döndürmek için bir giriş noktası oluşturmamız gerekir.
+
+```java
+package com.example.ecommerce.security;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@Component
+@Slf4j
+public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response,
+                         AuthenticationException authException) throws IOException {
+        log.error("Unauthorized error: {}", authException.getMessage());
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+    }
+}
+```
+
+Bu sınıf, kimlik doğrulama hatası durumunda 401 Unauthorized yanıtı döndürür.
+
+## Uygulama Özellikleri
+
+JWT token'ları için gerekli özellikleri `application.properties` dosyasına eklememiz gerekir:
+
+```properties
+# JWT Properties
+app.jwt.secret=YourJwtSecretKey
+app.jwt.expiration=86400000
+```
+
+Bu özellikler, JWT token'larının imzalanması için kullanılan gizli anahtarı ve token'ların geçerlilik süresini (milisaniye cinsinden) belirtir.
+
+## Kimlik Doğrulama ve Yetkilendirme İşlemleri
+
+### Kullanıcı Kaydı
+
+Kullanıcı kaydı için, `AuthController` sınıfında bir endpoint tanımlarız:
+
+```java
+@PostMapping("/register")
+public ResponseEntity<UserDto> register(@Valid @RequestBody UserDto userDto) {
+    UserDto createdUser = userService.createUser(userDto);
+    return ResponseEntity.ok(createdUser);
+}
+```
+
+Bu endpoint, kullanıcı bilgilerini alır, şifreyi şifreler ve kullanıcıyı veritabanına kaydeder.
+
+### Kullanıcı Girişi
+
+Kullanıcı girişi için, `AuthController` sınıfında bir endpoint tanımlarız:
+
+```java
+@PostMapping("/login")
+public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody AuthRequestDto authRequestDto) {
+    Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                    authRequestDto.getUsername(),
+                    authRequestDto.getPassword()
+            )
+    );
+
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+    String jwt = jwtTokenProvider.generateToken(authentication);
+
+    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    UserDto userDto = userService.getUserByUsername(userDetails.getUsername());
+
+    AuthResponseDto authResponseDto = new AuthResponseDto(jwt, userDto);
+    return ResponseEntity.ok(authResponseDto);
+}
+```
+
+Bu endpoint, kullanıcı adı ve şifreyi doğrular, bir JWT token oluşturur ve kullanıcı bilgileriyle birlikte döndürür.
+
+### Yetkilendirme
+
+Yetkilendirme için, `@PreAuthorize` anotasyonunu kullanırız. Bu anotasyon, Spring Security'nin SpEL (Spring Expression Language) ifadelerini kullanarak, endpoint'lere erişim yetkilerini belirler.
+
+```java
+@GetMapping
+@PreAuthorize("hasRole('ADMIN')")
+public ResponseEntity<List<UserDto>> getAllUsers() {
+    List<UserDto> users = userService.getAllUsers();
+    return ResponseEntity.ok(users);
+}
+```
+
+Bu endpoint, sadece "ADMIN" rolüne sahip kullanıcılar tarafından erişilebilir.
+
+```java
+@GetMapping("/{id}")
+@PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#id)")
+public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+    UserDto user = userService.getUserById(id);
+    return ResponseEntity.ok(user);
+}
+```
+
+Bu endpoint, "ADMIN" rolüne sahip kullanıcılar veya kendi bilgilerini görüntüleyen kullanıcılar tarafından erişilebilir.
+
+## Güvenlik Kontrolleri
+
+Güvenlik kontrolleri için, özel sınıflar oluşturabiliriz. Bu sınıflar, `@PreAuthorize` anotasyonunda kullanılabilir.
+
+```java
+@Component
+@RequiredArgsConstructor
+public class UserSecurity {
+
+    private final UserRepository userRepository;
+
+    public boolean isCurrentUser(Long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof UserDetails)) {
+            return false;
+        }
+
+        String username = ((UserDetails) principal).getUsername();
+        User user = userRepository.findByUsername(username).orElse(null);
+        return user != null && user.getId().equals(userId);
+    }
+
+    public boolean isCurrentUsername(String username) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof UserDetails)) {
+            return false;
+        }
+
+        return ((UserDetails) principal).getUsername().equals(username);
+    }
+}
+```
+
+Bu sınıf, kullanıcının kendi bilgilerini görüntüleyip görüntüleyemeyeceğini kontrol eder.
+
+## Şifre Şifreleme
+
+Şifreleri güvenli bir şekilde saklamak için, `BCryptPasswordEncoder` sınıfını kullanırız.
+
+```java
+@Bean
+public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+}
+```
+
+Bu bean, şifreleri şifrelemek ve doğrulamak için kullanılır.
+
+```java
+@Transactional
+public UserDto createUser(UserDto userDto) {
+    // Kullanıcı adı ve e-posta kontrolü
+    if (userRepository.existsByUsername(userDto.getUsername())) {
+        throw new IllegalArgumentException("Username is already taken");
+    }
+    if (userRepository.existsByEmail(userDto.getEmail())) {
+        throw new IllegalArgumentException("Email is already in use");
+    }
+
+    // Kullanıcı oluşturma
+    User user = convertToEntity(userDto);
+    user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+    user.setActive(true);
+    User savedUser = userRepository.save(user);
+    return convertToDto(savedUser);
+}
+```
+
+Bu metod, kullanıcı şifresini şifreler ve kullanıcıyı veritabanına kaydeder.
+
+## Güvenlik Testleri
+
+Güvenlik yapılandırmasını test etmek için, unit testler ve integration testler yazabiliriz.
+
+### Unit Test Örneği
+
+```java
+@ExtendWith(MockitoExtension.class)
+public class JwtTokenProviderTest {
+
+    @Mock
+    private Authentication authentication;
+
+    @InjectMocks
+    private JwtTokenProvider jwtTokenProvider;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(jwtTokenProvider, "jwtSecret", "testSecret");
+        ReflectionTestUtils.setField(jwtTokenProvider, "jwtExpirationInMs", 3600000);
+    }
+
+    @Test
+    void generateToken_ValidAuthentication_ReturnsToken() {
+        // Arrange
+        UserDetails userDetails = new User("testuser", "password", Collections.emptyList());
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+
+        // Act
+        String token = jwtTokenProvider.generateToken(authentication);
+
+        // Assert
+        assertNotNull(token);
+        assertTrue(token.length() > 0);
+    }
+
+    @Test
+    void getUsernameFromJWT_ValidToken_ReturnsUsername() {
+        // Arrange
+        UserDetails userDetails = new User("testuser", "password", Collections.emptyList());
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        String token = jwtTokenProvider.generateToken(authentication);
+
+        // Act
+        String username = jwtTokenProvider.getUsernameFromJWT(token);
+
+        // Assert
+        assertEquals("testuser", username);
+    }
+
+    @Test
+    void validateToken_ValidToken_ReturnsTrue() {
+        // Arrange
+        UserDetails userDetails = new User("testuser", "password", Collections.emptyList());
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        String token = jwtTokenProvider.generateToken(authentication);
+
+        // Act
+        boolean isValid = jwtTokenProvider.validateToken(token);
+
+        // Assert
+        assertTrue(isValid);
+    }
+}
+```
+
+Bu unit test, `JwtTokenProvider` sınıfının `generateToken`, `getUsernameFromJWT` ve `validateToken` metodlarını test eder.
+
+### Integration Test Örneği
+
+```java
+@SpringBootTest
+@AutoConfigureMockMvc
+public class AuthControllerIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @BeforeEach
+    void setUp() {
+        userRepository.deleteAll();
+    }
+
+    @Test
+    void register_ValidUserDto_ReturnsCreatedUser() throws Exception {
+        // Arrange
+        UserDto userDto = UserDto.builder()
+                .username("testuser")
+                .email("test@example.com")
+                .password("password")
+                .firstName("Test")
+                .lastName("User")
+                .role("USER")
+                .build();
+
+        // Act & Assert
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.username").value(userDto.getUsername()))
+                .andExpect(jsonPath("$.email").value(userDto.getEmail()));
+    }
+
+    @Test
+    void login_ValidCredentials_ReturnsToken() throws Exception {
+        // Arrange
+        User user = new User();
+        user.setUsername("testuser");
+        user.setEmail("test@example.com");
+        user.setPassword(passwordEncoder.encode("password"));
+        user.setFirstName("Test");
+        user.setLastName("User");
+        user.setRole("USER");
+        user.setActive(true);
+        userRepository.save(user);
+
+        AuthRequestDto authRequestDto = new AuthRequestDto("testuser", "password");
+
+        // Act & Assert
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(authRequestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").exists())
+                .andExpect(jsonPath("$.user.username").value(user.getUsername()))
+                .andExpect(jsonPath("$.user.email").value(user.getEmail()));
+    }
+}
+```
+
+Bu integration test, `AuthController` sınıfının `register` ve `login` endpoint'lerini test eder.
+
+## Hata Yönetimi ve Exception Handling
+
+Hata yönetimi ve exception handling, uygulamanın güvenliği için önemlidir. Spring Boot, hata yönetimi için `@ControllerAdvice` ve `@ExceptionHandler` anotasyonlarını sağlar.
+
+```java
+package com.example.ecommerce.exception;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@ControllerAdvice
+@Slf4j
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        log.error("Resource not found exception: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.error("Illegal argument exception: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
+        log.error("Bad credentials exception: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Invalid username or password");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
+        log.error("Access denied exception: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Access denied");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        log.error("Validation exception: {}", ex.getMessage());
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
+        log.error("Global exception: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+}
+```
+
+Bu sınıf, çeşitli istisnaları yakalar ve uygun HTTP yanıtlarına dönüştürür.
+
+### ErrorResponse
+
+```java
+package com.example.ecommerce.exception;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ErrorResponse {
+    private int status;
+    private String message;
+    private LocalDateTime timestamp;
+
+    public ErrorResponse(int status, String message) {
+        this.status = status;
+        this.message = message;
+        this.timestamp = LocalDateTime.now();
+    }
+}
+```
+
+Bu sınıf, hata yanıtlarının yapısını tanımlar.
+
+### ResourceNotFoundException
+
+```java
+package com.example.ecommerce.exception;
+
+public class ResourceNotFoundException extends RuntimeException {
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+}
+```
+
+Bu sınıf, kaynak bulunamadığında fırlatılan bir istisnadır.
+
+## Güvenlik En İyi Uygulamaları
+
+Spring Security ile güvenli bir uygulama geliştirmek için aşağıdaki en iyi uygulamaları izleyebilirsiniz:
+
+1. **Güçlü Şifre Politikaları**: Kullanıcıların güçlü şifreler oluşturmasını sağlayın.
+2. **Şifre Şifreleme**: Şifreleri her zaman şifrelenmiş olarak saklayın.
+3. **HTTPS Kullanımı**: Tüm iletişimi HTTPS üzerinden gerçekleştirin.
+4. **CSRF Koruması**: CSRF saldırılarına karşı koruma sağlayın.
+5. **XSS Koruması**: XSS saldırılarına karşı koruma sağlayın.
+6. **Yetkilendirme Kontrolleri**: Tüm endpoint'ler için uygun yetkilendirme kontrolleri uygulayın.
+7. **Hata Mesajları**: Hassas bilgileri açığa çıkaran hata mesajları göstermeyin.
+8. **Oturum Yönetimi**: Güvenli oturum yönetimi uygulayın.
+9. **Rate Limiting**: Brute force saldırılarını önlemek için rate limiting uygulayın.
+10. **Güncel Bağımlılıklar**: Güvenlik açıklarını önlemek için bağımlılıkları güncel tutun.
+
+## Sonuç
+
+Bu bölümde, e-ticaret uygulaması için Spring Security kullanarak kimlik doğrulama ve yetkilendirme yapılandırmasını detaylı olarak ele aldık. Spring Security, Java uygulamaları için kapsamlı bir güvenlik çerçevesidir ve kimlik doğrulama, yetkilendirme ve diğer güvenlik özelliklerini sağlar.
+
+Bir sonraki bölümde, frontend geliştirme konusunu ele alacağız.

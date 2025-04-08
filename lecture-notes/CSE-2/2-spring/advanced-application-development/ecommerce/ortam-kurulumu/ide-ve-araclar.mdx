@@ -1,0 +1,203 @@
+---
+title: 'IDE ve Araçların Kurulumu'
+description: 'E-Ticaret Web Uygulaması geliştirmek için gerekli IDE ve araçların kurulumu'
+---
+
+# IDE ve Araçların Kurulumu
+
+Bu bölümde, e-ticaret web uygulaması geliştirmek için kullanacağımız Entegre Geliştirme Ortamları (IDE) ve diğer araçların kurulumunu adım adım anlatacağız. Doğru araçları kullanmak, geliştirme sürecini daha verimli ve keyifli hale getirecektir.
+
+## IntelliJ IDEA Kurulumu (Backend Geliştirme için)
+
+IntelliJ IDEA, JetBrains tarafından geliştirilen ve Java uygulamaları için özellikle optimize edilmiş güçlü bir IDE'dir. Spring Boot uygulamaları geliştirmek için mükemmel bir seçimdir.
+
+### Windows, macOS ve Linux için IntelliJ IDEA Kurulumu
+
+1. [IntelliJ IDEA İndirme Sayfası](https://www.jetbrains.com/idea/download/) adresine gidin.
+2. İki sürüm bulunmaktadır: Ultimate (ücretli) ve Community (ücretsiz). Spring Boot geliştirmesi için Ultimate sürümü daha fazla özellik sunar, ancak Community sürümü de temel geliştirme ihtiyaçlarını karşılar. Öğrenciyseniz, JetBrains'in [eğitim programı](https://www.jetbrains.com/community/education/) aracılığıyla Ultimate sürümünü ücretsiz kullanabilirsiniz.
+3. İşletim sisteminize uygun sürümü indirin.
+4. İndirilen kurulum dosyasını çalıştırın ve ekrandaki talimatları izleyin.
+5. Kurulum tamamlandıktan sonra, IntelliJ IDEA'yı başlatın.
+6. İlk başlatmada, bazı temel ayarları yapılandırmanız istenecektir. Varsayılan ayarları kabul edebilir veya tercihlerinize göre özelleştirebilirsiniz.
+
+### IntelliJ IDEA için Spring Boot Eklentileri
+
+IntelliJ IDEA Ultimate sürümü, Spring Boot desteğini içerir. Community sürümünü kullanıyorsanız veya ek özellikler eklemek istiyorsanız, aşağıdaki eklentileri kurabilirsiniz:
+
+1. IntelliJ IDEA'yı açın.
+2. `File > Settings` (Windows/Linux) veya `IntelliJ IDEA > Preferences` (macOS) menüsüne gidin.
+3. Sol panelde `Plugins` seçeneğine tıklayın.
+4. `Marketplace` sekmesine tıklayın.
+5. Arama kutusuna "Spring Boot" yazın.
+6. Aşağıdaki eklentileri kurun:
+   - Spring Boot Assistant
+   - Spring Initializr and Assistant
+   - Spring Boot Devtools
+7. Eklentileri kurduktan sonra, IDE'yi yeniden başlatın.
+
+## Visual Studio Code Kurulumu (Frontend Geliştirme için)
+
+Visual Studio Code (VS Code), Microsoft tarafından geliştirilen hafif ve güçlü bir kod editörüdür. Angular uygulamaları geliştirmek için popüler bir seçimdir.
+
+### Windows, macOS ve Linux için VS Code Kurulumu
+
+1. [Visual Studio Code İndirme Sayfası](https://code.visualstudio.com/download) adresine gidin.
+2. İşletim sisteminize uygun sürümü indirin.
+3. İndirilen kurulum dosyasını çalıştırın ve ekrandaki talimatları izleyin.
+4. Kurulum tamamlandıktan sonra, VS Code'u başlatın.
+
+### VS Code için Angular Eklentileri
+
+Angular geliştirmesi için VS Code'a bazı eklentiler eklemeniz önerilir:
+
+1. VS Code'u açın.
+2. Sol taraftaki Eklentiler simgesine tıklayın (veya `Ctrl+Shift+X` / `Cmd+Shift+X` kısayolunu kullanın).
+3. Arama kutusunu kullanarak aşağıdaki eklentileri arayın ve kurun:
+   - Angular Language Service
+   - Angular Snippets (Version 13)
+   - Angular Essentials
+   - ESLint
+   - Prettier - Code formatter
+   - Auto Import
+   - Path Intellisense
+   - Material Icon Theme (opsiyonel, dosya simgelerini güzelleştirir)
+
+## Postman Kurulumu (API Testi için)
+
+Postman, API'leri test etmek ve belgelemek için kullanılan popüler bir araçtır. Backend API'lerinizi geliştirirken ve test ederken çok faydalı olacaktır.
+
+### Windows, macOS ve Linux için Postman Kurulumu
+
+1. [Postman İndirme Sayfası](https://www.postman.com/downloads/) adresine gidin.
+2. İşletim sisteminize uygun sürümü indirin.
+3. İndirilen kurulum dosyasını çalıştırın ve ekrandaki talimatları izleyin.
+4. Kurulum tamamlandıktan sonra, Postman'ı başlatın.
+5. Bir hesap oluşturabilir veya hesap oluşturmadan devam edebilirsiniz.
+
+## Git Kurulumu (Sürüm Kontrolü için)
+
+Git, sürüm kontrolü için kullanılan popüler bir araçtır. Projenizin farklı sürümlerini yönetmenize ve takım halinde çalışmanıza olanak tanır.
+
+### Windows için Git Kurulumu
+
+1. [Git İndirme Sayfası](https://git-scm.com/download/win) adresine gidin.
+2. Windows için Git kurulum dosyasını indirin.
+3. İndirilen kurulum dosyasını çalıştırın ve ekrandaki talimatları izleyin.
+4. Kurulum sırasında, varsayılan ayarları kabul edebilirsiniz.
+5. Kurulum tamamlandıktan sonra, Git'in doğru şekilde kurulduğunu kontrol etmek için komut istemini açın ve aşağıdaki komutu çalıştırın:
+
+```bash
+git --version
+```
+
+### macOS için Git Kurulumu
+
+macOS'ta Git'i Homebrew ile kurabilirsiniz:
+
+1. Terminal uygulamasını açın.
+2. Aşağıdaki komutu çalıştırın:
+
+```bash
+brew install git
+```
+
+3. Kurulum tamamlandıktan sonra, Git'in doğru şekilde kurulduğunu kontrol etmek için aşağıdaki komutu çalıştırın:
+
+```bash
+git --version
+```
+
+### Linux (Ubuntu) için Git Kurulumu
+
+Ubuntu'da Git'i apt paket yöneticisi ile kurabilirsiniz:
+
+1. Terminal uygulamasını açın.
+2. Aşağıdaki komutları çalıştırın:
+
+```bash
+sudo apt update
+sudo apt install git
+```
+
+3. Kurulum tamamlandıktan sonra, Git'in doğru şekilde kurulduğunu kontrol etmek için aşağıdaki komutu çalıştırın:
+
+```bash
+git --version
+```
+
+## Tomcat Kurulumu (Deployment için)
+
+Apache Tomcat, Java web uygulamalarını çalıştırmak için kullanılan açık kaynaklı bir web sunucusudur. Spring Boot uygulamanızı dağıtmak (deploy etmek) için Tomcat kullanabilirsiniz.
+
+### Windows için Tomcat Kurulumu
+
+1. [Apache Tomcat İndirme Sayfası](https://tomcat.apache.org/download-90.cgi) adresine gidin.
+2. "Core" bölümünden "Windows Service Installer" (.exe) dosyasını indirin.
+3. İndirilen kurulum dosyasını çalıştırın ve ekrandaki talimatları izleyin.
+4. Kurulum sırasında, yönetici kullanıcı adı ve şifre belirlemeniz istenecektir. Bu bilgileri not alın, çünkü Tomcat yönetim konsoluna erişmek için gerekli olacaktır.
+5. Kurulum tamamlandıktan sonra, Tomcat otomatik olarak başlatılacaktır. Tarayıcınızda `http://localhost:8080` adresine giderek Tomcat'in çalıştığını kontrol edebilirsiniz.
+
+### macOS ve Linux için Tomcat Kurulumu
+
+1. [Apache Tomcat İndirme Sayfası](https://tomcat.apache.org/download-90.cgi) adresine gidin.
+2. "Core" bölümünden "tar.gz" dosyasını indirin.
+3. İndirilen dosyayı çıkarmak için Terminal uygulamasını açın ve aşağıdaki komutu çalıştırın:
+
+```bash
+tar -xvf apache-tomcat-9.0.xx.tar.gz
+```
+
+4. Çıkarılan dizini istediğiniz bir konuma taşıyabilirsiniz:
+
+```bash
+sudo mv apache-tomcat-9.0.xx /opt/tomcat
+```
+
+5. Tomcat'i başlatmak için:
+
+```bash
+cd /opt/tomcat/bin
+./startup.sh
+```
+
+6. Tomcat'i durdurmak için:
+
+```bash
+cd /opt/tomcat/bin
+./shutdown.sh
+```
+
+7. Tarayıcınızda `http://localhost:8080` adresine giderek Tomcat'in çalıştığını kontrol edebilirsiniz.
+
+## MySQL Workbench Kurulumu (Veritabanı Yönetimi için)
+
+MySQL Workbench, MySQL veritabanlarını yönetmek ve sorgulamak için kullanılan görsel bir araçtır.
+
+### Windows için MySQL Workbench Kurulumu
+
+MySQL Installer kullanarak MySQL'i kurduysanız, MySQL Workbench de otomatik olarak kurulmuş olabilir. Kurulu değilse:
+
+1. [MySQL Workbench İndirme Sayfası](https://dev.mysql.com/downloads/workbench/) adresine gidin.
+2. Windows için olan kurulum dosyasını indirin.
+3. İndirilen kurulum dosyasını çalıştırın ve ekrandaki talimatları izleyin.
+
+### macOS için MySQL Workbench Kurulumu
+
+1. [MySQL Workbench İndirme Sayfası](https://dev.mysql.com/downloads/workbench/) adresine gidin.
+2. macOS için olan DMG dosyasını indirin.
+3. İndirilen .dmg dosyasını açın ve kurulum paketini çalıştırın.
+4. Ekrandaki talimatları izleyerek kurulumu tamamlayın.
+
+### Linux (Ubuntu) için MySQL Workbench Kurulumu
+
+1. Terminal uygulamasını açın.
+2. Aşağıdaki komutları çalıştırın:
+
+```bash
+sudo apt update
+sudo apt install mysql-workbench
+```
+
+## Sonuç
+
+Tebrikler! E-ticaret web uygulaması geliştirmek için gerekli tüm IDE'leri ve araçları başarıyla kurdunuz. Artık geliştirme sürecine başlayabilirsiniz. Bir sonraki bölümde, veritabanı tasarımı ve uygulaması konusunu ele alacağız.

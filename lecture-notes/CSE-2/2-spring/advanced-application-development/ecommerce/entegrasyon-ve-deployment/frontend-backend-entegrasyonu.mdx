@@ -1,0 +1,753 @@
+---
+title: 'Frontend-Backend Entegrasyonu'
+description: 'Angular frontend ve Spring Boot backend arasındaki entegrasyonun yapılandırılması'
+---
+
+# Frontend-Backend Entegrasyonu
+
+Bu bölümde, Angular frontend ve Spring Boot backend arasındaki entegrasyonu detaylı olarak ele alacağız. İki farklı teknoloji yığınının nasıl birlikte çalıştığını, veri alışverişinin nasıl gerçekleştiğini ve entegrasyon sürecinde karşılaşılabilecek zorlukları ve çözümlerini inceleyeceğiz.
+
+## Mimari Genel Bakış
+
+E-ticaret uygulamamız, aşağıdaki mimari yapıya sahiptir:
+
+1. **Frontend**: Angular ile geliştirilmiş, kullanıcı arayüzünü sağlayan istemci uygulaması.
+2. **Backend**: Spring Boot ile geliştirilmiş, iş mantığını ve veri erişimini sağlayan sunucu uygulaması.
+3. **Veritabanı**: MySQL veritabanı, verilerin kalıcı olarak saklandığı yer.
+
+Bu mimari, aşağıdaki avantajları sağlar:
+
+- **Ayrı Geliştirme**: Frontend ve backend ekipleri, birbirlerinden bağımsız olarak çalışabilir.
+- **Ölçeklenebilirlik**: Frontend ve backend bileşenleri ayrı ayrı ölçeklendirilebilir.
+- **Teknoloji Bağımsızlığı**: Her katman, kendi teknoloji yığınını kullanabilir.
+- **Yeniden Kullanılabilirlik**: Backend API'si, farklı istemciler (web, mobil, masaüstü) tarafından kullanılabilir.
+
+## İletişim Akışı
+
+Frontend ve backend arasındaki iletişim, HTTP protokolü üzerinden gerçekleşir. İşte tipik bir istek-yanıt döngüsü:
+
+1. Kullanıcı, Angular uygulamasında bir eylem gerçekleştirir (örneğin, bir ürünü sepete ekler).
+2. Angular, HTTP isteği oluşturur ve Spring Boot API'sine gönderir.
+3. Spring Boot, isteği alır, işler ve veritabanı işlemlerini gerçekleştirir.
+4. Spring Boot, işlem sonucunu JSON formatında döndürür.
+5. Angular, yanıtı alır, işler ve kullanıcı arayüzünü günceller.
+
+## API Endpoint'leri ve Servisler
+
+Frontend ve backend arasındaki iletişim, API endpoint'leri aracılığıyla gerçekleşir. Spring Boot, RESTful API endpoint'leri sağlar ve Angular, bu endpoint'lere HTTP istekleri gönderir.
+
+### Backend API Endpoint'leri
+
+Spring Boot uygulamasında, RESTful API endpoint'leri `@RestController` anotasyonu ile işaretlenmiş sınıflarda tanımlanır:
+
+```java
+@RestController
+@RequestMapping("/api/products")
+public class ProductController {
+    
+    private final ProductService productService;
+    
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
+    
+    @GetMapping
+    public Page<ProductDTO> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc") String sort) {
+        
+        return productService.getAllProducts(page, size, sort);
+    }
+    
+    @GetMapping("/{id}")
+    public ProductDTO getProductById(@PathVariable Long id) {
+        return productService.getProductById(id);
+    }
+    
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductDTO createProduct(@Valid @RequestBody ProductDTO productDTO) {
+        return productService.createProduct(productDTO);
+    }
+    
+    @PutMapping("/{id}")
+    public ProductDTO updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDTO productDTO) {
+        return productService.updateProduct(id, productDTO);
+    }
+    
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+    }
+    
+    @GetMapping("/category/{categoryId}")
+    public Page<ProductDTO> getProductsByCategory(
+            @PathVariable Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc") String sort) {
+        
+        return productService.getProductsByCategory(categoryId, page, size, sort);
+    }
+    
+    @GetMapping("/search")
+    public Page<ProductDTO> searchProducts(
+            @RequestParam String keyword,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc") String sort) {
+        
+        return productService.searchProducts(keyword, categoryId, minPrice, maxPrice, page, size, sort);
+    }
+}
+```
+
+### Frontend Servisler
+
+Angular uygulamasında, HTTP isteklerini göndermek için servisler kullanılır:
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { Product } from '../models/product.model';
+import { PaginatedResponse } from '../models/paginated-response.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProductService {
+  private apiUrl = `${environment.apiUrl}/products`;
+  
+  constructor(private http: HttpClient) { }
+  
+  getProducts(page = 0, size = 10, sort = 'id,asc'): Observable<PaginatedResponse<Product>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
+    
+    return this.http.get<PaginatedResponse<Product>>(this.apiUrl, { params });
+  }
+  
+  getProductById(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/${id}`);
+  }
+  
+  getProductsByCategory(categoryId: number, page = 0, size = 10, sort = 'id,asc'): Observable<PaginatedResponse<Product>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
+    
+    return this.http.get<PaginatedResponse<Product>>(`${this.apiUrl}/category/${categoryId}`, { params });
+  }
+  
+  searchProducts(keyword: string, categoryId?: number, minPrice?: number, maxPrice?: number, page = 0, size = 10, sort = 'id,asc'): Observable<PaginatedResponse<Product>> {
+    let params = new HttpParams()
+      .set('keyword', keyword)
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
+    
+    if (categoryId !== undefined) {
+      params = params.set('categoryId', categoryId.toString());
+    }
+    
+    if (minPrice !== undefined) {
+      params = params.set('minPrice', minPrice.toString());
+    }
+    
+    if (maxPrice !== undefined) {
+      params = params.set('maxPrice', maxPrice.toString());
+    }
+    
+    return this.http.get<PaginatedResponse<Product>>(`${this.apiUrl}/search`, { params });
+  }
+  
+  createProduct(product: Product): Observable<Product> {
+    return this.http.post<Product>(this.apiUrl, product);
+  }
+  
+  updateProduct(id: number, product: Product): Observable<Product> {
+    return this.http.put<Product>(`${this.apiUrl}/${id}`, product);
+  }
+  
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+}
+```
+
+## API URL Yapılandırması
+
+Frontend uygulamasında, backend API'sine erişmek için API URL'sini yapılandırmanız gerekir. Bu, geliştirme ve üretim ortamları için farklı olabilir.
+
+### Environment Dosyaları
+
+Angular, farklı ortamlar için farklı yapılandırmalar sağlamak amacıyla environment dosyaları kullanır:
+
+```typescript
+// src/environments/environment.ts (Development)
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:8080/api'
+};
+
+// src/environments/environment.prod.ts (Production)
+export const environment = {
+  production: true,
+  apiUrl: 'https://api.example.com/api'
+};
+```
+
+Bu yapılandırma, geliştirme ortamında yerel bir API'ye ve üretim ortamında gerçek bir API'ye bağlanmanızı sağlar.
+
+## CORS Yapılandırması
+
+Cross-Origin Resource Sharing (CORS), farklı kaynaklardan gelen HTTP isteklerine izin vermek için bir mekanizmadır. Angular uygulaması ve Spring Boot API'si farklı kaynaklarda çalıştığında, CORS yapılandırması gereklidir.
+
+### Spring Boot CORS Yapılandırması
+
+Spring Boot uygulamasında, CORS'u yapılandırmak için birkaç yöntem vardır:
+
+#### 1. WebMvcConfigurer Kullanarak
+
+```java
+@Configuration
+public class CorsConfig implements WebMvcConfigurer {
+    
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/api/**")
+                .allowedOrigins("http://localhost:4200")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
+    }
+}
+```
+
+#### 2. @CrossOrigin Anotasyonu Kullanarak
+
+```java
+@RestController
+@RequestMapping("/api/products")
+@CrossOrigin(origins = "http://localhost:4200")
+public class ProductController {
+    // ...
+}
+```
+
+#### 3. CorsFilter Kullanarak
+
+```java
+@Configuration
+public class CorsConfig {
+    
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("http://localhost:4200");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        
+        source.registerCorsConfiguration("/api/**", config);
+        return new CorsFilter(source);
+    }
+}
+```
+
+### Üretim Ortamı için CORS Yapılandırması
+
+Üretim ortamında, güvenlik nedeniyle CORS yapılandırmasını daha kısıtlayıcı hale getirmelisiniz:
+
+```java
+@Configuration
+public class CorsConfig implements WebMvcConfigurer {
+    
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/api/**")
+                .allowedOrigins("https://www.example.com")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
+    }
+}
+```
+
+## Kimlik Doğrulama ve Yetkilendirme
+
+Frontend ve backend arasındaki güvenli iletişim için, kimlik doğrulama ve yetkilendirme mekanizmaları gereklidir.
+
+### JWT Kimlik Doğrulama
+
+JSON Web Token (JWT), güvenli bir şekilde bilgi aktarmak için kullanılan bir standarttır. JWT, kimlik doğrulama ve yetkilendirme için yaygın olarak kullanılır.
+
+#### Backend JWT Yapılandırması
+
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    
+    private final JwtTokenProvider jwtTokenProvider;
+    
+    public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
+    
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .csrf().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .authorizeRequests()
+                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                .anyRequest().authenticated()
+            .and()
+            .apply(new JwtConfigurer(jwtTokenProvider));
+    }
+    
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+```
+
+#### Frontend JWT Interceptor
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { AuthService } from '../services/auth.service';
+
+@Injectable()
+export class JwtInterceptor implements HttpInterceptor {
+  constructor(private authService: AuthService) { }
+  
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    const token = this.authService.getToken();
+    
+    if (token) {
+      request = request.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    }
+    
+    return next.handle(request);
+  }
+}
+```
+
+```typescript
+// app.module.ts
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
+
+@NgModule({
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+  ]
+})
+export class AppModule { }
+```
+
+## Veri Modelleri ve DTO'lar
+
+Frontend ve backend arasında veri alışverişi için, veri modellerini ve DTO'ları (Data Transfer Object) tanımlamanız gerekir.
+
+### Backend DTO'ları
+
+```java
+public class ProductDTO {
+    private Long id;
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private Integer stock;
+    private String imageUrl;
+    private Long categoryId;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    
+    // Getters and setters
+}
+```
+
+### Frontend Modelleri
+
+```typescript
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  imageUrl: string;
+  categoryId: number;
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
+## Hata İşleme
+
+Frontend ve backend arasındaki iletişimde, hataları düzgün bir şekilde işlemek önemlidir.
+
+### Backend Hata İşleme
+
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+    
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(ValidationException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ValidationErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        ValidationErrorResponse error = new ValidationErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation error");
+        
+        ex.getBindingResult().getFieldErrors().forEach(fieldError -> {
+            error.addValidationError(fieldError.getField(), fieldError.getDefaultMessage());
+        });
+        
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred");
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+```
+
+### Frontend Hata İşleme
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+import { NotificationService } from '../services/notification.service';
+
+@Injectable()
+export class ErrorInterceptor implements HttpInterceptor {
+  constructor(
+    private authService: AuthService,
+    private notificationService: NotificationService,
+    private router: Router
+  ) { }
+  
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    return next.handle(request).pipe(
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Bir hata oluştu.';
+        
+        if (error.error instanceof ErrorEvent) {
+          // İstemci taraflı hata
+          errorMessage = `Hata: ${error.error.message}`;
+        } else {
+          // Sunucu taraflı hata
+          if (error.status === 401) {
+            // Kimlik doğrulama hatası
+            this.authService.logout();
+            this.router.navigate(['/auth/login']);
+            errorMessage = 'Oturum süreniz doldu. Lütfen tekrar giriş yapın.';
+          } else if (error.status === 403) {
+            // Yetkilendirme hatası
+            errorMessage = 'Bu işlemi gerçekleştirmek için yetkiniz yok.';
+          } else if (error.status === 404) {
+            // Kaynak bulunamadı hatası
+            errorMessage = 'İstenen kaynak bulunamadı.';
+          } else if (error.status === 500) {
+            // Sunucu hatası
+            errorMessage = 'Sunucu hatası. Lütfen daha sonra tekrar deneyin.';
+          } else if (error.error && error.error.message) {
+            // Özel hata mesajı
+            errorMessage = error.error.message;
+          }
+        }
+        
+        this.notificationService.error(errorMessage);
+        return throwError(errorMessage);
+      })
+    );
+  }
+}
+```
+
+```typescript
+// app.module.ts
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ErrorInterceptor } from './core/interceptors/error.interceptor';
+
+@NgModule({
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+  ]
+})
+export class AppModule { }
+```
+
+## Proxy Yapılandırması
+
+Geliştirme sırasında, Angular uygulamasından Spring Boot API'sine yapılan istekleri yönlendirmek için bir proxy yapılandırması kullanabilirsiniz. Bu, CORS sorunlarını önlemeye yardımcı olur.
+
+### proxy.conf.json
+
+```json
+{
+  "/api": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true
+  }
+}
+```
+
+### angular.json
+
+```json
+{
+  "projects": {
+    "e-commerce-app": {
+      "architect": {
+        "serve": {
+          "options": {
+            "proxyConfig": "src/proxy.conf.json"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Bu yapılandırma ile, Angular uygulamasından `/api` ile başlayan tüm istekler, `http://localhost:8080` adresine yönlendirilir.
+
+## Entegrasyon Testi
+
+Frontend ve backend entegrasyonunu test etmek için, entegrasyon testleri yazabilirsiniz.
+
+### Backend Entegrasyon Testi
+
+```java
+@SpringBootTest
+@AutoConfigureMockMvc
+public class ProductControllerIntegrationTest {
+    
+    @Autowired
+    private MockMvc mockMvc;
+    
+    @Autowired
+    private ObjectMapper objectMapper;
+    
+    @Test
+    public void testGetAllProducts() throws Exception {
+        mockMvc.perform(get("/api/products")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(0))))
+                .andExpect(jsonPath("$.totalElements", greaterThanOrEqualTo(0)));
+    }
+    
+    @Test
+    public void testGetProductById() throws Exception {
+        // Önce bir ürün oluştur
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setName("Test Product");
+        productDTO.setDescription("Test Description");
+        productDTO.setPrice(new BigDecimal("99.99"));
+        productDTO.setStock(10);
+        productDTO.setCategoryId(1L);
+        
+        String productJson = objectMapper.writeValueAsString(productDTO);
+        
+        MvcResult result = mockMvc.perform(post("/api/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(productJson)
+                .header("Authorization", "Bearer " + getToken()))
+                .andExpect(status().isCreated())
+                .andReturn();
+        
+        ProductDTO createdProduct = objectMapper.readValue(result.getResponse().getContentAsString(), ProductDTO.class);
+        
+        // Oluşturulan ürünü getir
+        mockMvc.perform(get("/api/products/" + createdProduct.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(createdProduct.getId().intValue())))
+                .andExpect(jsonPath("$.name", is("Test Product")))
+                .andExpect(jsonPath("$.description", is("Test Description")))
+                .andExpect(jsonPath("$.price", is(99.99)));
+    }
+    
+    private String getToken() {
+        // Token alma işlemi
+    }
+}
+```
+
+### Frontend Entegrasyon Testi
+
+```typescript
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { ProductService } from './product.service';
+import { Product } from '../models/product.model';
+import { environment } from '../../environments/environment';
+
+describe('ProductService', () => {
+  let service: ProductService;
+  let httpMock: HttpTestingController;
+  
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [ProductService]
+    });
+    
+    service = TestBed.inject(ProductService);
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+  
+  afterEach(() => {
+    httpMock.verify();
+  });
+  
+  it('should get products', () => {
+    const mockResponse = {
+      content: [
+        { id: 1, name: 'Product 1', price: 100 },
+        { id: 2, name: 'Product 2', price: 200 }
+      ],
+      totalElements: 2,
+      totalPages: 1,
+      size: 10,
+      number: 0
+    };
+    
+    service.getProducts().subscribe(response => {
+      expect(response.content.length).toBe(2);
+      expect(response.content[0].name).toBe('Product 1');
+      expect(response.content[1].name).toBe('Product 2');
+    });
+    
+    const req = httpMock.expectOne(`${environment.apiUrl}/products?page=0&size=10&sort=id,asc`);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockResponse);
+  });
+  
+  it('should get product by id', () => {
+    const mockProduct: Product = {
+      id: 1,
+      name: 'Product 1',
+      description: 'Description 1',
+      price: 100,
+      stock: 10,
+      imageUrl: 'image1.jpg',
+      categoryId: 1,
+      createdAt: '2023-01-01T00:00:00',
+      updatedAt: '2023-01-01T00:00:00'
+    };
+    
+    service.getProductById(1).subscribe(product => {
+      expect(product).toEqual(mockProduct);
+    });
+    
+    const req = httpMock.expectOne(`${environment.apiUrl}/products/1`);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockProduct);
+  });
+});
+```
+
+## Yaygın Entegrasyon Sorunları ve Çözümleri
+
+Frontend ve backend entegrasyonu sırasında karşılaşılabilecek bazı yaygın sorunlar ve çözümleri:
+
+### 1. CORS Hataları
+
+**Sorun**: Frontend ve backend farklı kaynaklarda çalıştığında, tarayıcı güvenlik nedeniyle istekleri engeller.
+
+**Çözüm**: Backend'de CORS yapılandırması yapın veya geliştirme sırasında proxy kullanın.
+
+### 2. Kimlik Doğrulama Sorunları
+
+**Sorun**: JWT token'ları düzgün bir şekilde gönderilmiyor veya doğrulanmıyor.
+
+**Çözüm**: JWT interceptor'ını kontrol edin ve token'ın doğru bir şekilde gönderildiğinden emin olun.
+
+### 3. Veri Tipleri Uyumsuzluğu
+
+**Sorun**: Backend ve frontend arasında veri tipleri uyumsuzluğu (örneğin, tarih formatları).
+
+**Çözüm**: DTO'ları ve modelleri uyumlu hale getirin veya dönüşüm işlevleri kullanın.
+
+### 4. API Endpoint Yolları
+
+**Sorun**: Frontend ve backend arasında API endpoint yolları uyumsuzluğu.
+
+**Çözüm**: API URL'lerini yapılandırma dosyalarında tanımlayın ve tutarlı bir şekilde kullanın.
+
+### 5. Hata İşleme
+
+**Sorun**: Backend hataları frontend'de düzgün bir şekilde işlenmiyor.
+
+**Çözüm**: Hata interceptor'ı kullanarak backend hatalarını yakalayın ve kullanıcıya uygun mesajlar gösterin.
+
+## Entegrasyon İçin En İyi Uygulamalar
+
+Frontend ve backend entegrasyonu için bazı en iyi uygulamalar:
+
+1. **API Dokümantasyonu**: Backend API'sini Swagger veya OpenAPI ile belgelendirin.
+2. **Versiyon Kontrolü**: API'nizi sürümlendirin ve değişiklikleri belgelendirin.
+3. **Tutarlı Veri Modelleri**: Frontend ve backend arasında tutarlı veri modelleri kullanın.
+4. **Hata Kodları**: Anlamlı hata kodları ve mesajları kullanın.
+5. **Güvenlik**: HTTPS, JWT ve CORS gibi güvenlik önlemlerini uygulayın.
+6. **Performans**: API yanıtlarını optimize edin ve gereksiz veri transferini önleyin.
+7. **Test**: Entegrasyon testleri yazın ve düzenli olarak çalıştırın.
+
+## Sonuç
+
+Bu bölümde, Angular frontend ve Spring Boot backend arasındaki entegrasyonu detaylı olarak ele aldık. İki farklı teknoloji yığınının nasıl birlikte çalıştığını, veri alışverişinin nasıl gerçekleştiğini ve entegrasyon sürecinde karşılaşılabilecek zorlukları ve çözümlerini inceledik.
+
+API endpoint'leri, CORS yapılandırması, kimlik doğrulama, veri modelleri, hata işleme, proxy yapılandırması ve entegrasyon testi konularını ele aldık. Ayrıca, yaygın entegrasyon sorunlarını ve çözümlerini ve entegrasyon için en iyi uygulamaları inceledik.
+
+Bir sonraki bölümde, uygulamanın dağıtımını ele alacağız.

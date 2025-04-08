@@ -1,0 +1,1111 @@
+---
+title: 'Servisler ve Dependency Injection'
+description: 'Angular servislerinin yapısı ve bağımlılık enjeksiyonu'
+---
+
+# Servisler ve Dependency Injection
+
+Bu bölümde, Angular servislerinin yapısını ve bağımlılık enjeksiyonu (Dependency Injection) mekanizmasını detaylı olarak ele alacağız. Servisler, uygulamanın farklı bölümleri arasında veri paylaşımı ve işlevsellik sağlayan önemli bileşenlerdir.
+
+## Angular Servisleri Nedir?
+
+Angular servisleri, uygulamanın farklı bölümleri arasında paylaşılan işlevselliği ve veriyi kapsülleyen sınıflardır. Servisler, aşağıdaki amaçlar için kullanılır:
+
+1. **Veri Paylaşımı**: Komponentler arasında veri paylaşımı sağlar.
+2. **İş Mantığı**: Uygulamanın iş mantığını içerir.
+3. **HTTP İstekleri**: Backend API'leri ile iletişim kurmak için kullanılır.
+4. **Durum Yönetimi**: Uygulamanın durumunu yönetir.
+5. **Yardımcı İşlevler**: Ortak yardımcı işlevleri sağlar.
+
+Servisler, komponentlerin daha temiz ve odaklanmış olmasını sağlar. Komponentler, kullanıcı arayüzü ile ilgilenirken, servisler veri işleme, HTTP istekleri ve iş mantığı gibi görevleri üstlenir.
+
+## Servis Oluşturma
+
+Angular CLI kullanarak yeni bir servis oluşturmak için, aşağıdaki komutu kullanabilirsiniz:
+
+```bash
+ng generate service core/services/product
+```
+
+Bu komut, `core/services/` klasöründe `product` adında yeni bir servis oluşturur. Oluşturulan dosyalar şunlardır:
+
+- **product.service.ts**: Servisin TypeScript kodu.
+- **product.service.spec.ts**: Servisin test dosyası.
+
+### Servis Dekoratörü
+
+Servis sınıfı, `@Injectable` dekoratörü ile işaretlenir. Bu dekoratör, servisin bağımlılık enjeksiyonu sistemine kaydedilmesini sağlar:
+
+```typescript
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProductService {
+  constructor() { }
+}
+```
+
+`@Injectable` dekoratörü, `providedIn` özelliği ile servisin hangi modülde sağlanacağını belirtir. `'root'` değeri, servisin uygulama genelinde tek bir örneğinin (singleton) oluşturulacağını belirtir.
+
+## Dependency Injection (Bağımlılık Enjeksiyonu)
+
+Dependency Injection (DI), bir sınıfın bağımlılıklarını dışarıdan almasını sağlayan bir tasarım desenidir. Angular, güçlü bir DI sistemi sağlar ve bu sistem, uygulamanın farklı bölümleri arasında bağımlılıkları yönetir.
+
+### DI'nin Avantajları
+
+DI kullanmanın bazı avantajları şunlardır:
+
+1. **Gevşek Bağlantı (Loose Coupling)**: Sınıflar arasındaki bağımlılıkları azaltır.
+2. **Testedilebilirlik**: Bağımlılıkları mock'layarak sınıfları daha kolay test etmenizi sağlar.
+3. **Kod Tekrarını Önleme**: Ortak işlevselliği paylaşmanızı sağlar.
+4. **Yaşam Döngüsü Yönetimi**: Bağımlılıkların yaşam döngüsünü yönetir.
+
+### DI Nasıl Çalışır?
+
+Angular'da DI, üç ana bileşenden oluşur:
+
+1. **Provider**: Bir servisin nasıl oluşturulacağını tanımlar.
+2. **Injector**: Bağımlılıkları oluşturur ve yönetir.
+3. **Consumer**: Bağımlılıkları kullanır.
+
+Bir servis, constructor enjeksiyonu ile tüketilir:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { ProductService } from '../../core/services/product.service';
+import { Product } from '../../core/models/product.model';
+
+@Component({
+  selector: 'app-product-list',
+  templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.scss']
+})
+export class ProductListComponent implements OnInit {
+  products: Product[] = [];
+  
+  constructor(private productService: ProductService) { }
+  
+  ngOnInit(): void {
+    this.loadProducts();
+  }
+  
+  loadProducts(): void {
+    this.productService.getProducts()
+      .subscribe(products => {
+        this.products = products;
+      });
+  }
+}
+```
+
+Bu örnekte, `ProductListComponent` sınıfı, `ProductService` bağımlılığını constructor aracılığıyla enjekte eder.
+
+### Provider Yapılandırması
+
+Servisler, çeşitli şekillerde sağlanabilir:
+
+#### Root Seviyesinde Sağlama
+
+Servis, uygulama genelinde tek bir örnek olarak sağlanır:
+
+```typescript
+@Injectable({
+  providedIn: 'root'
+})
+export class ProductService {
+  // ...
+}
+```
+
+#### Modül Seviyesinde Sağlama
+
+Servis, belirli bir modülde sağlanır:
+
+```typescript
+@Injectable({
+  providedIn: ProductModule
+})
+export class ProductService {
+  // ...
+}
+```
+
+Alternatif olarak, modülün `providers` dizisinde de tanımlanabilir:
+
+```typescript
+@NgModule({
+  declarations: [
+    ProductListComponent,
+    ProductDetailComponent
+  ],
+  imports: [
+    CommonModule,
+    SharedModule,
+    RouterModule.forChild(routes)
+  ],
+  providers: [
+    ProductService
+  ]
+})
+export class ProductModule { }
+```
+
+#### Komponent Seviyesinde Sağlama
+
+Servis, belirli bir komponent ve onun alt komponentleri için sağlanır:
+
+```typescript
+@Component({
+  selector: 'app-product-list',
+  templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.scss'],
+  providers: [ProductService]
+})
+export class ProductListComponent {
+  // ...
+}
+```
+
+### Hiyerarşik Injector
+
+Angular'da injector'lar hiyerarşiktir. Bir komponent, bir bağımlılık talep ettiğinde, Angular önce komponentin kendi injector'ını kontrol eder. Eğer bağımlılık bulunamazsa, üst komponentin injector'ına bakar ve bu şekilde kök injector'a kadar devam eder.
+
+Bu hiyerarşi, aynı servisin farklı örneklerini farklı seviyelerde sağlamanıza olanak tanır.
+
+## Servis Örnekleri
+
+E-ticaret uygulaması için çeşitli servis örnekleri oluşturalım.
+
+### ProductService
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
+import { Product } from '../models/product.model';
+import { PaginatedResponse } from '../models/paginated-response.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProductService {
+  private apiUrl = `${environment.apiUrl}/products`;
+  
+  constructor(private http: HttpClient) { }
+  
+  getProducts(page = 0, size = 10, sort = 'id,asc'): Observable<PaginatedResponse<Product>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
+    
+    return this.http.get<PaginatedResponse<Product>>(this.apiUrl, { params });
+  }
+  
+  getProductById(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/${id}`);
+  }
+  
+  getProductsByCategory(categoryId: number, page = 0, size = 10, sort = 'id,asc'): Observable<PaginatedResponse<Product>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
+    
+    return this.http.get<PaginatedResponse<Product>>(`${this.apiUrl}/category/${categoryId}`, { params });
+  }
+  
+  searchProducts(keyword: string, page = 0, size = 10, sort = 'id,asc'): Observable<PaginatedResponse<Product>> {
+    let params = new HttpParams()
+      .set('keyword', keyword)
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
+    
+    return this.http.get<PaginatedResponse<Product>>(`${this.apiUrl}/search`, { params });
+  }
+  
+  getProductsByPriceRange(minPrice: number, maxPrice: number): Observable<Product[]> {
+    let params = new HttpParams()
+      .set('minPrice', minPrice.toString())
+      .set('maxPrice', maxPrice.toString());
+    
+    return this.http.get<Product[]>(`${this.apiUrl}/price`, { params });
+  }
+  
+  createProduct(product: Product): Observable<Product> {
+    return this.http.post<Product>(this.apiUrl, product);
+  }
+  
+  updateProduct(id: number, product: Product): Observable<Product> {
+    return this.http.put<Product>(`${this.apiUrl}/${id}`, product);
+  }
+  
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+  
+  updateProductStock(id: number, quantity: number): Observable<void> {
+    let params = new HttpParams()
+      .set('quantity', quantity.toString());
+    
+    return this.http.patch<void>(`${this.apiUrl}/${id}/stock`, null, { params });
+  }
+}
+```
+
+Bu servis, ürünlerle ilgili tüm API isteklerini gerçekleştirir. `HttpClient` kullanarak backend API'sine istek gönderir ve yanıtları Observable olarak döndürür.
+
+### CategoryService
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { Category } from '../models/category.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CategoryService {
+  private apiUrl = `${environment.apiUrl}/categories`;
+  
+  constructor(private http: HttpClient) { }
+  
+  getCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(this.apiUrl);
+  }
+  
+  getCategoryById(id: number): Observable<Category> {
+    return this.http.get<Category>(`${this.apiUrl}/${id}`);
+  }
+  
+  getParentCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.apiUrl}/parent`);
+  }
+  
+  getSubcategories(parentId: number): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.apiUrl}/subcategories/${parentId}`);
+  }
+  
+  createCategory(category: Category): Observable<Category> {
+    return this.http.post<Category>(this.apiUrl, category);
+  }
+  
+  updateCategory(id: number, category: Category): Observable<Category> {
+    return this.http.put<Category>(`${this.apiUrl}/${id}`, category);
+  }
+  
+  deleteCategory(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+}
+```
+
+Bu servis, kategorilerle ilgili tüm API isteklerini gerçekleştirir.
+
+### CartService
+
+```typescript
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Product } from '../models/product.model';
+import { CartItem } from '../models/cart-item.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CartService {
+  private cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
+  cartItems$ = this.cartItemsSubject.asObservable();
+  
+  constructor() {
+    this.loadCartFromLocalStorage();
+  }
+  
+  addToCart(product: Product, quantity = 1): void {
+    const currentItems = this.cartItemsSubject.value;
+    const existingItemIndex = currentItems.findIndex(item => item.product.id === product.id);
+    
+    if (existingItemIndex !== -1) {
+      // Ürün zaten sepette, miktarı güncelle
+      const updatedItems = [...currentItems];
+      updatedItems[existingItemIndex].quantity += quantity;
+      this.cartItemsSubject.next(updatedItems);
+    } else {
+      // Yeni ürün ekle
+      const newItem: CartItem = {
+        product,
+        quantity
+      };
+      this.cartItemsSubject.next([...currentItems, newItem]);
+    }
+    
+    this.saveCartToLocalStorage();
+  }
+  
+  updateQuantity(productId: number, quantity: number): void {
+    const currentItems = this.cartItemsSubject.value;
+    const existingItemIndex = currentItems.findIndex(item => item.product.id === productId);
+    
+    if (existingItemIndex !== -1) {
+      const updatedItems = [...currentItems];
+      updatedItems[existingItemIndex].quantity = quantity;
+      this.cartItemsSubject.next(updatedItems);
+      this.saveCartToLocalStorage();
+    }
+  }
+  
+  removeFromCart(productId: number): void {
+    const currentItems = this.cartItemsSubject.value;
+    const updatedItems = currentItems.filter(item => item.product.id !== productId);
+    this.cartItemsSubject.next(updatedItems);
+    this.saveCartToLocalStorage();
+  }
+  
+  clearCart(): void {
+    this.cartItemsSubject.next([]);
+    localStorage.removeItem('cart');
+  }
+  
+  getCartItems(): CartItem[] {
+    return this.cartItemsSubject.value;
+  }
+  
+  getCartItemCount(): Observable<number> {
+    return this.cartItems$.pipe(
+      map(items => items.reduce((total, item) => total + item.quantity, 0))
+    );
+  }
+  
+  getCartTotal(): Observable<number> {
+    return this.cartItems$.pipe(
+      map(items => items.reduce((total, item) => total + (item.product.price * item.quantity), 0))
+    );
+  }
+  
+  private saveCartToLocalStorage(): void {
+    localStorage.setItem('cart', JSON.stringify(this.cartItemsSubject.value));
+  }
+  
+  private loadCartFromLocalStorage(): void {
+    const cartJson = localStorage.getItem('cart');
+    if (cartJson) {
+      try {
+        const cart = JSON.parse(cartJson);
+        this.cartItemsSubject.next(cart);
+      } catch (error) {
+        console.error('Sepet yüklenirken hata:', error);
+        this.cartItemsSubject.next([]);
+      }
+    }
+  }
+}
+```
+
+Bu servis, alışveriş sepeti işlemlerini yönetir. Sepet öğelerini bir `BehaviorSubject` içinde saklar ve localStorage kullanarak kalıcı hale getirir.
+
+### AuthService
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { map, tap, catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
+import { User } from '../models/user.model';
+import { AuthResponse } from '../models/auth-response.model';
+import { JwtHelperService } from '@auth0/angular-jwt';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private apiUrl = `${environment.apiUrl}/auth`;
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  private jwtHelper = new JwtHelperService();
+  
+  currentUser$ = this.currentUserSubject.asObservable();
+  isAuthenticated$ = this.currentUser$.pipe(map(user => !!user));
+  
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
+    this.loadUserFromLocalStorage();
+  }
+  
+  login(username: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { username, password })
+      .pipe(
+        tap(response => {
+          this.setSession(response);
+          this.currentUserSubject.next(response.user);
+        })
+      );
+  }
+  
+  register(user: User): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/register`, user);
+  }
+  
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.currentUserSubject.next(null);
+    this.router.navigate(['/auth/login']);
+  }
+  
+  isAuthenticated(): boolean {
+    const token = localStorage.getItem('token');
+    return !!token && !this.jwtHelper.isTokenExpired(token);
+  }
+  
+  getCurrentUser(): User | null {
+    return this.currentUserSubject.value;
+  }
+  
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+  
+  hasRole(role: string): boolean {
+    const user = this.getCurrentUser();
+    return !!user && user.role === role;
+  }
+  
+  private setSession(authResult: AuthResponse): void {
+    localStorage.setItem('token', authResult.token);
+    localStorage.setItem('user', JSON.stringify(authResult.user));
+  }
+  
+  private loadUserFromLocalStorage(): void {
+    const token = localStorage.getItem('token');
+    const userJson = localStorage.getItem('user');
+    
+    if (token && userJson && !this.jwtHelper.isTokenExpired(token)) {
+      try {
+        const user = JSON.parse(userJson);
+        this.currentUserSubject.next(user);
+      } catch (error) {
+        console.error('Kullanıcı yüklenirken hata:', error);
+        this.currentUserSubject.next(null);
+      }
+    } else {
+      this.currentUserSubject.next(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+  }
+}
+```
+
+Bu servis, kimlik doğrulama işlemlerini yönetir. JWT token'ı ve kullanıcı bilgilerini localStorage'da saklar ve kullanıcının kimlik doğrulama durumunu bir `BehaviorSubject` aracılığıyla yayınlar.
+
+### OrderService
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { Order } from '../models/order.model';
+import { PaginatedResponse } from '../models/paginated-response.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class OrderService {
+  private apiUrl = `${environment.apiUrl}/orders`;
+  
+  constructor(private http: HttpClient) { }
+  
+  getOrders(page = 0, size = 10, sort = 'id,desc'): Observable<PaginatedResponse<Order>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
+    
+    return this.http.get<PaginatedResponse<Order>>(this.apiUrl, { params });
+  }
+  
+  getOrderById(id: number): Observable<Order> {
+    return this.http.get<Order>(`${this.apiUrl}/${id}`);
+  }
+  
+  getOrdersByUser(userId: number, page = 0, size = 10, sort = 'id,desc'): Observable<PaginatedResponse<Order>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
+    
+    return this.http.get<PaginatedResponse<Order>>(`${this.apiUrl}/user/${userId}`, { params });
+  }
+  
+  getOrdersByStatus(status: string): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/status/${status}`);
+  }
+  
+  createOrder(order: Order): Observable<Order> {
+    return this.http.post<Order>(this.apiUrl, order);
+  }
+  
+  updateOrderStatus(id: number, status: string): Observable<Order> {
+    let params = new HttpParams()
+      .set('status', status);
+    
+    return this.http.patch<Order>(`${this.apiUrl}/${id}/status`, null, { params });
+  }
+  
+  deleteOrder(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+}
+```
+
+Bu servis, sipariş işlemlerini yönetir ve sipariş ile ilgili tüm API isteklerini gerçekleştirir.
+
+### PaymentService
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { Payment } from '../models/payment.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PaymentService {
+  private apiUrl = `${environment.apiUrl}/payments`;
+  
+  constructor(private http: HttpClient) { }
+  
+  getPayments(): Observable<Payment[]> {
+    return this.http.get<Payment[]>(this.apiUrl);
+  }
+  
+  getPaymentById(id: number): Observable<Payment> {
+    return this.http.get<Payment>(`${this.apiUrl}/${id}`);
+  }
+  
+  getPaymentByOrderId(orderId: number): Observable<Payment> {
+    return this.http.get<Payment>(`${this.apiUrl}/order/${orderId}`);
+  }
+  
+  createPayment(payment: Payment): Observable<Payment> {
+    return this.http.post<Payment>(this.apiUrl, payment);
+  }
+  
+  processPayment(id: number): Observable<Payment> {
+    return this.http.post<Payment>(`${this.apiUrl}/${id}/process`, null);
+  }
+  
+  updatePaymentStatus(id: number, status: string): Observable<Payment> {
+    let params = new HttpParams()
+      .set('status', status);
+    
+    return this.http.patch<Payment>(`${this.apiUrl}/${id}/status`, null, { params });
+  }
+}
+```
+
+Bu servis, ödeme işlemlerini yönetir ve ödeme ile ilgili tüm API isteklerini gerçekleştirir.
+
+### NotificationService
+
+```typescript
+import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class NotificationService {
+  constructor(private snackBar: MatSnackBar) { }
+  
+  success(message: string, duration = 3000): void {
+    this.snackBar.open(message, 'Kapat', {
+      duration,
+      panelClass: ['success-snackbar'],
+      horizontalPosition: 'end',
+      verticalPosition: 'top'
+    });
+  }
+  
+  error(message: string, duration = 5000): void {
+    this.snackBar.open(message, 'Kapat', {
+      duration,
+      panelClass: ['error-snackbar'],
+      horizontalPosition: 'end',
+      verticalPosition: 'top'
+    });
+  }
+  
+  info(message: string, duration = 3000): void {
+    this.snackBar.open(message, 'Kapat', {
+      duration,
+      panelClass: ['info-snackbar'],
+      horizontalPosition: 'end',
+      verticalPosition: 'top'
+    });
+  }
+  
+  warn(message: string, duration = 4000): void {
+    this.snackBar.open(message, 'Kapat', {
+      duration,
+      panelClass: ['warning-snackbar'],
+      horizontalPosition: 'end',
+      verticalPosition: 'top'
+    });
+  }
+}
+```
+
+Bu servis, kullanıcıya bildirimler göstermek için kullanılır. Angular Material'in `MatSnackBar` bileşenini kullanarak farklı türlerde bildirimler gösterir.
+
+### LoadingService
+
+```typescript
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LoadingService {
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+  loading$ = this.loadingSubject.asObservable();
+  
+  show(): void {
+    this.loadingSubject.next(true);
+  }
+  
+  hide(): void {
+    this.loadingSubject.next(false);
+  }
+  
+  isLoading(): Observable<boolean> {
+    return this.loading$;
+  }
+}
+```
+
+Bu servis, uygulamada yükleme durumunu yönetir. Bir `BehaviorSubject` kullanarak yükleme durumunu yayınlar.
+
+## HTTP Interceptor'lar
+
+HTTP Interceptor'lar, HTTP isteklerini ve yanıtlarını yakalamak ve değiştirmek için kullanılır. Angular, `HttpInterceptor` arayüzünü sağlar ve bu arayüzü uygulayan sınıflar, HTTP isteklerini ve yanıtlarını işleyebilir.
+
+### AuthInterceptor
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { AuthService } from '../services/auth.service';
+
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
+  constructor(private authService: AuthService) { }
+  
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    const token = this.authService.getToken();
+    
+    if (token) {
+      request = request.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    }
+    
+    return next.handle(request);
+  }
+}
+```
+
+Bu interceptor, her HTTP isteğine JWT token'ını ekler. `AuthService`'den token'ı alır ve isteğin başlıklarına ekler.
+
+### ErrorInterceptor
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+import { NotificationService } from '../services/notification.service';
+
+@Injectable()
+export class ErrorInterceptor implements HttpInterceptor {
+  constructor(
+    private authService: AuthService,
+    private notificationService: NotificationService,
+    private router: Router
+  ) { }
+  
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    return next.handle(request).pipe(
+      catchError((error: HttpErrorResponse) => {
+        let errorMessage = 'Bir hata oluştu.';
+        
+        if (error.error instanceof ErrorEvent) {
+          // İstemci taraflı hata
+          errorMessage = `Hata: ${error.error.message}`;
+        } else {
+          // Sunucu taraflı hata
+          if (error.status === 401) {
+            // Kimlik doğrulama hatası
+            this.authService.logout();
+            this.router.navigate(['/auth/login']);
+            errorMessage = 'Oturum süreniz doldu. Lütfen tekrar giriş yapın.';
+          } else if (error.status === 403) {
+            // Yetkilendirme hatası
+            errorMessage = 'Bu işlemi gerçekleştirmek için yetkiniz yok.';
+          } else if (error.status === 404) {
+            // Kaynak bulunamadı hatası
+            errorMessage = 'İstenen kaynak bulunamadı.';
+          } else if (error.status === 500) {
+            // Sunucu hatası
+            errorMessage = 'Sunucu hatası. Lütfen daha sonra tekrar deneyin.';
+          } else if (error.error && error.error.message) {
+            // Özel hata mesajı
+            errorMessage = error.error.message;
+          }
+        }
+        
+        this.notificationService.error(errorMessage);
+        return throwError(errorMessage);
+      })
+    );
+  }
+}
+```
+
+Bu interceptor, HTTP hatalarını yakalar ve uygun şekilde işler. Hata türüne göre farklı mesajlar gösterir ve gerekirse kullanıcıyı yönlendirir.
+
+### LoadingInterceptor
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { finalize } from 'rxjs/operators';
+import { LoadingService } from '../services/loading.service';
+
+@Injectable()
+export class LoadingInterceptor implements HttpInterceptor {
+  private activeRequests = 0;
+  
+  constructor(private loadingService: LoadingService) { }
+  
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    if (this.activeRequests === 0) {
+      this.loadingService.show();
+    }
+    
+    this.activeRequests++;
+    
+    return next.handle(request).pipe(
+      finalize(() => {
+        this.activeRequests--;
+        if (this.activeRequests === 0) {
+          this.loadingService.hide();
+        }
+      })
+    );
+  }
+}
+```
+
+Bu interceptor, HTTP isteklerinin yükleme durumunu yönetir. Aktif istek sayısını takip eder ve gerektiğinde yükleme göstergesini gösterir veya gizler.
+
+## Interceptor'ları Kaydetme
+
+Interceptor'ları kullanmak için, bunları `providers` dizisine eklemeniz gerekir:
+
+```typescript
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { CoreModule } from './core/core.module';
+import { SharedModule } from './shared/shared.module';
+
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { ErrorInterceptor } from './core/interceptors/error.interceptor';
+import { LoadingInterceptor } from './core/interceptors/loading.interceptor';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    CoreModule,
+    SharedModule
+  ],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true }
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+`multi: true` özelliği, birden fazla interceptor'ın aynı token için sağlanmasına olanak tanır.
+
+## Servis Testleri
+
+Servisleri test etmek için, Angular'ın test araçlarını kullanabilirsiniz. İşte bazı servis test örnekleri:
+
+### ProductService Testi
+
+```typescript
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { ProductService } from './product.service';
+import { environment } from '../../../environments/environment';
+import { Product } from '../models/product.model';
+import { PaginatedResponse } from '../models/paginated-response.model';
+
+describe('ProductService', () => {
+  let service: ProductService;
+  let httpMock: HttpTestingController;
+  const apiUrl = `${environment.apiUrl}/products`;
+  
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [ProductService]
+    });
+    
+    service = TestBed.inject(ProductService);
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+  
+  afterEach(() => {
+    httpMock.verify();
+  });
+  
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+  
+  it('should get products', () => {
+    const mockResponse: PaginatedResponse<Product> = {
+      content: [
+        { id: 1, name: 'Product 1', price: 100 } as Product,
+        { id: 2, name: 'Product 2', price: 200 } as Product
+      ],
+      totalElements: 2,
+      totalPages: 1,
+      size: 10,
+      number: 0
+    };
+    
+    service.getProducts().subscribe(response => {
+      expect(response).toEqual(mockResponse);
+      expect(response.content.length).toBe(2);
+      expect(response.content[0].name).toBe('Product 1');
+    });
+    
+    const req = httpMock.expectOne(`${apiUrl}?page=0&size=10&sort=id%2Casc`);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockResponse);
+  });
+  
+  it('should get product by id', () => {
+    const mockProduct: Product = { id: 1, name: 'Product 1', price: 100 } as Product;
+    
+    service.getProductById(1).subscribe(product => {
+      expect(product).toEqual(mockProduct);
+      expect(product.name).toBe('Product 1');
+    });
+    
+    const req = httpMock.expectOne(`${apiUrl}/1`);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockProduct);
+  });
+  
+  it('should create product', () => {
+    const mockProduct: Product = { name: 'New Product', price: 300 } as Product;
+    const mockResponse: Product = { id: 3, name: 'New Product', price: 300 } as Product;
+    
+    service.createProduct(mockProduct).subscribe(product => {
+      expect(product).toEqual(mockResponse);
+      expect(product.id).toBe(3);
+      expect(product.name).toBe('New Product');
+    });
+    
+    const req = httpMock.expectOne(apiUrl);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(mockProduct);
+    req.flush(mockResponse);
+  });
+  
+  it('should update product', () => {
+    const mockProduct: Product = { id: 1, name: 'Updated Product', price: 150 } as Product;
+    
+    service.updateProduct(1, mockProduct).subscribe(product => {
+      expect(product).toEqual(mockProduct);
+      expect(product.name).toBe('Updated Product');
+    });
+    
+    const req = httpMock.expectOne(`${apiUrl}/1`);
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual(mockProduct);
+    req.flush(mockProduct);
+  });
+  
+  it('should delete product', () => {
+    service.deleteProduct(1).subscribe(response => {
+      expect(response).toBeUndefined();
+    });
+    
+    const req = httpMock.expectOne(`${apiUrl}/1`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush(null);
+  });
+});
+```
+
+Bu test, `ProductService`'in çeşitli metodlarını test eder. `HttpClientTestingModule` kullanarak HTTP isteklerini mock'lar ve beklenen yanıtları sağlar.
+
+### AuthService Testi
+
+```typescript
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { AuthService } from './auth.service';
+import { environment } from '../../../environments/environment';
+import { User } from '../models/user.model';
+import { AuthResponse } from '../models/auth-response.model';
+
+describe('AuthService', () => {
+  let service: AuthService;
+  let httpMock: HttpTestingController;
+  const apiUrl = `${environment.apiUrl}/auth`;
+  
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        RouterTestingModule
+      ],
+      providers: [AuthService]
+    });
+    
+    service = TestBed.inject(AuthService);
+    httpMock = TestBed.inject(HttpTestingController);
+    
+    // localStorage temizleme
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  });
+  
+  afterEach(() => {
+    httpMock.verify();
+  });
+  
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+  
+  it('should login user', () => {
+    const mockUser: User = { id: 1, username: 'testuser', email: 'test@example.com', role: 'USER' } as User;
+    const mockResponse: AuthResponse = { token: 'fake-jwt-token', user: mockUser };
+    
+    service.login('testuser', 'password').subscribe(response => {
+      expect(response).toEqual(mockResponse);
+      expect(response.token).toBe('fake-jwt-token');
+      expect(response.user.username).toBe('testuser');
+    });
+    
+    const req = httpMock.expectOne(`${apiUrl}/login`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ username: 'testuser', password: 'password' });
+    req.flush(mockResponse);
+    
+    // localStorage kontrolü
+    expect(localStorage.getItem('token')).toBe('fake-jwt-token');
+    expect(localStorage.getItem('user')).toBe(JSON.stringify(mockUser));
+    
+    // currentUser$ kontrolü
+    service.currentUser$.subscribe(user => {
+      expect(user).toEqual(mockUser);
+    });
+    
+    // isAuthenticated$ kontrolü
+    service.isAuthenticated$.subscribe(isAuthenticated => {
+      expect(isAuthenticated).toBeTrue();
+    });
+  });
+  
+  it('should register user', () => {
+    const mockUser: User = { username: 'newuser', email: 'new@example.com', password: 'password' } as User;
+    const mockResponse: User = { id: 2, username: 'newuser', email: 'new@example.com', role: 'USER' } as User;
+    
+    service.register(mockUser).subscribe(user => {
+      expect(user).toEqual(mockResponse);
+      expect(user.id).toBe(2);
+      expect(user.username).toBe('newuser');
+    });
+    
+    const req = httpMock.expectOne(`${apiUrl}/register`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(mockUser);
+    req.flush(mockResponse);
+  });
+  
+  it('should logout user', () => {
+    // Önce kullanıcıyı giriş yapmış duruma getir
+    const mockUser: User = { id: 1, username: 'testuser', email: 'test@example.com', role: 'USER' } as User;
+    localStorage.setItem('token', 'fake-jwt-token');
+    localStorage.setItem('user', JSON.stringify(mockUser));
+    
+    service.logout();
+    
+    // localStorage kontrolü
+    expect(localStorage.getItem('token')).toBeNull();
+    expect(localStorage.getItem('user')).toBeNull();
+    
+    // currentUser$ kontrolü
+    service.currentUser$.subscribe(user => {
+      expect(user).toBeNull();
+    });
+    
+    // isAuthenticated$ kontrolü
+    service.isAuthenticated$.subscribe(isAuthenticated => {
+      expect(isAuthenticated).toBeFalse();
+    });
+  });
+});
+```
+
+Bu test, `AuthService`'in kimlik doğrulama işlemlerini test eder. `localStorage` kullanımını ve Observable'ların davranışını kontrol eder.
+
+## Sonuç
+
+Bu bölümde, Angular servislerinin yapısını ve bağımlılık enjeksiyonu mekanizmasını detaylı olarak ele aldık. Servisler, uygulamanın farklı bölümleri arasında veri paylaşımı ve işlevsellik sağlayan önemli bileşenlerdir.
+
+Servislerin oluşturulmasını, bağımlılık enjeksiyonunu, HTTP interceptor'ları ve servis testlerini inceledik. Ayrıca, e-ticaret uygulaması için çeşitli servis örnekleri oluşturduk.
+
+Bir sonraki bölümde, Angular routing yapılandırmasını ele alacağız.

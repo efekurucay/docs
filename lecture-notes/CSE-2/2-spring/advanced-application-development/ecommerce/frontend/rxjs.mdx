@@ -1,0 +1,1478 @@
+---
+title: 'RxJS ile Asenkron İşlemler'
+description: 'Angular uygulamalarında RxJS kullanarak asenkron işlemleri yönetme'
+---
+
+# RxJS ile Asenkron İşlemler
+
+Bu bölümde, Angular uygulamalarında asenkron işlemleri yönetmek için kullanılan RxJS (Reactive Extensions for JavaScript) kütüphanesini detaylı olarak ele alacağız. RxJS, asenkron ve olay tabanlı programlar oluşturmak için Observable'ları kullanan güçlü bir kütüphanedir.
+
+## RxJS Nedir?
+
+RxJS (Reactive Extensions for JavaScript), asenkron programlama için bir kütüphanedir. Gözlemlenebilir diziler (Observable sequences) kullanarak asenkron ve olay tabanlı programlar oluşturmayı kolaylaştırır. RxJS, fonksiyonel programlama kavramlarını kullanarak, karmaşık asenkron kod yazımını basitleştirir.
+
+RxJS'in temel özellikleri şunlardır:
+
+1. **Observable**: Zaman içinde yayılan verileri temsil eder.
+2. **Observer**: Observable'dan gelen verileri dinleyen ve işleyen nesnedir.
+3. **Subscription**: Observable'ın yürütülmesini temsil eder ve iptal edilebilir.
+4. **Operators**: Fonksiyonel programlama stilinde verileri dönüştürmek için kullanılan saf fonksiyonlardır.
+5. **Subject**: EventEmitter'a benzer, çoklu değer yayınlama ve çoklu dinleme özelliği sağlar.
+6. **Schedulers**: Observable'ların ve Observer'ların yürütülme zamanlamasını kontrol eder.
+
+## Observable ve Observer
+
+Observable, zaman içinde yayılan verileri temsil eden bir koleksiyondur. Observer ise, Observable'dan gelen verileri dinleyen ve işleyen bir nesnedir.
+
+### Observable Oluşturma
+
+RxJS, Observable oluşturmak için çeşitli yöntemler sağlar:
+
+```typescript
+import { Observable, of, from, interval, timer, fromEvent } from 'rxjs';
+
+// of: Belirtilen değerleri sırayla yayınlar
+const ofObservable = of(1, 2, 3, 4, 5);
+
+// from: Bir dizi, promise veya iterable'dan Observable oluşturur
+const arrayObservable = from([1, 2, 3, 4, 5]);
+const promiseObservable = from(Promise.resolve('Hello World'));
+
+// interval: Belirtilen aralıklarla artan sayılar yayınlar
+const intervalObservable = interval(1000); // Her saniye bir değer yayınlar
+
+// timer: Belirtilen süre sonra bir değer yayınlar ve isteğe bağlı olarak belirtilen aralıklarla devam eder
+const timerObservable = timer(3000, 1000); // 3 saniye sonra başlar, her saniye bir değer yayınlar
+
+// fromEvent: DOM olaylarından Observable oluşturur
+const clickObservable = fromEvent(document, 'click');
+
+// new Observable: Özel bir Observable oluşturur
+const customObservable = new Observable<number>(subscriber => {
+  subscriber.next(1);
+  subscriber.next(2);
+  subscriber.next(3);
+  setTimeout(() => {
+    subscriber.next(4);
+    subscriber.complete();
+  }, 1000);
+});
+```
+
+### Observer ve Subscription
+
+Observer, Observable'dan gelen verileri dinleyen ve işleyen bir nesnedir. Observer, üç callback fonksiyonu içerebilir: `next`, `error` ve `complete`.
+
+```typescript
+import { Observable } from 'rxjs';
+
+const observable = new Observable<number>(subscriber => {
+  subscriber.next(1);
+  subscriber.next(2);
+  subscriber.next(3);
+  setTimeout(() => {
+    subscriber.next(4);
+    subscriber.complete();
+  }, 1000);
+});
+
+// Observer oluşturma
+const observer = {
+  next: (value: number) => console.log('Next:', value),
+  error: (err: any) => console.error('Error:', err),
+  complete: () => console.log('Complete!')
+};
+
+// Observable'a abone olma
+const subscription = observable.subscribe(observer);
+
+// Alternatif olarak, doğrudan callback fonksiyonlarını sağlayabilirsiniz
+const subscription2 = observable.subscribe(
+  value => console.log('Next:', value),
+  err => console.error('Error:', err),
+  () => console.log('Complete!')
+);
+
+// Aboneliği iptal etme
+setTimeout(() => {
+  subscription.unsubscribe();
+  subscription2.unsubscribe();
+}, 2000);
+```
+
+## Operatörler
+
+RxJS operatörleri, Observable'ları dönüştürmek, filtrelemek ve birleştirmek için kullanılan fonksiyonlardır. Operatörler, fonksiyonel programlama stilinde verileri işlemenizi sağlar.
+
+### Dönüştürme Operatörleri
+
+Dönüştürme operatörleri, Observable'dan gelen verileri dönüştürür:
+
+```typescript
+import { of } from 'rxjs';
+import { map, scan, buffer, bufferCount, bufferTime, bufferToggle, bufferWhen, window, windowCount, windowTime, windowToggle, windowWhen, concatMap, mergeMap, switchMap, exhaustMap } from 'rxjs/operators';
+
+// map: Her değeri dönüştürür
+of(1, 2, 3, 4, 5).pipe(
+  map(value => value * 10)
+).subscribe(value => console.log(value)); // 10, 20, 30, 40, 50
+
+// scan: Bir akümülatör fonksiyonu uygular
+of(1, 2, 3, 4, 5).pipe(
+  scan((acc, value) => acc + value, 0)
+).subscribe(value => console.log(value)); // 1, 3, 6, 10, 15
+
+// buffer: Değerleri bir dizide toplar
+const clicks = fromEvent(document, 'click');
+const intervalEvents = interval(1000);
+clicks.pipe(
+  buffer(intervalEvents)
+).subscribe(value => console.log(value)); // Her saniye, o saniye içinde gerçekleşen tıklamaların dizisi
+
+// bufferCount: Belirtilen sayıda değeri bir dizide toplar
+of(1, 2, 3, 4, 5, 6, 7, 8, 9).pipe(
+  bufferCount(3)
+).subscribe(value => console.log(value)); // [1, 2, 3], [4, 5, 6], [7, 8, 9]
+
+// bufferTime: Belirtilen süre boyunca değerleri bir dizide toplar
+interval(500).pipe(
+  bufferTime(2000)
+).subscribe(value => console.log(value)); // Her 2 saniyede bir, o süre içinde yayınlanan değerlerin dizisi
+
+// concatMap: Her değeri bir Observable'a dönüştürür ve sırayla yayınlar
+of(1, 2, 3).pipe(
+  concatMap(value => of(`Value: ${value}`).pipe(delay(1000)))
+).subscribe(value => console.log(value)); // "Value: 1", "Value: 2", "Value: 3" (her biri 1 saniye arayla)
+
+// mergeMap: Her değeri bir Observable'a dönüştürür ve paralel olarak yayınlar
+of(1, 2, 3).pipe(
+  mergeMap(value => of(`Value: ${value}`).pipe(delay(1000)))
+).subscribe(value => console.log(value)); // "Value: 1", "Value: 2", "Value: 3" (yaklaşık aynı zamanda)
+
+// switchMap: Her değeri bir Observable'a dönüştürür ve önceki Observable'ı iptal eder
+fromEvent(document, 'click').pipe(
+  switchMap(() => interval(1000).pipe(take(5)))
+).subscribe(value => console.log(value)); // Her tıklamada, önceki interval iptal edilir ve yeni bir interval başlar
+
+// exhaustMap: Her değeri bir Observable'a dönüştürür ve mevcut Observable tamamlanana kadar yeni Observable'ları yok sayar
+fromEvent(document, 'click').pipe(
+  exhaustMap(() => interval(1000).pipe(take(5)))
+).subscribe(value => console.log(value)); // Bir interval devam ederken yapılan tıklamalar yok sayılır
+```
+
+### Filtreleme Operatörleri
+
+Filtreleme operatörleri, Observable'dan gelen verileri filtreler:
+
+```typescript
+import { of, interval } from 'rxjs';
+import { filter, take, takeUntil, takeWhile, skip, skipUntil, skipWhile, distinct, distinctUntilChanged, distinctUntilKeyChanged, debounce, debounceTime, throttle, throttleTime, audit, auditTime, sample, sampleTime, first, last, single, elementAt, ignoreElements } from 'rxjs/operators';
+
+// filter: Belirtilen koşulu sağlayan değerleri filtreler
+of(1, 2, 3, 4, 5).pipe(
+  filter(value => value % 2 === 0)
+).subscribe(value => console.log(value)); // 2, 4
+
+// take: Belirtilen sayıda değer alır
+interval(1000).pipe(
+  take(5)
+).subscribe(value => console.log(value)); // 0, 1, 2, 3, 4
+
+// takeUntil: Belirtilen Observable bir değer yayınlayana kadar değer alır
+const source = interval(1000);
+const timer$ = timer(5000);
+source.pipe(
+  takeUntil(timer$)
+).subscribe(value => console.log(value)); // 0, 1, 2, 3, 4 (5 saniye sonra durur)
+
+// takeWhile: Belirtilen koşul sağlandığı sürece değer alır
+interval(1000).pipe(
+  takeWhile(value => value < 5)
+).subscribe(value => console.log(value)); // 0, 1, 2, 3, 4
+
+// skip: Belirtilen sayıda değeri atlar
+interval(1000).pipe(
+  skip(3),
+  take(5)
+).subscribe(value => console.log(value)); // 3, 4, 5, 6, 7
+
+// skipUntil: Belirtilen Observable bir değer yayınlayana kadar değerleri atlar
+const source2 = interval(1000);
+const timer2$ = timer(5000);
+source2.pipe(
+  skipUntil(timer2$),
+  take(5)
+).subscribe(value => console.log(value)); // 5, 6, 7, 8, 9 (5 saniye sonra başlar)
+
+// skipWhile: Belirtilen koşul sağlandığı sürece değerleri atlar
+interval(1000).pipe(
+  skipWhile(value => value < 5),
+  take(5)
+).subscribe(value => console.log(value)); // 5, 6, 7, 8, 9
+
+// distinct: Tekrarlanan değerleri filtreler
+of(1, 2, 2, 3, 3, 3, 4, 5, 5).pipe(
+  distinct()
+).subscribe(value => console.log(value)); // 1, 2, 3, 4, 5
+
+// distinctUntilChanged: Ardışık tekrarlanan değerleri filtreler
+of(1, 1, 2, 2, 3, 1, 1, 3).pipe(
+  distinctUntilChanged()
+).subscribe(value => console.log(value)); // 1, 2, 3, 1, 3
+
+// debounceTime: Belirtilen süre boyunca yeni bir değer gelmezse, son değeri yayınlar
+fromEvent(document, 'click').pipe(
+  debounceTime(1000)
+).subscribe(() => console.log('Debounced click')); // Son tıklamadan 1 saniye sonra tetiklenir
+
+// throttleTime: Belirtilen süre boyunca yalnızca ilk değeri yayınlar ve diğerlerini yok sayar
+fromEvent(document, 'click').pipe(
+  throttleTime(1000)
+).subscribe(() => console.log('Throttled click')); // Her 1 saniyede en fazla bir tıklama
+```
+
+### Birleştirme Operatörleri
+
+Birleştirme operatörleri, birden fazla Observable'ı birleştirir:
+
+```typescript
+import { of, interval, merge, concat, combineLatest, zip, race, forkJoin } from 'rxjs';
+import { startWith, endWith, withLatestFrom } from 'rxjs/operators';
+
+// merge: Birden fazla Observable'ı paralel olarak birleştirir
+const source1$ = interval(1000).pipe(map(value => `A${value}`), take(3));
+const source2$ = interval(1500).pipe(map(value => `B${value}`), take(3));
+merge(source1$, source2$).subscribe(value => console.log(value));
+// A0, B0, A1, B1, A2, B2
+
+// concat: Birden fazla Observable'ı sırayla birleştirir
+concat(source1$, source2$).subscribe(value => console.log(value));
+// A0, A1, A2, B0, B1, B2
+
+// combineLatest: Her Observable'ın en son değerlerini birleştirir
+combineLatest([source1$, source2$]).subscribe(([value1, value2]) => console.log(value1, value2));
+// A0, B0
+// A1, B0
+// A1, B1
+// A2, B1
+// A2, B2
+
+// zip: Her Observable'dan eşleşen değerleri birleştirir
+zip(source1$, source2$).subscribe(([value1, value2]) => console.log(value1, value2));
+// A0, B0
+// A1, B1
+// A2, B2
+
+// race: İlk değeri yayınlayan Observable'ı seçer
+race(
+  timer(1000).pipe(mapTo('Fast')),
+  timer(2000).pipe(mapTo('Medium')),
+  timer(3000).pipe(mapTo('Slow'))
+).subscribe(value => console.log(value)); // "Fast"
+
+// forkJoin: Her Observable tamamlandığında, son değerlerini birleştirir
+forkJoin({
+  a: of(1, 2, 3),
+  b: Promise.resolve(4),
+  c: timer(3000).pipe(mapTo(5))
+}).subscribe(value => console.log(value)); // { a: 3, b: 4, c: 5 }
+
+// startWith: Observable'ın başlangıcında belirtilen değerleri yayınlar
+of(1, 2, 3).pipe(
+  startWith(0)
+).subscribe(value => console.log(value)); // 0, 1, 2, 3
+
+// endWith: Observable tamamlandığında belirtilen değerleri yayınlar
+of(1, 2, 3).pipe(
+  endWith(4, 5)
+).subscribe(value => console.log(value)); // 1, 2, 3, 4, 5
+
+// withLatestFrom: Ana Observable her değer yayınladığında, diğer Observable'ların en son değerlerini birleştirir
+const clicks = fromEvent(document, 'click');
+const timer$ = interval(1000);
+clicks.pipe(
+  withLatestFrom(timer$)
+).subscribe(([event, value]) => console.log(value)); // Tıklama anındaki en son timer değeri
+```
+
+### Hata İşleme Operatörleri
+
+Hata işleme operatörleri, Observable'larda oluşan hataları işler:
+
+```typescript
+import { of, throwError, interval } from 'rxjs';
+import { catchError, retry, retryWhen, timeout, timeoutWith } from 'rxjs/operators';
+
+// catchError: Hataları yakalar ve alternatif bir Observable döndürür
+throwError('Error!').pipe(
+  catchError(error => of(`Caught error: ${error}`))
+).subscribe(value => console.log(value)); // "Caught error: Error!"
+
+// retry: Hata durumunda belirtilen sayıda yeniden dener
+throwError('Error!').pipe(
+  retry(3),
+  catchError(error => of(`Caught error after 3 retries: ${error}`))
+).subscribe(value => console.log(value)); // "Caught error after 3 retries: Error!"
+
+// retryWhen: Hata durumunda belirtilen Observable'a göre yeniden dener
+throwError('Error!').pipe(
+  retryWhen(errors => errors.pipe(
+    delay(1000),
+    take(3),
+    concat(throwError('Retry limit exceeded!'))
+  )),
+  catchError(error => of(`Caught error: ${error}`))
+).subscribe(value => console.log(value)); // "Caught error: Retry limit exceeded!"
+
+// timeout: Belirtilen süre içinde değer yayınlanmazsa hata fırlatır
+interval(2000).pipe(
+  timeout(1000),
+  catchError(error => of(`Timeout error: ${error}`))
+).subscribe(value => console.log(value)); // "Timeout error: TimeoutError: Timeout has occurred"
+
+// timeoutWith: Belirtilen süre içinde değer yayınlanmazsa alternatif bir Observable'a geçer
+interval(2000).pipe(
+  timeoutWith(1000, of('Timeout occurred!'))
+).subscribe(value => console.log(value)); // "Timeout occurred!"
+```
+
+### Yardımcı Operatörler
+
+Yardımcı operatörler, çeşitli işlevler sağlar:
+
+```typescript
+import { of, interval } from 'rxjs';
+import { tap, delay, delayWhen, finalize, repeat, timeInterval, timestamp, timeout, toArray, defaultIfEmpty, every, find, findIndex, isEmpty, count } from 'rxjs/operators';
+
+// tap: Yan etkileri gerçekleştirir, değerleri değiştirmez
+of(1, 2, 3).pipe(
+  tap(value => console.log(`Before: ${value}`)),
+  map(value => value * 10),
+  tap(value => console.log(`After: ${value}`))
+).subscribe(); // "Before: 1", "After: 10", "Before: 2", "After: 20", "Before: 3", "After: 30"
+
+// delay: Belirtilen süre kadar geciktirir
+of(1, 2, 3).pipe(
+  delay(2000)
+).subscribe(value => console.log(value)); // 2 saniye sonra: 1, 2, 3
+
+// delayWhen: Her değeri belirtilen fonksiyona göre geciktirir
+of(1, 2, 3).pipe(
+  delayWhen(value => timer(value * 1000))
+).subscribe(value => console.log(value)); // 1 saniye sonra: 1, 2 saniye sonra: 2, 3 saniye sonra: 3
+
+// finalize: Observable tamamlandığında veya hata fırlattığında çalışır
+of(1, 2, 3).pipe(
+  finalize(() => console.log('Completed or error!'))
+).subscribe(value => console.log(value)); // 1, 2, 3, "Completed or error!"
+
+// repeat: Observable'ı belirtilen sayıda tekrarlar
+of(1, 2, 3).pipe(
+  repeat(2)
+).subscribe(value => console.log(value)); // 1, 2, 3, 1, 2, 3
+
+// timeInterval: Ardışık değerler arasındaki süreyi ölçer
+interval(1000).pipe(
+  take(3),
+  timeInterval()
+).subscribe(value => console.log(value)); // { value: 0, interval: 1000 }, { value: 1, interval: 1000 }, { value: 2, interval: 1000 }
+
+// timestamp: Her değere zaman damgası ekler
+interval(1000).pipe(
+  take(3),
+  timestamp()
+).subscribe(value => console.log(value)); // { value: 0, timestamp: 1234567890 }, { value: 1, timestamp: 1234568890 }, { value: 2, timestamp: 1234569890 }
+
+// toArray: Tüm değerleri bir dizide toplar
+of(1, 2, 3).pipe(
+  toArray()
+).subscribe(value => console.log(value)); // [1, 2, 3]
+
+// defaultIfEmpty: Observable boşsa belirtilen değeri döndürür
+of().pipe(
+  defaultIfEmpty('Empty!')
+).subscribe(value => console.log(value)); // "Empty!"
+
+// every: Tüm değerlerin belirtilen koşulu sağlayıp sağlamadığını kontrol eder
+of(1, 2, 3, 4, 5).pipe(
+  every(value => value < 10)
+).subscribe(value => console.log(value)); // true
+
+// find: Belirtilen koşulu sağlayan ilk değeri bulur
+of(1, 2, 3, 4, 5).pipe(
+  find(value => value > 3)
+).subscribe(value => console.log(value)); // 4
+
+// findIndex: Belirtilen koşulu sağlayan ilk değerin indeksini bulur
+of(1, 2, 3, 4, 5).pipe(
+  findIndex(value => value > 3)
+).subscribe(value => console.log(value)); // 3
+
+// isEmpty: Observable'ın boş olup olmadığını kontrol eder
+of(1, 2, 3).pipe(
+  isEmpty()
+).subscribe(value => console.log(value)); // false
+
+// count: Observable'dan gelen değerlerin sayısını sayar
+of(1, 2, 3, 4, 5).pipe(
+  count(value => value % 2 === 0)
+).subscribe(value => console.log(value)); // 2 (2 ve 4)
+```
+
+## Subject'ler
+
+Subject, hem Observable hem de Observer olarak davranabilen özel bir tür Observable'dır. Subject'ler, çoklu değer yayınlama ve çoklu dinleme özelliği sağlar.
+
+### Subject
+
+Temel Subject, değerleri çoklu Observer'lara yayınlar:
+
+```typescript
+import { Subject } from 'rxjs';
+
+const subject = new Subject<number>();
+
+// Observer 1
+subject.subscribe(value => console.log(`Observer 1: ${value}`));
+
+// Observer 2
+subject.subscribe(value => console.log(`Observer 2: ${value}`));
+
+// Değer yayınlama
+subject.next(1);
+subject.next(2);
+subject.next(3);
+
+// Çıktı:
+// Observer 1: 1
+// Observer 2: 1
+// Observer 1: 2
+// Observer 2: 2
+// Observer 1: 3
+// Observer 2: 3
+```
+
+### BehaviorSubject
+
+BehaviorSubject, bir başlangıç değeri alır ve yeni Observer'lara en son değeri hemen yayınlar:
+
+```typescript
+import { BehaviorSubject } from 'rxjs';
+
+const subject = new BehaviorSubject<number>(0); // Başlangıç değeri: 0
+
+// Observer 1
+subject.subscribe(value => console.log(`Observer 1: ${value}`));
+
+// Değer yayınlama
+subject.next(1);
+subject.next(2);
+
+// Observer 2 (geç abone olma)
+subject.subscribe(value => console.log(`Observer 2: ${value}`));
+
+// Değer yayınlama
+subject.next(3);
+
+// Çıktı:
+// Observer 1: 0
+// Observer 1: 1
+// Observer 1: 2
+// Observer 2: 2 (en son değer)
+// Observer 1: 3
+// Observer 2: 3
+```
+
+### ReplaySubject
+
+ReplaySubject, belirtilen sayıda önceki değeri yeni Observer'lara yeniden yayınlar:
+
+```typescript
+import { ReplaySubject } from 'rxjs';
+
+const subject = new ReplaySubject<number>(2); // Son 2 değeri yeniden yayınlar
+
+// Observer 1
+subject.subscribe(value => console.log(`Observer 1: ${value}`));
+
+// Değer yayınlama
+subject.next(1);
+subject.next(2);
+subject.next(3);
+
+// Observer 2 (geç abone olma)
+subject.subscribe(value => console.log(`Observer 2: ${value}`));
+
+// Değer yayınlama
+subject.next(4);
+
+// Çıktı:
+// Observer 1: 1
+// Observer 1: 2
+// Observer 1: 3
+// Observer 2: 2 (son 2 değer)
+// Observer 2: 3 (son 2 değer)
+// Observer 1: 4
+// Observer 2: 4
+```
+
+### AsyncSubject
+
+AsyncSubject, yalnızca tamamlandığında son değeri yayınlar:
+
+```typescript
+import { AsyncSubject } from 'rxjs';
+
+const subject = new AsyncSubject<number>();
+
+// Observer 1
+subject.subscribe(value => console.log(`Observer 1: ${value}`));
+
+// Değer yayınlama
+subject.next(1);
+subject.next(2);
+subject.next(3);
+
+// Observer 2 (geç abone olma)
+subject.subscribe(value => console.log(`Observer 2: ${value}`));
+
+// Değer yayınlama ve tamamlama
+subject.next(4);
+subject.complete();
+
+// Çıktı:
+// Observer 1: 4
+// Observer 2: 4
+```
+
+## Schedulers
+
+Scheduler'lar, Observable'ların ve Observer'ların yürütülme zamanlamasını kontrol eder. RxJS, çeşitli Scheduler'lar sağlar:
+
+```typescript
+import { of, asyncScheduler } from 'rxjs';
+import { observeOn, subscribeOn } from 'rxjs/operators';
+
+// observeOn: Observer'ların çalışma zamanlamasını kontrol eder
+of(1, 2, 3).pipe(
+  tap(value => console.log(`Sync: ${value}`)),
+  observeOn(asyncScheduler),
+  tap(value => console.log(`Async: ${value}`))
+).subscribe();
+
+// Çıktı:
+// Sync: 1
+// Sync: 2
+// Sync: 3
+// (Async işlemler daha sonra çalışır)
+// Async: 1
+// Async: 2
+// Async: 3
+
+// subscribeOn: Subscription'ın çalışma zamanlamasını kontrol eder
+of(1, 2, 3).pipe(
+  subscribeOn(asyncScheduler)
+).subscribe(value => console.log(value));
+
+// Çıktı:
+// (Async işlemler daha sonra çalışır)
+// 1
+// 2
+// 3
+```
+
+## RxJS ile Durum Yönetimi
+
+RxJS, Angular uygulamalarında durum yönetimi için kullanılabilir. BehaviorSubject ve operatörler kullanarak, basit bir durum yönetimi servisi oluşturabilirsiniz:
+
+```typescript
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+interface AppState {
+  user: User | null;
+  products: Product[];
+  cart: CartItem[];
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: AppState = {
+  user: null,
+  products: [],
+  cart: [],
+  loading: false,
+  error: null
+};
+
+@Injectable({
+  providedIn: 'root'
+})
+export class StateService {
+  private state = new BehaviorSubject<AppState>(initialState);
+  
+  // State selectors
+  getState(): Observable<AppState> {
+    return this.state.asObservable();
+  }
+  
+  getUser(): Observable<User | null> {
+    return this.state.pipe(map(state => state.user));
+  }
+  
+  getProducts(): Observable<Product[]> {
+    return this.state.pipe(map(state => state.products));
+  }
+  
+  getCart(): Observable<CartItem[]> {
+    return this.state.pipe(map(state => state.cart));
+  }
+  
+  getLoading(): Observable<boolean> {
+    return this.state.pipe(map(state => state.loading));
+  }
+  
+  getError(): Observable<string | null> {
+    return this.state.pipe(map(state => state.error));
+  }
+  
+  // State updaters
+  setUser(user: User | null): void {
+    const currentState = this.state.value;
+    this.state.next({
+      ...currentState,
+      user
+    });
+  }
+  
+  setProducts(products: Product[]): void {
+    const currentState = this.state.value;
+    this.state.next({
+      ...currentState,
+      products
+    });
+  }
+  
+  addToCart(product: Product, quantity = 1): void {
+    const currentState = this.state.value;
+    const currentCart = [...currentState.cart];
+    const existingItemIndex = currentCart.findIndex(item => item.product.id === product.id);
+    
+    if (existingItemIndex !== -1) {
+      // Ürün zaten sepette, miktarı güncelle
+      currentCart[existingItemIndex] = {
+        ...currentCart[existingItemIndex],
+        quantity: currentCart[existingItemIndex].quantity + quantity
+      };
+    } else {
+      // Yeni ürün ekle
+      currentCart.push({ product, quantity });
+    }
+    
+    this.state.next({
+      ...currentState,
+      cart: currentCart
+    });
+  }
+  
+  removeFromCart(productId: number): void {
+    const currentState = this.state.value;
+    const updatedCart = currentState.cart.filter(item => item.product.id !== productId);
+    
+    this.state.next({
+      ...currentState,
+      cart: updatedCart
+    });
+  }
+  
+  setLoading(loading: boolean): void {
+    const currentState = this.state.value;
+    this.state.next({
+      ...currentState,
+      loading
+    });
+  }
+  
+  setError(error: string | null): void {
+    const currentState = this.state.value;
+    this.state.next({
+      ...currentState,
+      error
+    });
+  }
+  
+  resetState(): void {
+    this.state.next(initialState);
+  }
+}
+```
+
+Bu durum yönetimi servisi, uygulamanın durumunu bir BehaviorSubject içinde saklar ve durumu güncellemek ve seçmek için metodlar sağlar.
+
+## RxJS ile HTTP İstekleri
+
+RxJS, HTTP isteklerini yönetmek için güçlü operatörler sağlar. Angular'ın HttpClient'ı ile birlikte kullanıldığında, karmaşık HTTP senaryolarını kolayca yönetebilirsiniz:
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
+import { map, catchError, switchMap, tap, retry, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
+import { Product } from '../models/product.model';
+import { StateService } from './state.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProductService {
+  private apiUrl = `${environment.apiUrl}/products`;
+  
+  constructor(
+    private http: HttpClient,
+    private stateService: StateService
+  ) { }
+  
+  getProducts(): Observable<Product[]> {
+    this.stateService.setLoading(true);
+    
+    return this.http.get<Product[]>(this.apiUrl).pipe(
+      tap(products => {
+        this.stateService.setProducts(products);
+        this.stateService.setLoading(false);
+      }),
+      catchError(error => {
+        this.stateService.setError('Ürünler yüklenirken bir hata oluştu.');
+        this.stateService.setLoading(false);
+        return throwError(error);
+      })
+    );
+  }
+  
+  getProductById(id: number): Observable<Product> {
+    this.stateService.setLoading(true);
+    
+    return this.http.get<Product>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => this.stateService.setLoading(false)),
+      catchError(error => {
+        this.stateService.setError('Ürün detayları yüklenirken bir hata oluştu.');
+        this.stateService.setLoading(false);
+        return throwError(error);
+      })
+    );
+  }
+  
+  searchProducts(term: string): Observable<Product[]> {
+    if (!term.trim()) {
+      return of([]);
+    }
+    
+    let params = new HttpParams().set('name', term);
+    
+    return this.http.get<Product[]>(`${this.apiUrl}/search`, { params }).pipe(
+      catchError(error => {
+        this.stateService.setError('Ürün araması yapılırken bir hata oluştu.');
+        return of([]);
+      })
+    );
+  }
+  
+  createProduct(product: Product): Observable<Product> {
+    this.stateService.setLoading(true);
+    
+    return this.http.post<Product>(this.apiUrl, product).pipe(
+      tap(newProduct => {
+        const currentProducts = this.stateService.getProducts();
+        this.stateService.setProducts([...currentProducts, newProduct]);
+        this.stateService.setLoading(false);
+      }),
+      catchError(error => {
+        this.stateService.setError('Ürün oluşturulurken bir hata oluştu.');
+        this.stateService.setLoading(false);
+        return throwError(error);
+      })
+    );
+  }
+  
+  updateProduct(id: number, product: Product): Observable<Product> {
+    this.stateService.setLoading(true);
+    
+    return this.http.put<Product>(`${this.apiUrl}/${id}`, product).pipe(
+      tap(updatedProduct => {
+        const currentProducts = this.stateService.getProducts();
+        const updatedProducts = currentProducts.map(p => p.id === id ? updatedProduct : p);
+        this.stateService.setProducts(updatedProducts);
+        this.stateService.setLoading(false);
+      }),
+      catchError(error => {
+        this.stateService.setError('Ürün güncellenirken bir hata oluştu.');
+        this.stateService.setLoading(false);
+        return throwError(error);
+      })
+    );
+  }
+  
+  deleteProduct(id: number): Observable<void> {
+    this.stateService.setLoading(true);
+    
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        const currentProducts = this.stateService.getProducts();
+        const updatedProducts = currentProducts.filter(p => p.id !== id);
+        this.stateService.setProducts(updatedProducts);
+        this.stateService.setLoading(false);
+      }),
+      catchError(error => {
+        this.stateService.setError('Ürün silinirken bir hata oluştu.');
+        this.stateService.setLoading(false);
+        return throwError(error);
+      })
+    );
+  }
+}
+```
+
+Bu servis, HTTP istekleri yapar ve durum yönetimi servisi ile entegre çalışır. Her istek, yükleme durumunu ve hataları yönetir.
+
+## RxJS ile Form İşlemleri
+
+RxJS, form işlemlerini yönetmek için de kullanılabilir. Reactive Forms ile birlikte kullanıldığında, form değişikliklerini dinleyebilir ve işleyebilirsiniz:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { ProductService } from '../../core/services/product.service';
+import { Product } from '../../core/models/product.model';
+
+@Component({
+  selector: 'app-product-search',
+  template: `
+    <form [formGroup]="searchForm">
+      <mat-form-field appearance="outline">
+        <mat-label>Ürün Ara</mat-label>
+        <input matInput formControlName="searchTerm" placeholder="Ürün adı girin">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </form>
+    
+    <div *ngIf="loading">Aranıyor...</div>
+    
+    <div *ngIf="results.length > 0">
+      <h3>Sonuçlar</h3>
+      <mat-list>
+        <mat-list-item *ngFor="let product of results">
+          <h4 matLine>{{ product.name }}</h4>
+          <p matLine>{{ product.price | currency:'TRY':'symbol':'1.2-2' }}</p>
+        </mat-list-item>
+      </mat-list>
+    </div>
+    
+    <div *ngIf="!loading && results.length === 0 && searchForm.get('searchTerm').value">
+      Sonuç bulunamadı.
+    </div>
+  `
+})
+export class ProductSearchComponent implements OnInit {
+  searchForm: FormGroup;
+  results: Product[] = [];
+  loading = false;
+  
+  constructor(
+    private fb: FormBuilder,
+    private productService: ProductService
+  ) { }
+  
+  ngOnInit(): void {
+    this.searchForm = this.fb.group({
+      searchTerm: ['', Validators.minLength(3)]
+    });
+    
+    this.searchForm.get('searchTerm').valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(term => {
+        if (term.length < 3) {
+          this.results = [];
+          return of([]);
+        }
+        
+        this.loading = true;
+        return this.productService.searchProducts(term);
+      })
+    ).subscribe(
+      products => {
+        this.results = products;
+        this.loading = false;
+      },
+      error => {
+        console.error('Arama hatası:', error);
+        this.loading = false;
+      }
+    );
+  }
+}
+```
+
+Bu komponent, kullanıcı arama terimini yazdıkça, debounce ve distinctUntilChanged operatörleri ile gereksiz istekleri önler ve switchMap operatörü ile önceki istekleri iptal eder.
+
+## RxJS ile Olay İşleme
+
+RxJS, DOM olaylarını işlemek için de kullanılabilir. fromEvent operatörü ile DOM olaylarını Observable'lara dönüştürebilirsiniz:
+
+```typescript
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { fromEvent } from 'rxjs';
+import { debounceTime, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+
+@Component({
+  selector: 'app-drag-drop',
+  template: `
+    <div class="container">
+      <div #draggable class="draggable">
+        Sürükle & Bırak
+      </div>
+    </div>
+  `,
+  styles: [`
+    .container {
+      width: 100%;
+      height: 400px;
+      border: 1px solid #ccc;
+      position: relative;
+    }
+    
+    .draggable {
+      width: 100px;
+      height: 100px;
+      background-color: #2196f3;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: move;
+      position: absolute;
+      user-select: none;
+    }
+  `]
+})
+export class DragDropComponent implements OnInit {
+  @ViewChild('draggable', { static: true }) draggable: ElementRef;
+  
+  constructor() { }
+  
+  ngOnInit(): void {
+    const element = this.draggable.nativeElement;
+    
+    // Başlangıç pozisyonu
+    let startX = 0;
+    let startY = 0;
+    let x = 0;
+    let y = 0;
+    
+    // Mousedown olayı
+    const mousedown$ = fromEvent<MouseEvent>(element, 'mousedown');
+    
+    // Mousemove olayı
+    const mousemove$ = fromEvent<MouseEvent>(document, 'mousemove');
+    
+    // Mouseup olayı
+    const mouseup$ = fromEvent<MouseEvent>(document, 'mouseup');
+    
+    // Sürükleme işlemi
+    mousedown$.pipe(
+      tap((event: MouseEvent) => {
+        // Başlangıç pozisyonunu kaydet
+        startX = event.clientX - x;
+        startY = event.clientY - y;
+        
+        // Sürükleme stilini ayarla
+        element.style.zIndex = '1000';
+        element.style.opacity = '0.8';
+      }),
+      switchMap(() => mousemove$.pipe(
+        map((event: MouseEvent) => {
+          // Yeni pozisyonu hesapla
+          x = event.clientX - startX;
+          y = event.clientY - startY;
+          
+          // Sınırları kontrol et
+          const container = element.parentElement;
+          const maxX = container.clientWidth - element.clientWidth;
+          const maxY = container.clientHeight - element.clientHeight;
+          
+          x = Math.max(0, Math.min(x, maxX));
+          y = Math.max(0, Math.min(y, maxY));
+          
+          return { x, y };
+        }),
+        takeUntil(mouseup$)
+      )),
+      tap(() => {
+        // Sürükleme stilini sıfırla
+        element.style.zIndex = '';
+        element.style.opacity = '';
+      })
+    ).subscribe(({ x, y }) => {
+      // Elementi taşı
+      element.style.transform = `translate(${x}px, ${y}px)`;
+    });
+  }
+}
+```
+
+Bu komponent, bir elementi sürüklemek ve bırakmak için RxJS kullanır. mousedown, mousemove ve mouseup olaylarını Observable'lara dönüştürür ve bunları işler.
+
+## RxJS ile Animasyon
+
+RxJS, animasyonlar için de kullanılabilir. interval ve animasyon frame'leri kullanarak, düzgün animasyonlar oluşturabilirsiniz:
+
+```typescript
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { interval, animationFrameScheduler } from 'rxjs';
+import { map, takeWhile, tap } from 'rxjs/operators';
+
+@Component({
+  selector: 'app-animation',
+  template: `
+    <div class="container">
+      <div #box class="box"></div>
+      <button (click)="startAnimation()">Animasyonu Başlat</button>
+    </div>
+  `,
+  styles: [`
+    .container {
+      width: 100%;
+      height: 400px;
+      border: 1px solid #ccc;
+      position: relative;
+    }
+    
+    .box {
+      width: 50px;
+      height: 50px;
+      background-color: #f44336;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  `]
+})
+export class AnimationComponent implements OnInit {
+  @ViewChild('box', { static: true }) box: ElementRef;
+  
+  constructor() { }
+  
+  ngOnInit(): void { }
+  
+  startAnimation(): void {
+    const element = this.box.nativeElement;
+    const container = element.parentElement;
+    const maxX = container.clientWidth - element.clientWidth;
+    
+    // Başlangıç pozisyonu
+    let x = 0;
+    element.style.left = `${x}px`;
+    
+    // Animasyon hızı
+    const speed = 2;
+    
+    // Animasyon yönü
+    let direction = 1;
+    
+    // Animasyon frame'leri
+    interval(0, animationFrameScheduler).pipe(
+      tap(() => {
+        // Pozisyonu güncelle
+        x += speed * direction;
+        
+        // Sınırları kontrol et
+        if (x >= maxX) {
+          x = maxX;
+          direction = -1;
+        } else if (x <= 0) {
+          x = 0;
+          direction = 1;
+        }
+        
+        // Elementi taşı
+        element.style.left = `${x}px`;
+      }),
+      takeWhile(() => true) // Sonsuza kadar devam et
+    ).subscribe();
+  }
+}
+```
+
+Bu komponent, bir kutuyu sağa ve sola hareket ettiren bir animasyon oluşturur. interval operatörü ile animasyon frame'leri oluşturur ve takeWhile operatörü ile animasyonu sürdürür.
+
+## RxJS ile Bellek Yönetimi
+
+RxJS Observable'ları, bellek sızıntılarına neden olabilir. Bu nedenle, Observable'ları doğru şekilde temizlemek önemlidir. Angular komponentlerinde, ngOnDestroy hook'unu kullanarak abonelikleri iptal edebilirsiniz:
+
+```typescript
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { interval, Subscription } from 'rxjs';
+import { takeUntil, tap } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+
+@Component({
+  selector: 'app-memory-management',
+  template: `
+    <div>
+      <h2>Bellek Yönetimi</h2>
+      <p>Sayaç: {{ counter }}</p>
+      <button (click)="startCounter()">Sayacı Başlat</button>
+      <button (click)="stopCounter()">Sayacı Durdur</button>
+    </div>
+  `
+})
+export class MemoryManagementComponent implements OnInit, OnDestroy {
+  counter = 0;
+  private counterSubscription: Subscription | null = null;
+  private destroy$ = new Subject<void>();
+  
+  constructor() { }
+  
+  ngOnInit(): void { }
+  
+  startCounter(): void {
+    // Yöntem 1: Subscription'ı sakla ve iptal et
+    this.stopCounter();
+    
+    this.counterSubscription = interval(1000).subscribe(value => {
+      this.counter = value;
+    });
+    
+    // Yöntem 2: takeUntil operatörü kullanarak aboneliği otomatik olarak iptal et
+    interval(1000).pipe(
+      tap(value => this.counter = value),
+      takeUntil(this.destroy$)
+    ).subscribe();
+  }
+  
+  stopCounter(): void {
+    if (this.counterSubscription) {
+      this.counterSubscription.unsubscribe();
+      this.counterSubscription = null;
+    }
+  }
+  
+  ngOnDestroy(): void {
+    // Yöntem 1: Subscription'ı iptal et
+    this.stopCounter();
+    
+    // Yöntem 2: destroy$ subject'ini tamamla
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}
+```
+
+Bu komponent, iki farklı bellek yönetimi yöntemi gösterir:
+
+1. Subscription'ı saklama ve manuel olarak iptal etme
+2. takeUntil operatörü ile aboneliği otomatik olarak iptal etme
+
+İkinci yöntem, daha temiz ve hata yapma olasılığı daha düşüktür.
+
+## RxJS ile Hata İşleme
+
+RxJS, hata işleme için çeşitli operatörler sağlar. catchError, retry ve retryWhen operatörleri, hataları yakalamak ve işlemek için kullanılabilir:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, throwError, timer } from 'rxjs';
+import { catchError, retry, retryWhen, delayWhen, scan, tap } from 'rxjs/operators';
+
+@Component({
+  selector: 'app-error-handling',
+  template: `
+    <div>
+      <h2>Hata İşleme</h2>
+      <button (click)="fetchData()">Veri Getir</button>
+      <button (click)="fetchDataWithRetry()">Veri Getir (Yeniden Deneme)</button>
+      <button (click)="fetchDataWithRetryWhen()">Veri Getir (Özel Yeniden Deneme)</button>
+      
+      <div *ngIf="loading">Yükleniyor...</div>
+      <div *ngIf="error" class="error">{{ error }}</div>
+      <div *ngIf="data">{{ data | json }}</div>
+    </div>
+  `,
+  styles: [`
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  `]
+})
+export class ErrorHandlingComponent implements OnInit {
+  data: any = null;
+  loading = false;
+  error: string | null = null;
+  
+  constructor(private http: HttpClient) { }
+  
+  ngOnInit(): void { }
+  
+  fetchData(): void {
+    this.loading = true;
+    this.error = null;
+    this.data = null;
+    
+    this.http.get('https://jsonplaceholder.typicode.com/posts/1').pipe(
+      catchError(error => {
+        console.error('Hata:', error);
+        return throwError('Veri getirilemedi. Lütfen daha sonra tekrar deneyin.');
+      })
+    ).subscribe(
+      response => {
+        this.data = response;
+        this.loading = false;
+      },
+      error => {
+        this.error = error;
+        this.loading = false;
+      }
+    );
+  }
+  
+  fetchDataWithRetry(): void {
+    this.loading = true;
+    this.error = null;
+    this.data = null;
+    
+    this.http.get('https://jsonplaceholder.typicode.com/posts/1').pipe(
+      retry(3), // 3 kez daha dene
+      catchError(error => {
+        console.error('Hata:', error);
+        return throwError('Veri getirilemedi. 3 kez denendi.');
+      })
+    ).subscribe(
+      response => {
+        this.data = response;
+        this.loading = false;
+      },
+      error => {
+        this.error = error;
+        this.loading = false;
+      }
+    );
+  }
+  
+  fetchDataWithRetryWhen(): void {
+    this.loading = true;
+    this.error = null;
+    this.data = null;
+    
+    this.http.get('https://jsonplaceholder.typicode.com/posts/1').pipe(
+      retryWhen(errors => 
+        errors.pipe(
+          scan((count, error) => {
+            if (count >= 3) {
+              throw error;
+            }
+            console.log(`Yeniden deneme ${count + 1}/3`);
+            return count + 1;
+          }, 0),
+          delayWhen(count => timer(count * 1000)) // Her denemede artan gecikme
+        )
+      ),
+      catchError(error => {
+        console.error('Hata:', error);
+        return throwError('Veri getirilemedi. Özel yeniden deneme başarısız oldu.');
+      })
+    ).subscribe(
+      response => {
+        this.data = response;
+        this.loading = false;
+      },
+      error => {
+        this.error = error;
+        this.loading = false;
+      }
+    );
+  }
+}
+```
+
+Bu komponent, üç farklı hata işleme yöntemi gösterir:
+
+1. catchError ile basit hata yakalama
+2. retry ile yeniden deneme
+3. retryWhen ile özel yeniden deneme stratejisi
+
+## RxJS ile Test Yazma
+
+RxJS Observable'larını test etmek için, TestScheduler kullanabilirsiniz:
+
+```typescript
+import { TestBed } from '@angular/core/testing';
+import { of, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { ProductService } from './product.service';
+import { HttpClient } from '@angular/common/http';
+import { StateService } from './state.service';
+
+describe('ProductService', () => {
+  let service: ProductService;
+  let httpClientSpy: jasmine.SpyObj<HttpClient>;
+  let stateServiceSpy: jasmine.SpyObj<StateService>;
+  
+  beforeEach(() => {
+    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'put', 'delete']);
+    stateServiceSpy = jasmine.createSpyObj('StateService', ['setLoading', 'setError', 'setProducts', 'getProducts']);
+    
+    TestBed.configureTestingModule({
+      providers: [
+        ProductService,
+        { provide: HttpClient, useValue: httpClientSpy },
+        { provide: StateService, useValue: stateServiceSpy }
+      ]
+    });
+    
+    service = TestBed.inject(ProductService);
+  });
+  
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+  
+  it('should return products', (done: DoneFn) => {
+    const expectedProducts = [
+      { id: 1, name: 'Product 1', price: 100 },
+      { id: 2, name: 'Product 2', price: 200 }
+    ];
+    
+    httpClientSpy.get.and.returnValue(of(expectedProducts));
+    
+    service.getProducts().subscribe(
+      products => {
+        expect(products).toEqual(expectedProducts);
+        expect(stateServiceSpy.setLoading.calls.count()).toBe(2);
+        expect(stateServiceSpy.setLoading.calls.allArgs()).toEqual([[true], [false]]);
+        expect(stateServiceSpy.setProducts.calls.count()).toBe(1);
+        expect(stateServiceSpy.setProducts.calls.allArgs()).toEqual([[expectedProducts]]);
+        done();
+      },
+      error => done.fail('Expected products, not error')
+    );
+  });
+  
+  it('should handle error', (done: DoneFn) => {
+    const errorMessage = 'Test error';
+    
+    httpClientSpy.get.and.returnValue(throwError(errorMessage));
+    
+    service.getProducts().subscribe(
+      products => done.fail('Expected error, not products'),
+      error => {
+        expect(error).toBe(errorMessage);
+        expect(stateServiceSpy.setLoading.calls.count()).toBe(2);
+        expect(stateServiceSpy.setLoading.calls.allArgs()).toEqual([[true], [false]]);
+        expect(stateServiceSpy.setError.calls.count()).toBe(1);
+        expect(stateServiceSpy.setError.calls.allArgs()).toEqual([['Ürünler yüklenirken bir hata oluştu.']]);
+        done();
+      }
+    );
+  });
+});
+```
+
+Bu test, ProductService'in getProducts metodunu test eder. HttpClient ve StateService'i mock'lar ve Observable'ların davranışını doğrular.
+
+## RxJS ile Performans Optimizasyonu
+
+RxJS, performans optimizasyonu için çeşitli operatörler sağlar. debounceTime, throttleTime, distinctUntilChanged ve shareReplay gibi operatörler, gereksiz işlemleri önlemek için kullanılabilir:
+
+```typescript
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { Observable, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, takeUntil, shareReplay } from 'rxjs/operators';
+import { ProductService } from '../../core/services/product.service';
+import { Product } from '../../core/models/product.model';
+
+@Component({
+  selector: 'app-performance-optimization',
+  template: `
+    <div>
+      <h2>Performans Optimizasyonu</h2>
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Ürün Ara</mat-label>
+        <input matInput [formControl]="searchControl" placeholder="Ürün adı girin">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      
+      <div *ngIf="loading">Aranıyor...</div>
+      
+      <div *ngIf="(products$ | async)?.length">
+        <h3>Sonuçlar</h3>
+        <mat-list>
+          <mat-list-item *ngFor="let product of products$ | async">
+            <h4 matLine>{{ product.name }}</h4>
+            <p matLine>{{ product.price | currency:'TRY':'symbol':'1.2-2' }}</p>
+          </mat-list-item>
+        </mat-list>
+      </div>
+      
+      <div *ngIf="!loading && (products$ | async)?.length === 0 && searchControl.value">
+        Sonuç bulunamadı.
+      </div>
+    </div>
+  `
+})
+export class PerformanceOptimizationComponent implements OnInit, OnDestroy {
+  searchControl = new FormControl('');
+  products$: Observable<Product[]>;
+  loading = false;
+  private destroy$ = new Subject<void>();
+  
+  constructor(private productService: ProductService) { }
+  
+  ngOnInit(): void {
+    // Arama işlemi
+    this.products$ = this.searchControl.valueChanges.pipe(
+      debounceTime(300), // 300ms bekle
+      distinctUntilChanged(), // Değer değişmediyse yok say
+      switchMap(term => {
+        if (!term || term.length < 3) {
+          return of([]);
+        }
+        
+        this.loading = true;
+        return this.productService.searchProducts(term);
+      }),
+      tap(() => this.loading = false),
+      shareReplay(1), // Sonuçları önbelleğe al
+      takeUntil(this.destroy$) // Komponent yok edildiğinde aboneliği iptal et
+    );
+  }
+  
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}
+```
+
+Bu komponent, arama işlemini optimize etmek için çeşitli operatörler kullanır:
+
+1. debounceTime: Kullanıcı yazmayı bıraktıktan sonra belirli bir süre bekler
+2. distinctUntilChanged: Değer değişmediyse yeni bir istek yapmaz
+3. switchMap: Önceki istekleri iptal eder
+4. shareReplay: Sonuçları önbelleğe alır ve birden fazla abonelik için yeniden kullanır
+5. takeUntil: Komponent yok edildiğinde aboneliği iptal eder
+
+## Sonuç
+
+Bu bölümde, Angular uygulamalarında asenkron işlemleri yönetmek için kullanılan RxJS kütüphanesini detaylı olarak ele aldık. RxJS, asenkron ve olay tabanlı programlar oluşturmak için Observable'ları kullanan güçlü bir kütüphanedir.
+
+Observable, Observer, Subscription, Operatörler, Subject'ler ve Scheduler'ları inceledik. Ayrıca, RxJS ile durum yönetimi, HTTP istekleri, form işlemleri, olay işleme, animasyon, bellek yönetimi, hata işleme, test yazma ve performans optimizasyonu konularını ele aldık.
+
+RxJS, Angular uygulamalarında asenkron işlemleri yönetmek için vazgeçilmez bir araçtır ve bu bölümde öğrendiğiniz kavramlar ve teknikler, karmaşık asenkron senaryoları kolayca yönetmenize yardımcı olacaktır.
+
+Bir sonraki bölümde, kullanıcı arayüzü tasarımı ve stil uygulaması konularını ele alacağız.

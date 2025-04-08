@@ -1,0 +1,1356 @@
+---
+title: 'Reactive Forms ve Validasyon'
+description: 'Angular Reactive Forms kullanımı ve form validasyonu'
+---
+
+# Reactive Forms ve Validasyon
+
+Bu bölümde, Angular'da form işlemlerini yönetmek için kullanılan Reactive Forms yaklaşımını ve form validasyonunu detaylı olarak ele alacağız. Reactive Forms, karmaşık form senaryolarını yönetmek için güçlü bir yöntem sunar ve e-ticaret uygulamaları için idealdir.
+
+## Angular'da Form Yaklaşımları
+
+Angular, form işlemlerini yönetmek için iki farklı yaklaşım sunar:
+
+1. **Template-driven Forms**: HTML şablonunda direktifler kullanarak formları tanımlar. Daha basit formlar için uygundur.
+2. **Reactive Forms**: TypeScript kodunda form kontrollerini tanımlar ve form durumunu yönetir. Daha karmaşık formlar için uygundur.
+
+Bu bölümde, daha güçlü ve esnek olan Reactive Forms yaklaşımına odaklanacağız.
+
+## Reactive Forms Modülü
+
+Reactive Forms kullanmak için, `ReactiveFormsModule`'ü import etmeniz gerekir:
+
+```typescript
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { ReactiveFormsModule } from '@angular/forms';
+
+import { AppComponent } from './app.component';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    ReactiveFormsModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+Eğer bir feature modülünde Reactive Forms kullanacaksanız, o modüle de `ReactiveFormsModule`'ü import etmeniz gerekir:
+
+```typescript
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+
+import { CheckoutRoutingModule } from './checkout-routing.module';
+import { CheckoutComponent } from './checkout/checkout.component';
+
+@NgModule({
+  declarations: [
+    CheckoutComponent
+  ],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    CheckoutRoutingModule
+  ]
+})
+export class CheckoutModule { }
+```
+
+## Reactive Forms Temel Bileşenleri
+
+Reactive Forms, aşağıdaki temel bileşenlerden oluşur:
+
+1. **FormControl**: Tek bir form kontrolünü (input, select, vb.) temsil eder.
+2. **FormGroup**: Bir grup form kontrolünü temsil eder.
+3. **FormArray**: Dinamik sayıda form kontrolünü veya form grubunu temsil eder.
+4. **FormBuilder**: Form kontrollerini, gruplarını ve dizilerini oluşturmak için kullanılan bir yardımcı servistir.
+
+### FormControl
+
+`FormControl`, tek bir form kontrolünü temsil eder ve değerini, durumunu ve geçerliliğini izler:
+
+```typescript
+import { Component } from '@angular/core';
+import { FormControl } from '@angular/forms';
+
+@Component({
+  selector: 'app-name-editor',
+  template: `
+    <label for="name">İsim:</label>
+    <input id="name" type="text" [formControl]="name">
+    
+    <p>Değer: {{ name.value }}</p>
+    <p>Geçerli: {{ name.valid }}</p>
+    <p>Dokunulmuş: {{ name.touched }}</p>
+    <p>Kirli: {{ name.dirty }}</p>
+    
+    <button (click)="updateName()">İsmi Güncelle</button>
+  `
+})
+export class NameEditorComponent {
+  name = new FormControl('');
+  
+  updateName() {
+    this.name.setValue('Ahmet Yılmaz');
+  }
+}
+```
+
+Bu örnekte, `name` adında bir `FormControl` oluşturulur ve başlangıç değeri boş bir string olarak ayarlanır. `[formControl]="name"` direktifi, input elementini `name` kontrolüne bağlar.
+
+### FormGroup
+
+`FormGroup`, bir grup form kontrolünü temsil eder ve tüm kontrollerin değerlerini, durumlarını ve geçerliliklerini bir bütün olarak izler:
+
+```typescript
+import { Component } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
+
+@Component({
+  selector: 'app-profile-editor',
+  template: `
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+      <div>
+        <label for="firstName">Ad:</label>
+        <input id="firstName" type="text" formControlName="firstName">
+      </div>
+      
+      <div>
+        <label for="lastName">Soyad:</label>
+        <input id="lastName" type="text" formControlName="lastName">
+      </div>
+      
+      <button type="submit" [disabled]="!profileForm.valid">Kaydet</button>
+    </form>
+    
+    <p>Form Değeri: {{ profileForm.value | json }}</p>
+    <p>Form Geçerli: {{ profileForm.valid }}</p>
+  `
+})
+export class ProfileEditorComponent {
+  profileForm = new FormGroup({
+    firstName: new FormControl(''),
+    lastName: new FormControl('')
+  });
+  
+  onSubmit() {
+    console.log(this.profileForm.value);
+  }
+}
+```
+
+Bu örnekte, `profileForm` adında bir `FormGroup` oluşturulur ve içinde `firstName` ve `lastName` adında iki `FormControl` bulunur. `[formGroup]="profileForm"` direktifi, form elementini `profileForm` grubuna bağlar ve `formControlName` direktifi, input elementlerini ilgili kontrollere bağlar.
+
+### FormArray
+
+`FormArray`, dinamik sayıda form kontrolünü veya form grubunu temsil eder:
+
+```typescript
+import { Component } from '@angular/core';
+import { FormArray, FormGroup, FormControl } from '@angular/forms';
+
+@Component({
+  selector: 'app-address-list',
+  template: `
+    <form [formGroup]="addressForm" (ngSubmit)="onSubmit()">
+      <div formArrayName="addresses">
+        <div *ngFor="let address of addresses.controls; let i = index">
+          <div [formGroupName]="i">
+            <h3>Adres {{ i + 1 }}</h3>
+            
+            <div>
+              <label for="street-{{ i }}">Sokak:</label>
+              <input id="street-{{ i }}" type="text" formControlName="street">
+            </div>
+            
+            <div>
+              <label for="city-{{ i }}">Şehir:</label>
+              <input id="city-{{ i }}" type="text" formControlName="city">
+            </div>
+            
+            <div>
+              <label for="zipCode-{{ i }}">Posta Kodu:</label>
+              <input id="zipCode-{{ i }}" type="text" formControlName="zipCode">
+            </div>
+            
+            <button type="button" (click)="removeAddress(i)">Adresi Sil</button>
+          </div>
+        </div>
+      </div>
+      
+      <button type="button" (click)="addAddress()">Adres Ekle</button>
+      <button type="submit" [disabled]="!addressForm.valid">Kaydet</button>
+    </form>
+    
+    <p>Form Değeri: {{ addressForm.value | json }}</p>
+  `
+})
+export class AddressListComponent {
+  addressForm = new FormGroup({
+    addresses: new FormArray([
+      this.createAddressGroup()
+    ])
+  });
+  
+  get addresses() {
+    return this.addressForm.get('addresses') as FormArray;
+  }
+  
+  createAddressGroup(): FormGroup {
+    return new FormGroup({
+      street: new FormControl(''),
+      city: new FormControl(''),
+      zipCode: new FormControl('')
+    });
+  }
+  
+  addAddress() {
+    this.addresses.push(this.createAddressGroup());
+  }
+  
+  removeAddress(index: number) {
+    this.addresses.removeAt(index);
+  }
+  
+  onSubmit() {
+    console.log(this.addressForm.value);
+  }
+}
+```
+
+Bu örnekte, `addressForm` adında bir `FormGroup` oluşturulur ve içinde `addresses` adında bir `FormArray` bulunur. `formArrayName` direktifi, div elementini `addresses` dizisine bağlar ve `[formGroupName]="i"` direktifi, her bir adres div'ini ilgili form grubuna bağlar.
+
+### FormBuilder
+
+`FormBuilder`, form kontrollerini, gruplarını ve dizilerini daha kolay oluşturmak için kullanılan bir yardımcı servistir:
+
+```typescript
+import { Component } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-profile-editor',
+  template: `
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+      <div>
+        <label for="firstName">Ad:</label>
+        <input id="firstName" type="text" formControlName="firstName">
+        <div *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)">
+          <div *ngIf="firstName.errors?.required">Ad gereklidir.</div>
+        </div>
+      </div>
+      
+      <div>
+        <label for="lastName">Soyad:</label>
+        <input id="lastName" type="text" formControlName="lastName">
+        <div *ngIf="lastName.invalid && (lastName.dirty || lastName.touched)">
+          <div *ngIf="lastName.errors?.required">Soyad gereklidir.</div>
+        </div>
+      </div>
+      
+      <div formGroupName="address">
+        <h3>Adres</h3>
+        
+        <div>
+          <label for="street">Sokak:</label>
+          <input id="street" type="text" formControlName="street">
+        </div>
+        
+        <div>
+          <label for="city">Şehir:</label>
+          <input id="city" type="text" formControlName="city">
+        </div>
+        
+        <div>
+          <label for="zipCode">Posta Kodu:</label>
+          <input id="zipCode" type="text" formControlName="zipCode">
+        </div>
+      </div>
+      
+      <button type="submit" [disabled]="!profileForm.valid">Kaydet</button>
+    </form>
+    
+    <p>Form Değeri: {{ profileForm.value | json }}</p>
+    <p>Form Geçerli: {{ profileForm.valid }}</p>
+  `
+})
+export class ProfileEditorComponent {
+  profileForm = this.fb.group({
+    firstName: ['', Validators.required],
+    lastName: ['', Validators.required],
+    address: this.fb.group({
+      street: [''],
+      city: [''],
+      zipCode: ['']
+    })
+  });
+  
+  constructor(private fb: FormBuilder) { }
+  
+  get firstName() {
+    return this.profileForm.get('firstName');
+  }
+  
+  get lastName() {
+    return this.profileForm.get('lastName');
+  }
+  
+  onSubmit() {
+    console.log(this.profileForm.value);
+  }
+}
+```
+
+Bu örnekte, `FormBuilder` servisi kullanılarak daha kısa bir şekilde form oluşturulur. `fb.group()` metodu, bir `FormGroup` oluşturur ve `fb.array()` metodu, bir `FormArray` oluşturur.
+
+## Form Validasyonu
+
+Angular, form kontrollerinin geçerliliğini kontrol etmek için çeşitli validatörler sağlar. Validatörler, form kontrollerinin değerlerini kontrol eder ve geçerli olup olmadıklarını belirler.
+
+### Yerleşik Validatörler
+
+Angular, aşağıdaki yerleşik validatörleri sağlar:
+
+- **required**: Kontrolün değerinin boş olmamasını sağlar.
+- **minLength**: Kontrolün değerinin belirli bir minimum uzunlukta olmasını sağlar.
+- **maxLength**: Kontrolün değerinin belirli bir maksimum uzunlukta olmasını sağlar.
+- **pattern**: Kontrolün değerinin belirli bir regex desenine uymasını sağlar.
+- **email**: Kontrolün değerinin geçerli bir e-posta adresi olmasını sağlar.
+- **min**: Kontrolün değerinin belirli bir minimum değerden büyük veya eşit olmasını sağlar.
+- **max**: Kontrolün değerinin belirli bir maksimum değerden küçük veya eşit olmasını sağlar.
+
+```typescript
+import { Component } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-user-form',
+  template: `
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <div>
+        <label for="username">Kullanıcı Adı:</label>
+        <input id="username" type="text" formControlName="username">
+        <div *ngIf="username.invalid && (username.dirty || username.touched)">
+          <div *ngIf="username.errors?.required">Kullanıcı adı gereklidir.</div>
+          <div *ngIf="username.errors?.minlength">Kullanıcı adı en az 3 karakter olmalıdır.</div>
+          <div *ngIf="username.errors?.maxlength">Kullanıcı adı en fazla 20 karakter olmalıdır.</div>
+          <div *ngIf="username.errors?.pattern">Kullanıcı adı yalnızca harf, rakam ve alt çizgi içerebilir.</div>
+        </div>
+      </div>
+      
+      <div>
+        <label for="email">E-posta:</label>
+        <input id="email" type="email" formControlName="email">
+        <div *ngIf="email.invalid && (email.dirty || email.touched)">
+          <div *ngIf="email.errors?.required">E-posta gereklidir.</div>
+          <div *ngIf="email.errors?.email">Geçerli bir e-posta adresi giriniz.</div>
+        </div>
+      </div>
+      
+      <div>
+        <label for="age">Yaş:</label>
+        <input id="age" type="number" formControlName="age">
+        <div *ngIf="age.invalid && (age.dirty || age.touched)">
+          <div *ngIf="age.errors?.required">Yaş gereklidir.</div>
+          <div *ngIf="age.errors?.min">Yaş en az 18 olmalıdır.</div>
+          <div *ngIf="age.errors?.max">Yaş en fazla 100 olmalıdır.</div>
+        </div>
+      </div>
+      
+      <button type="submit" [disabled]="!userForm.valid">Kaydet</button>
+    </form>
+  `
+})
+export class UserFormComponent {
+  userForm = this.fb.group({
+    username: ['', [
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(20),
+      Validators.pattern('^[a-zA-Z0-9_]+$')
+    ]],
+    email: ['', [
+      Validators.required,
+      Validators.email
+    ]],
+    age: ['', [
+      Validators.required,
+      Validators.min(18),
+      Validators.max(100)
+    ]]
+  });
+  
+  constructor(private fb: FormBuilder) { }
+  
+  get username() {
+    return this.userForm.get('username');
+  }
+  
+  get email() {
+    return this.userForm.get('email');
+  }
+  
+  get age() {
+    return this.userForm.get('age');
+  }
+  
+  onSubmit() {
+    console.log(this.userForm.value);
+  }
+}
+```
+
+Bu örnekte, `username`, `email` ve `age` kontrolleri için çeşitli validatörler kullanılmıştır. Her bir kontrol için, validasyon hatalarını göstermek için koşullu div'ler eklenmiştir.
+
+### Özel Validatörler
+
+Yerleşik validatörler yeterli değilse, özel validatörler oluşturabilirsiniz:
+
+```typescript
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+
+// Parola ve parola onayının eşleşmesini kontrol eden validatör
+export function passwordMatchValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const password = control.get('password');
+    const confirmPassword = control.get('confirmPassword');
+    
+    if (!password || !confirmPassword) {
+      return null;
+    }
+    
+    return password.value === confirmPassword.value ? null : { passwordMismatch: true };
+  };
+}
+
+// Yasaklı kullanıcı adlarını kontrol eden validatör
+export function forbiddenNameValidator(forbiddenNames: string[]): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const forbidden = forbiddenNames.includes(control.value);
+    return forbidden ? { forbiddenName: { value: control.value } } : null;
+  };
+}
+
+// TC Kimlik Numarası validatörü
+export function tcknValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+    
+    if (!value) {
+      return null;
+    }
+    
+    // TC Kimlik Numarası 11 haneli olmalıdır
+    if (!/^\d{11}$/.test(value)) {
+      return { tckn: { invalidFormat: true } };
+    }
+    
+    // İlk hane 0 olamaz
+    if (value[0] === '0') {
+      return { tckn: { invalidFirstDigit: true } };
+    }
+    
+    // TC Kimlik Numarası algoritması kontrolü
+    let oddSum = 0;
+    let evenSum = 0;
+    let tenthDigit = 0;
+    let eleventhDigit = 0;
+    let total = 0;
+    
+    for (let i = 0; i < 9; i += 2) {
+      oddSum += parseInt(value[i], 10);
+    }
+    
+    for (let i = 1; i < 8; i += 2) {
+      evenSum += parseInt(value[i], 10);
+    }
+    
+    tenthDigit = parseInt(value[9], 10);
+    eleventhDigit = parseInt(value[10], 10);
+    
+    total = oddSum * 7 - evenSum;
+    
+    if (total % 10 !== tenthDigit) {
+      return { tckn: { invalidChecksum: true } };
+    }
+    
+    if ((oddSum + evenSum + tenthDigit) % 10 !== eleventhDigit) {
+      return { tckn: { invalidChecksum: true } };
+    }
+    
+    return null;
+  };
+}
+```
+
+Bu özel validatörleri kullanmak için:
+
+```typescript
+import { Component } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+import { passwordMatchValidator, forbiddenNameValidator, tcknValidator } from '../../core/validators/custom-validators';
+
+@Component({
+  selector: 'app-register-form',
+  template: `
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div>
+        <label for="username">Kullanıcı Adı:</label>
+        <input id="username" type="text" formControlName="username">
+        <div *ngIf="username.invalid && (username.dirty || username.touched)">
+          <div *ngIf="username.errors?.required">Kullanıcı adı gereklidir.</div>
+          <div *ngIf="username.errors?.forbiddenName">Bu kullanıcı adı kullanılamaz.</div>
+        </div>
+      </div>
+      
+      <div>
+        <label for="tckn">TC Kimlik Numarası:</label>
+        <input id="tckn" type="text" formControlName="tckn">
+        <div *ngIf="tckn.invalid && (tckn.dirty || tckn.touched)">
+          <div *ngIf="tckn.errors?.required">TC Kimlik Numarası gereklidir.</div>
+          <div *ngIf="tckn.errors?.tckn?.invalidFormat">TC Kimlik Numarası 11 haneli olmalıdır.</div>
+          <div *ngIf="tckn.errors?.tckn?.invalidFirstDigit">TC Kimlik Numarası 0 ile başlayamaz.</div>
+          <div *ngIf="tckn.errors?.tckn?.invalidChecksum">Geçersiz TC Kimlik Numarası.</div>
+        </div>
+      </div>
+      
+      <div formGroupName="passwordGroup">
+        <div>
+          <label for="password">Parola:</label>
+          <input id="password" type="password" formControlName="password">
+          <div *ngIf="password.invalid && (password.dirty || password.touched)">
+            <div *ngIf="password.errors?.required">Parola gereklidir.</div>
+            <div *ngIf="password.errors?.minlength">Parola en az 8 karakter olmalıdır.</div>
+          </div>
+        </div>
+        
+        <div>
+          <label for="confirmPassword">Parola Onayı:</label>
+          <input id="confirmPassword" type="password" formControlName="confirmPassword">
+          <div *ngIf="confirmPassword.invalid && (confirmPassword.dirty || confirmPassword.touched)">
+            <div *ngIf="confirmPassword.errors?.required">Parola onayı gereklidir.</div>
+          </div>
+        </div>
+        
+        <div *ngIf="passwordGroup.errors?.passwordMismatch && (passwordGroup.touched || passwordGroup.dirty)">
+          Parolalar eşleşmiyor.
+        </div>
+      </div>
+      
+      <button type="submit" [disabled]="!registerForm.valid">Kayıt Ol</button>
+    </form>
+  `
+})
+export class RegisterFormComponent {
+  registerForm = this.fb.group({
+    username: ['', [
+      Validators.required,
+      forbiddenNameValidator(['admin', 'root', 'superuser'])
+    ]],
+    tckn: ['', [
+      Validators.required,
+      tcknValidator()
+    ]],
+    passwordGroup: this.fb.group({
+      password: ['', [
+        Validators.required,
+        Validators.minLength(8)
+      ]],
+      confirmPassword: ['', Validators.required]
+    }, { validators: passwordMatchValidator() })
+  });
+  
+  constructor(private fb: FormBuilder) { }
+  
+  get username() {
+    return this.registerForm.get('username');
+  }
+  
+  get tckn() {
+    return this.registerForm.get('tckn');
+  }
+  
+  get passwordGroup() {
+    return this.registerForm.get('passwordGroup');
+  }
+  
+  get password() {
+    return this.registerForm.get('passwordGroup.password');
+  }
+  
+  get confirmPassword() {
+    return this.registerForm.get('passwordGroup.confirmPassword');
+  }
+  
+  onSubmit() {
+    console.log(this.registerForm.value);
+  }
+}
+```
+
+Bu örnekte, `forbiddenNameValidator`, `tcknValidator` ve `passwordMatchValidator` adında üç özel validatör kullanılmıştır. `passwordMatchValidator`, bir form grubuna uygulanır ve grup içindeki iki kontrolün değerlerini karşılaştırır.
+
+### Asenkron Validatörler
+
+Bazı validasyonlar, sunucuya istek göndermek gibi asenkron işlemler gerektirebilir. Bu durumlar için, asenkron validatörler kullanabilirsiniz:
+
+```typescript
+import { AbstractControl, AsyncValidatorFn, ValidationErrors } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { map, catchError, debounceTime, switchMap, first } from 'rxjs/operators';
+import { UserService } from '../services/user.service';
+
+// Kullanıcı adının benzersiz olup olmadığını kontrol eden asenkron validatör
+export function usernameExistsValidator(userService: UserService): AsyncValidatorFn {
+  return (control: AbstractControl): Observable<ValidationErrors | null> => {
+    if (!control.value) {
+      return of(null);
+    }
+    
+    return control.valueChanges.pipe(
+      debounceTime(500),
+      switchMap(username => userService.checkUsernameExists(username)),
+      map(exists => exists ? { usernameExists: true } : null),
+      catchError(() => of(null)),
+      first()
+    );
+  };
+}
+
+// E-posta adresinin benzersiz olup olmadığını kontrol eden asenkron validatör
+export function emailExistsValidator(userService: UserService): AsyncValidatorFn {
+  return (control: AbstractControl): Observable<ValidationErrors | null> => {
+    if (!control.value) {
+      return of(null);
+    }
+    
+    return control.valueChanges.pipe(
+      debounceTime(500),
+      switchMap(email => userService.checkEmailExists(email)),
+      map(exists => exists ? { emailExists: true } : null),
+      catchError(() => of(null)),
+      first()
+    );
+  };
+}
+```
+
+Bu asenkron validatörleri kullanmak için:
+
+```typescript
+import { Component } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+import { UserService } from '../../core/services/user.service';
+import { usernameExistsValidator, emailExistsValidator } from '../../core/validators/async-validators';
+
+@Component({
+  selector: 'app-register-form',
+  template: `
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div>
+        <label for="username">Kullanıcı Adı:</label>
+        <input id="username" type="text" formControlName="username">
+        <div *ngIf="username.pending">Kontrol ediliyor...</div>
+        <div *ngIf="username.invalid && (username.dirty || username.touched)">
+          <div *ngIf="username.errors?.required">Kullanıcı adı gereklidir.</div>
+          <div *ngIf="username.errors?.usernameExists">Bu kullanıcı adı zaten kullanılıyor.</div>
+        </div>
+      </div>
+      
+      <div>
+        <label for="email">E-posta:</label>
+        <input id="email" type="email" formControlName="email">
+        <div *ngIf="email.pending">Kontrol ediliyor...</div>
+        <div *ngIf="email.invalid && (email.dirty || email.touched)">
+          <div *ngIf="email.errors?.required">E-posta gereklidir.</div>
+          <div *ngIf="email.errors?.email">Geçerli bir e-posta adresi giriniz.</div>
+          <div *ngIf="email.errors?.emailExists">Bu e-posta adresi zaten kullanılıyor.</div>
+        </div>
+      </div>
+      
+      <button type="submit" [disabled]="!registerForm.valid || registerForm.pending">Kayıt Ol</button>
+    </form>
+  `
+})
+export class RegisterFormComponent {
+  registerForm = this.fb.group({
+    username: ['', {
+      validators: [Validators.required],
+      asyncValidators: [usernameExistsValidator(this.userService)],
+      updateOn: 'blur'
+    }],
+    email: ['', {
+      validators: [Validators.required, Validators.email],
+      asyncValidators: [emailExistsValidator(this.userService)],
+      updateOn: 'blur'
+    }]
+  });
+  
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService
+  ) { }
+  
+  get username() {
+    return this.registerForm.get('username');
+  }
+  
+  get email() {
+    return this.registerForm.get('email');
+  }
+  
+  onSubmit() {
+    console.log(this.registerForm.value);
+  }
+}
+```
+
+Bu örnekte, `usernameExistsValidator` ve `emailExistsValidator` adında iki asenkron validatör kullanılmıştır. Bu validatörler, kullanıcı adı ve e-posta adresinin benzersiz olup olmadığını kontrol etmek için `UserService`'i kullanır. `updateOn: 'blur'` özelliği, validasyonun yalnızca kontrol odağını kaybettiğinde gerçekleşmesini sağlar.
+
+## Form Durumu ve CSS Sınıfları
+
+Angular, form kontrollerinin durumuna göre otomatik olarak CSS sınıfları ekler. Bu sınıflar, form kontrollerinin stilini durumlarına göre değiştirmek için kullanılabilir:
+
+- **ng-valid**: Kontrol geçerli olduğunda.
+- **ng-invalid**: Kontrol geçersiz olduğunda.
+- **ng-pending**: Kontrol asenkron validasyon beklerken.
+- **ng-pristine**: Kontrol henüz değiştirilmediğinde.
+- **ng-dirty**: Kontrol değiştirildiğinde.
+- **ng-untouched**: Kontrol henüz odaklanmadığında.
+- **ng-touched**: Kontrol odaklandığında ve odağı kaybettiğinde.
+
+Bu sınıfları kullanarak, form kontrollerinin stilini durumlarına göre değiştirebilirsiniz:
+
+```scss
+.form-control {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  
+  &.ng-invalid.ng-touched {
+    border-color: #f44336;
+  }
+  
+  &.ng-valid.ng-touched {
+    border-color: #4caf50;
+  }
+  
+  &.ng-pending {
+    border-color: #ff9800;
+  }
+}
+
+.error-message {
+  color: #f44336;
+  font-size: 12px;
+  margin-top: 4px;
+}
+```
+
+## Form Değerlerini Ayarlama ve Sıfırlama
+
+Form değerlerini programatik olarak ayarlamak veya sıfırlamak için çeşitli metodlar kullanabilirsiniz:
+
+### setValue
+
+`setValue` metodu, bir form grubunun veya kontrolünün değerini tamamen değiştirir. Tüm kontroller için değer sağlamanız gerekir:
+
+```typescript
+this.profileForm.setValue({
+  firstName: 'Ahmet',
+  lastName: 'Yılmaz',
+  address: {
+    street: 'Atatürk Cad.',
+    city: 'İstanbul',
+    zipCode: '34000'
+  }
+});
+```
+
+### patchValue
+
+`patchValue` metodu, bir form grubunun veya kontrolünün değerini kısmen değiştirir. Yalnızca değiştirmek istediğiniz kontroller için değer sağlamanız gerekir:
+
+```typescript
+this.profileForm.patchValue({
+  firstName: 'Ahmet',
+  address: {
+    city: 'İstanbul'
+  }
+});
+```
+
+### reset
+
+`reset` metodu, bir form grubunun veya kontrolünün değerini sıfırlar ve durumunu pristine ve untouched olarak ayarlar:
+
+```typescript
+this.profileForm.reset();
+```
+
+Belirli değerlerle sıfırlamak için:
+
+```typescript
+this.profileForm.reset({
+  firstName: '',
+  lastName: '',
+  address: {
+    street: '',
+    city: '',
+    zipCode: ''
+  }
+});
+```
+
+## Form Değişikliklerini Dinleme
+
+Form değerlerindeki veya durumundaki değişiklikleri dinlemek için, `valueChanges` ve `statusChanges` Observable'larını kullanabilirsiniz:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+
+@Component({
+  selector: 'app-search-form',
+  template: `
+    <form [formGroup]="searchForm">
+      <div>
+        <label for="keyword">Arama:</label>
+        <input id="keyword" type="text" formControlName="keyword">
+      </div>
+    </form>
+    
+    <div *ngIf="loading">Aranıyor...</div>
+    <div *ngIf="results.length > 0">
+      <h3>Sonuçlar</h3>
+      <ul>
+        <li *ngFor="let result of results">{{ result }}</li>
+      </ul>
+    </div>
+  `
+})
+export class SearchFormComponent implements OnInit {
+  searchForm = this.fb.group({
+    keyword: ['', Validators.minLength(3)]
+  });
+  
+  loading = false;
+  results: string[] = [];
+  
+  constructor(private fb: FormBuilder) { }
+  
+  ngOnInit(): void {
+    this.searchForm.get('keyword').valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(value => {
+      if (value.length >= 3) {
+        this.search(value);
+      } else {
+        this.results = [];
+      }
+    });
+    
+    this.searchForm.statusChanges.subscribe(status => {
+      console.log('Form durumu:', status);
+    });
+  }
+  
+  search(keyword: string): void {
+    this.loading = true;
+    // Arama işlemi
+    setTimeout(() => {
+      this.results = [
+        `${keyword} ile ilgili sonuç 1`,
+        `${keyword} ile ilgili sonuç 2`,
+        `${keyword} ile ilgili sonuç 3`
+      ];
+      this.loading = false;
+    }, 1000);
+  }
+}
+```
+
+Bu örnekte, `keyword` kontrolünün değeri değiştiğinde, `valueChanges` Observable'ı tetiklenir ve arama işlemi gerçekleştirilir. `debounceTime` operatörü, kullanıcı yazmayı bıraktıktan sonra belirli bir süre bekler ve `distinctUntilChanged` operatörü, aynı değer için tekrar arama yapılmasını önler.
+
+## Form Gruplarını Dinamik Olarak Oluşturma
+
+Karmaşık formlar için, form gruplarını dinamik olarak oluşturabilirsiniz:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-order-form',
+  template: `
+    <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
+      <div>
+        <label for="customerName">Müşteri Adı:</label>
+        <input id="customerName" type="text" formControlName="customerName">
+      </div>
+      
+      <div formArrayName="items">
+        <h3>Ürünler</h3>
+        <button type="button" (click)="addItem()">Ürün Ekle</button>
+        
+        <div *ngFor="let itemGroup of items.controls; let i = index">
+          <div [formGroupName]="i">
+            <div>
+              <label [for]="'productId-' + i">Ürün:</label>
+              <select [id]="'productId-' + i" formControlName="productId">
+                <option *ngFor="let product of products" [value]="product.id">{{ product.name }}</option>
+              </select>
+            </div>
+            
+            <div>
+              <label [for]="'quantity-' + i">Miktar:</label>
+              <input [id]="'quantity-' + i" type="number" formControlName="quantity">
+            </div>
+            
+            <button type="button" (click)="removeItem(i)">Ürünü Kaldır</button>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <label for="shippingAddress">Teslimat Adresi:</label>
+        <textarea id="shippingAddress" formControlName="shippingAddress"></textarea>
+      </div>
+      
+      <div>
+        <label for="paymentMethod">Ödeme Yöntemi:</label>
+        <select id="paymentMethod" formControlName="paymentMethod">
+          <option value="creditCard">Kredi Kartı</option>
+          <option value="bankTransfer">Banka Havalesi</option>
+          <option value="cashOnDelivery">Kapıda Ödeme</option>
+        </select>
+      </div>
+      
+      <div *ngIf="paymentMethod.value === 'creditCard'" formGroupName="creditCardInfo">
+        <h3>Kredi Kartı Bilgileri</h3>
+        
+        <div>
+          <label for="cardNumber">Kart Numarası:</label>
+          <input id="cardNumber" type="text" formControlName="cardNumber">
+        </div>
+        
+        <div>
+          <label for="cardHolderName">Kart Sahibi:</label>
+          <input id="cardHolderName" type="text" formControlName="cardHolderName">
+        </div>
+        
+        <div>
+          <label for="expiryMonth">Son Kullanma Ayı:</label>
+          <select id="expiryMonth" formControlName="expiryMonth">
+            <option *ngFor="let month of months" [value]="month">{{ month }}</option>
+          </select>
+        </div>
+        
+        <div>
+          <label for="expiryYear">Son Kullanma Yılı:</label>
+          <select id="expiryYear" formControlName="expiryYear">
+            <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+          </select>
+        </div>
+        
+        <div>
+          <label for="cvv">CVV:</label>
+          <input id="cvv" type="text" formControlName="cvv">
+        </div>
+      </div>
+      
+      <button type="submit" [disabled]="!orderForm.valid">Siparişi Tamamla</button>
+    </form>
+  `
+})
+export class OrderFormComponent implements OnInit {
+  products = [
+    { id: 1, name: 'Ürün 1', price: 100 },
+    { id: 2, name: 'Ürün 2', price: 200 },
+    { id: 3, name: 'Ürün 3', price: 300 }
+  ];
+  
+  months = Array.from({ length: 12 }, (_, i) => i + 1);
+  years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i);
+  
+  orderForm: FormGroup;
+  
+  constructor(private fb: FormBuilder) { }
+  
+  ngOnInit(): void {
+    this.createForm();
+    this.onPaymentMethodChange();
+  }
+  
+  createForm(): void {
+    this.orderForm = this.fb.group({
+      customerName: ['', Validators.required],
+      items: this.fb.array([this.createItemGroup()]),
+      shippingAddress: ['', Validators.required],
+      paymentMethod: ['creditCard', Validators.required],
+      creditCardInfo: this.fb.group({
+        cardNumber: ['', [
+          Validators.required,
+          Validators.pattern('^[0-9]{16}$')
+        ]],
+        cardHolderName: ['', Validators.required],
+        expiryMonth: ['', Validators.required],
+        expiryYear: ['', Validators.required],
+        cvv: ['', [
+          Validators.required,
+          Validators.pattern('^[0-9]{3,4}$')
+        ]]
+      })
+    });
+  }
+  
+  createItemGroup(): FormGroup {
+    return this.fb.group({
+      productId: ['', Validators.required],
+      quantity: [1, [
+        Validators.required,
+        Validators.min(1)
+      ]]
+    });
+  }
+  
+  get items(): FormArray {
+    return this.orderForm.get('items') as FormArray;
+  }
+  
+  get paymentMethod() {
+    return this.orderForm.get('paymentMethod');
+  }
+  
+  addItem(): void {
+    this.items.push(this.createItemGroup());
+  }
+  
+  removeItem(index: number): void {
+    this.items.removeAt(index);
+  }
+  
+  onPaymentMethodChange(): void {
+    this.paymentMethod.valueChanges.subscribe(value => {
+      const creditCardInfo = this.orderForm.get('creditCardInfo');
+      
+      if (value === 'creditCard') {
+        creditCardInfo.enable();
+      } else {
+        creditCardInfo.disable();
+      }
+    });
+  }
+  
+  onSubmit(): void {
+    console.log(this.orderForm.value);
+  }
+}
+```
+
+Bu örnekte, dinamik bir sipariş formu oluşturulmuştur. Form, müşteri bilgileri, ürün listesi, teslimat adresi ve ödeme bilgileri gibi bölümlerden oluşur. Ürün listesi, bir `FormArray` kullanılarak dinamik olarak yönetilir ve ödeme yöntemi değiştiğinde, kredi kartı bilgileri bölümü etkinleştirilir veya devre dışı bırakılır.
+
+## Form Gruplarını Yeniden Kullanma
+
+Karmaşık formlar için, form gruplarını yeniden kullanılabilir bileşenler olarak ayırabilirsiniz:
+
+```typescript
+import { Component, Input, OnInit } from '@angular/core';
+import { FormGroup, ControlContainer } from '@angular/forms';
+
+@Component({
+  selector: 'app-address-form',
+  template: `
+    <div [formGroupName]="groupName">
+      <div>
+        <label [for]="groupName + '-street'">Sokak:</label>
+        <input [id]="groupName + '-street'" type="text" formControlName="street">
+      </div>
+      
+      <div>
+        <label [for]="groupName + '-city'">Şehir:</label>
+        <input [id]="groupName + '-city'" type="text" formControlName="city">
+      </div>
+      
+      <div>
+        <label [for]="groupName + '-zipCode'">Posta Kodu:</label>
+        <input [id]="groupName + '-zipCode'" type="text" formControlName="zipCode">
+      </div>
+    </div>
+  `
+})
+export class AddressFormComponent {
+  @Input() groupName: string;
+}
+```
+
+Bu komponenti kullanmak için:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-checkout-form',
+  template: `
+    <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
+      <h3>Fatura Adresi</h3>
+      <app-address-form groupName="billingAddress"></app-address-form>
+      
+      <div>
+        <label>
+          <input type="checkbox" formControlName="sameAsShipping">
+          Teslimat adresi fatura adresi ile aynı
+        </label>
+      </div>
+      
+      <div *ngIf="!sameAsShipping.value">
+        <h3>Teslimat Adresi</h3>
+        <app-address-form groupName="shippingAddress"></app-address-form>
+      </div>
+      
+      <button type="submit" [disabled]="!checkoutForm.valid">Devam Et</button>
+    </form>
+  `
+})
+export class CheckoutFormComponent implements OnInit {
+  checkoutForm: FormGroup;
+  
+  constructor(private fb: FormBuilder) { }
+  
+  ngOnInit(): void {
+    this.createForm();
+    this.onSameAsShippingChange();
+  }
+  
+  createForm(): void {
+    this.checkoutForm = this.fb.group({
+      billingAddress: this.createAddressGroup(),
+      sameAsShipping: [true],
+      shippingAddress: this.createAddressGroup()
+    });
+  }
+  
+  createAddressGroup(): FormGroup {
+    return this.fb.group({
+      street: ['', Validators.required],
+      city: ['', Validators.required],
+      zipCode: ['', Validators.required]
+    });
+  }
+  
+  get sameAsShipping() {
+    return this.checkoutForm.get('sameAsShipping');
+  }
+  
+  onSameAsShippingChange(): void {
+    this.sameAsShipping.valueChanges.subscribe(value => {
+      const shippingAddress = this.checkoutForm.get('shippingAddress');
+      
+      if (value) {
+        shippingAddress.disable();
+      } else {
+        shippingAddress.enable();
+      }
+    });
+    
+    // Başlangıçta teslimat adresi devre dışı bırakılır
+    if (this.sameAsShipping.value) {
+      this.checkoutForm.get('shippingAddress').disable();
+    }
+  }
+  
+  onSubmit(): void {
+    console.log(this.checkoutForm.value);
+  }
+}
+```
+
+Bu örnekte, `AddressFormComponent` adında yeniden kullanılabilir bir adres formu komponenti oluşturulmuştur. Bu komponent, `formGroupName` direktifi ile ana formun bir alt grubuna bağlanır. `CheckoutFormComponent`, bu komponenti iki kez kullanarak fatura ve teslimat adresi formlarını oluşturur.
+
+## Reactive Forms ile Material Design
+
+Angular Material, Reactive Forms ile birlikte kullanılabilecek çeşitli form kontrolleri sağlar:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-material-form',
+  template: `
+    <form [formGroup]="materialForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="outline">
+        <mat-label>Ad</mat-label>
+        <input matInput formControlName="firstName" placeholder="Adınız">
+        <mat-error *ngIf="firstName.errors?.required">Ad gereklidir.</mat-error>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Soyad</mat-label>
+        <input matInput formControlName="lastName" placeholder="Soyadınız">
+        <mat-error *ngIf="lastName.errors?.required">Soyad gereklidir.</mat-error>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline">
+        <mat-label>E-posta</mat-label>
+        <input matInput formControlName="email" placeholder="E-posta adresiniz">
+        <mat-error *ngIf="email.errors?.required">E-posta gereklidir.</mat-error>
+        <mat-error *ngIf="email.errors?.email">Geçerli bir e-posta adresi giriniz.</mat-error>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Telefon</mat-label>
+        <input matInput formControlName="phone" placeholder="Telefon numaranız">
+        <mat-icon matPrefix>phone</mat-icon>
+        <mat-error *ngIf="phone.errors?.required">Telefon gereklidir.</mat-error>
+        <mat-error *ngIf="phone.errors?.pattern">Geçerli bir telefon numarası giriniz.</mat-error>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Doğum Tarihi</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="birthDate" placeholder="Doğum tarihiniz">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error *ngIf="birthDate.errors?.required">Doğum tarihi gereklidir.</mat-error>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Cinsiyet</mat-label>
+        <mat-select formControlName="gender">
+          <mat-option value="male">Erkek</mat-option>
+          <mat-option value="female">Kadın</mat-option>
+          <mat-option value="other">Diğer</mat-option>
+        </mat-select>
+        <mat-error *ngIf="gender.errors?.required">Cinsiyet gereklidir.</mat-error>
+      </mat-form-field>
+      
+      <div>
+        <mat-checkbox formControlName="subscribe">Bültenimize abone olmak istiyorum</mat-checkbox>
+      </div>
+      
+      <div>
+        <mat-radio-group formControlName="contactPreference">
+          <mat-label>İletişim Tercihi</mat-label>
+          <mat-radio-button value="email">E-posta</mat-radio-button>
+          <mat-radio-button value="phone">Telefon</mat-radio-button>
+        </mat-radio-group>
+      </div>
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Adres</mat-label>
+        <textarea matInput formControlName="address" placeholder="Adresiniz"></textarea>
+        <mat-error *ngIf="address.errors?.required">Adres gereklidir.</mat-error>
+      </mat-form-field>
+      
+      <button mat-raised-button color="primary" type="submit" [disabled]="!materialForm.valid">Kaydet</button>
+    </form>
+  `,
+  styles: [`
+    form {
+      display: flex;
+      flex-direction: column;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    mat-form-field {
+      margin-bottom: 16px;
+    }
+    
+    div {
+      margin-bottom: 16px;
+    }
+    
+    mat-radio-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 16px;
+    }
+    
+    mat-radio-button {
+      margin-bottom: 8px;
+    }
+    
+    button {
+      align-self: flex-end;
+    }
+  `]
+})
+export class MaterialFormComponent implements OnInit {
+  materialForm: FormGroup;
+  
+  constructor(private fb: FormBuilder) { }
+  
+  ngOnInit(): void {
+    this.createForm();
+  }
+  
+  createForm(): void {
+    this.materialForm = this.fb.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      birthDate: ['', Validators.required],
+      gender: ['', Validators.required],
+      subscribe: [false],
+      contactPreference: ['email', Validators.required],
+      address: ['', Validators.required]
+    });
+  }
+  
+  get firstName() {
+    return this.materialForm.get('firstName');
+  }
+  
+  get lastName() {
+    return this.materialForm.get('lastName');
+  }
+  
+  get email() {
+    return this.materialForm.get('email');
+  }
+  
+  get phone() {
+    return this.materialForm.get('phone');
+  }
+  
+  get birthDate() {
+    return this.materialForm.get('birthDate');
+  }
+  
+  get gender() {
+    return this.materialForm.get('gender');
+  }
+  
+  get address() {
+    return this.materialForm.get('address');
+  }
+  
+  onSubmit(): void {
+    console.log(this.materialForm.value);
+  }
+}
+```
+
+Bu örnekte, Angular Material'in çeşitli form kontrolleri kullanılmıştır: `mat-form-field`, `matInput`, `mat-select`, `mat-datepicker`, `mat-checkbox` ve `mat-radio-group`. Her bir kontrol, Reactive Forms API'si ile entegre edilmiştir.
+
+## Sonuç
+
+Bu bölümde, Angular'da form işlemlerini yönetmek için kullanılan Reactive Forms yaklaşımını ve form validasyonunu detaylı olarak ele aldık. Reactive Forms, karmaşık form senaryolarını yönetmek için güçlü bir yöntem sunar ve e-ticaret uygulamaları için idealdir.
+
+Temel form bileşenlerini, form validasyonunu, form durumunu, form değerlerini ayarlama ve sıfırlama yöntemlerini, form değişikliklerini dinleme yöntemlerini, dinamik form oluşturma tekniklerini ve Angular Material ile entegrasyonu inceledik.
+
+Bir sonraki bölümde, HTTP Client ile backend entegrasyonunu ele alacağız.

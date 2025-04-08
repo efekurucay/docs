@@ -42,7 +42,66 @@
 
               {"group":"Advanced Application Development", "pages": [
                 "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-lab",
-                "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-theory"
+                "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-theory",
+                {"group":"E commerce Term Project", "pages": [
+                  "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/index",
+                  "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/giris-ve-genel-bakis",
+
+                  {"group":"Ortam Kurulumu", "pages": [
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/ortam-kurulumu",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/ortam-kurulumu/backend-kurulumu",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/ortam-kurulumu/frontend-kurulumu",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/ortam-kurulumu/ide-ve-araclar"
+
+                  ]},
+
+
+                  {"group":"Veritabanı", "pages": [
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/sema-tasarimi",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/mysql-kurulumu",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/sql-komutlari"
+
+                  ]},
+
+                  {"group":"Backend Geliştirme", "pages": [
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/backend",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/backend/proje-yapisi",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/backend/model-siniflari",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/backend/jpa-hibernate",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/backend/repository",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/backend/controller-rest-api",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/backend/security"
+
+                  ]},
+                  {"group":"Frontend Geliştirme", "pages": [
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/angular-proje-yapisi",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/komponent-yapisi",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/servisler-dependency-injection",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/routing",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/reactive-forms",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/http-client",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/rxjs",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/ui-tasarim"
+
+                  ]},
+                  {"group":"Entegrasyon ve Deployment", "pages": [
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/entegrasyon-ve-deployment/frontend-backend-entegrasyonu",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/entegrasyon-ve-deployment/deployment-ve-test"
+     
+                  ]},
+                  {"group":"Dokümantasyon Tamamlama", "pages": [
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/dokumantasyon-tamamlama",
+                    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/dokumantasyon-dogrulama"
+     
+                  ]}
+
+
+
+
+
+                ]}
+
               ]},
 
               "lecture-notes/CSE-2/2-spring/database-management-system/database-management-system",
@@ -113,9 +172,11 @@
               
               "lecture-notes/CSE-1/1-spring/CSE-1-Spring-Lectures",
               "lecture-notes/CSE-1/1-spring/kariyer-planlama/Kariyer-Planlama",
+              
               {"group":"Computer Programming 2", "pages": [
               
                 "lecture-notes/CSE-1/1-spring/computer-programming-2/Computer-Programming-2-Theory",
+                
                 "lecture-notes/CSE-1/1-spring/computer-programming-2/Computer-Programming-2-Lab"
                
   

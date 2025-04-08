@@ -1,0 +1,408 @@
+---
+title: 'Proje Yapısı ve Konfigürasyon'
+description: 'Spring Boot proje yapısı ve konfigürasyonu'
+---
+
+# Proje Yapısı ve Konfigürasyon
+
+Bu bölümde, Spring Boot ile e-ticaret uygulamasının backend kısmının proje yapısını ve konfigürasyonunu detaylı olarak ele alacağız. Doğru bir proje yapısı ve konfigürasyon, uygulamanın bakımını kolaylaştırır ve geliştirme sürecini daha verimli hale getirir.
+
+## Spring Boot Proje Yapısı
+
+Spring Boot projesi, belirli bir dizin yapısına sahiptir. Bu yapı, uygulamanın farklı bileşenlerini organize etmeye yardımcı olur. Aşağıda, e-ticaret uygulaması için önerilen proje yapısı bulunmaktadır:
+
+```
+ecommerce/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/
+│   │   │       └── example/
+│   │   │           └── ecommerce/
+│   │   │               ├── EcommerceApplication.java
+│   │   │               ├── config/
+│   │   │               ├── controller/
+│   │   │               ├── dto/
+│   │   │               ├── exception/
+│   │   │               ├── model/
+│   │   │               ├── repository/
+│   │   │               ├── security/
+│   │   │               ├── service/
+│   │   │               └── util/
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       ├── application-dev.properties
+│   │       ├── application-prod.properties
+│   │       ├── static/
+│   │       └── templates/
+│   └── test/
+│       └── java/
+│           └── com/
+│               └── example/
+│                   └── ecommerce/
+│                       ├── controller/
+│                       ├── repository/
+│                       └── service/
+├── pom.xml
+└── README.md
+```
+
+Bu yapıda, her bir dizinin amacı şu şekildedir:
+
+- **src/main/java**: Java kaynak kodlarını içerir.
+  - **com.example.ecommerce**: Ana paket.
+    - **EcommerceApplication.java**: Uygulamanın başlangıç noktası.
+    - **config/**: Uygulama konfigürasyon sınıflarını içerir.
+    - **controller/**: REST API endpoint'lerini içeren controller sınıflarını içerir.
+    - **dto/**: Data Transfer Object (DTO) sınıflarını içerir.
+    - **exception/**: Özel istisna sınıflarını ve global istisna işleyicilerini içerir.
+    - **model/**: Entity sınıflarını içerir.
+    - **repository/**: Veritabanı işlemlerini gerçekleştiren repository sınıflarını içerir.
+    - **security/**: Güvenlik konfigürasyonunu ve ilgili sınıfları içerir.
+    - **service/**: İş mantığını içeren service sınıflarını içerir.
+    - **util/**: Yardımcı sınıfları ve metodları içerir.
+- **src/main/resources**: Uygulama kaynaklarını içerir.
+  - **application.properties**: Uygulama konfigürasyon dosyası.
+  - **application-dev.properties**: Geliştirme ortamı için konfigürasyon dosyası.
+  - **application-prod.properties**: Üretim ortamı için konfigürasyon dosyası.
+  - **static/**: Statik dosyaları (CSS, JavaScript, resimler) içerir.
+  - **templates/**: HTML şablonlarını içerir (Thymeleaf vb. kullanılıyorsa).
+- **src/test/java**: Test sınıflarını içerir.
+- **pom.xml**: Maven proje konfigürasyon dosyası.
+- **README.md**: Proje hakkında bilgi içeren dosya.
+
+## Maven Konfigürasyonu (pom.xml)
+
+Maven, Java projeleri için bağımlılık yönetimi ve derleme süreçlerini otomatikleştiren bir araçtır. Spring Boot projeleri genellikle Maven ile yapılandırılır. Aşağıda, e-ticaret uygulaması için örnek bir `pom.xml` dosyası bulunmaktadır:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    
+    <groupId>com.example</groupId>
+    <artifactId>ecommerce</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>ecommerce</name>
+    <description>E-Commerce Web Application</description>
+    
+    <properties>
+        <java.version>11</java.version>
+        <jjwt.version>0.9.1</jjwt.version>
+    </properties>
+    
+    <dependencies>
+        <!-- Spring Boot Starter Dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        
+        <!-- Database Dependencies -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        
+        <!-- JWT Dependencies -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        
+        <!-- Development Tools -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+```
+
+Bu `pom.xml` dosyası, e-ticaret uygulaması için gerekli tüm bağımlılıkları içerir:
+
+- **Spring Boot Starter Dependencies**: Spring Boot'un temel bileşenlerini içerir.
+  - **spring-boot-starter-data-jpa**: JPA ile veritabanı işlemleri için.
+  - **spring-boot-starter-web**: Web uygulamaları geliştirmek için.
+  - **spring-boot-starter-security**: Güvenlik özellikleri için.
+  - **spring-boot-starter-validation**: Veri doğrulama için.
+- **Database Dependencies**: Veritabanı bağlantısı için gerekli bağımlılıklar.
+  - **mysql-connector-java**: MySQL veritabanı bağlantısı için.
+- **JWT Dependencies**: JSON Web Token (JWT) desteği için.
+  - **jjwt**: JWT oluşturma ve doğrulama için.
+- **Lombok**: Tekrarlayan kod yazımını azaltan bir kütüphane.
+- **Development Tools**: Geliştirme sürecini kolaylaştıran araçlar.
+  - **spring-boot-devtools**: Otomatik yeniden başlatma ve diğer geliştirme özellikleri için.
+- **Test Dependencies**: Test için gerekli bağımlılıklar.
+  - **spring-boot-starter-test**: Birim ve entegrasyon testleri için.
+  - **spring-security-test**: Güvenlik testleri için.
+  - **h2**: Test için bellek içi veritabanı.
+
+## Uygulama Konfigürasyonu (application.properties)
+
+Spring Boot uygulamaları, `application.properties` (veya `application.yml`) dosyası aracılığıyla yapılandırılır. Bu dosya, veritabanı bağlantı bilgileri, sunucu portu, loglama ayarları gibi çeşitli konfigürasyon parametrelerini içerir.
+
+Aşağıda, e-ticaret uygulaması için örnek bir `application.properties` dosyası bulunmaktadır:
+
+```properties
+# Server Configuration
+server.port=8080
+server.servlet.context-path=/api
+
+# Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/ecommerce?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8
+spring.datasource.username=ecommerceuser
+spring.datasource.password=password
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA/Hibernate Configuration
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.jpa.properties.hibernate.format_sql=true
+
+# Jackson Configuration
+spring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS=false
+spring.jackson.time-zone=UTC
+
+# Logging Configuration
+logging.level.org.springframework.web=INFO
+logging.level.org.hibernate=ERROR
+logging.level.com.example.ecommerce=DEBUG
+
+# JWT Configuration
+jwt.secret=ecommerceSecretKey
+jwt.expiration=86400000
+
+# File Upload Configuration
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+```
+
+Bu konfigürasyon dosyası, aşağıdaki ayarları içerir:
+
+- **Server Configuration**: Sunucu portu ve context path ayarları.
+- **Database Configuration**: Veritabanı bağlantı bilgileri.
+- **JPA/Hibernate Configuration**: JPA ve Hibernate ayarları.
+- **Jackson Configuration**: JSON serileştirme/deserileştirme ayarları.
+- **Logging Configuration**: Loglama seviyesi ayarları.
+- **JWT Configuration**: JWT token ayarları.
+- **File Upload Configuration**: Dosya yükleme sınırlamaları.
+
+## Profil Tabanlı Konfigürasyon
+
+Spring Boot, farklı ortamlar (geliştirme, test, üretim) için farklı konfigürasyonlar tanımlamanıza olanak tanır. Bu, profil tabanlı konfigürasyon olarak adlandırılır. Profil tabanlı konfigürasyon, `application-{profile}.properties` dosyaları aracılığıyla yapılır.
+
+### application-dev.properties (Geliştirme Ortamı)
+
+```properties
+# Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/ecommerce_dev?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8
+spring.datasource.username=ecommerceuser
+spring.datasource.password=password
+
+# JPA/Hibernate Configuration
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# Logging Configuration
+logging.level.org.springframework.web=DEBUG
+logging.level.org.hibernate=DEBUG
+logging.level.com.example.ecommerce=DEBUG
+
+# JWT Configuration
+jwt.expiration=86400000
+```
+
+### application-prod.properties (Üretim Ortamı)
+
+```properties
+# Database Configuration
+spring.datasource.url=jdbc:mysql://production-db-server:3306/ecommerce_prod?useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
+
+# JPA/Hibernate Configuration
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=false
+
+# Logging Configuration
+logging.level.org.springframework.web=WARN
+logging.level.org.hibernate=ERROR
+logging.level.com.example.ecommerce=INFO
+
+# JWT Configuration
+jwt.expiration=604800000
+```
+
+Profil tabanlı konfigürasyonu etkinleştirmek için, uygulamayı başlatırken `spring.profiles.active` parametresini kullanabilirsiniz:
+
+```bash
+# Geliştirme profili ile başlatma
+java -jar ecommerce.jar --spring.profiles.active=dev
+
+# Üretim profili ile başlatma
+java -jar ecommerce.jar --spring.profiles.active=prod
+```
+
+## Ana Uygulama Sınıfı (EcommerceApplication.java)
+
+Spring Boot uygulamasının başlangıç noktası, `@SpringBootApplication` anotasyonu ile işaretlenmiş bir sınıftır. Bu sınıf, uygulamanın başlatılmasını ve yapılandırılmasını sağlar.
+
+```java
+package com.example.ecommerce;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+
+@SpringBootApplication
+@EnableJpaAuditing
+public class EcommerceApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(EcommerceApplication.class, args);
+    }
+}
+```
+
+Bu sınıf, aşağıdaki özelliklere sahiptir:
+
+- **@SpringBootApplication**: Bu anotasyon, `@Configuration`, `@EnableAutoConfiguration` ve `@ComponentScan` anotasyonlarını birleştirir. Bu, Spring Boot uygulamasının otomatik yapılandırmasını ve bileşen taramasını etkinleştirir.
+- **@EnableJpaAuditing**: Bu anotasyon, JPA varlıklarının otomatik denetimini (auditing) etkinleştirir. Bu, `@CreatedDate`, `@LastModifiedDate`, `@CreatedBy` ve `@LastModifiedBy` anotasyonlarının çalışmasını sağlar.
+- **main()**: Uygulamanın başlangıç noktasıdır. `SpringApplication.run()` metodu, Spring Boot uygulamasını başlatır.
+
+## Konfigürasyon Sınıfları
+
+Spring Boot uygulamaları, Java tabanlı konfigürasyon sınıfları aracılığıyla da yapılandırılabilir. Bu sınıflar, `@Configuration` anotasyonu ile işaretlenir ve bean'leri tanımlar.
+
+### WebConfig.java
+
+```java
+package com.example.ecommerce.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:4200")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true)
+                .maxAge(3600);
+    }
+}
+```
+
+Bu konfigürasyon sınıfı, CORS (Cross-Origin Resource Sharing) ayarlarını yapılandırır. Bu, frontend uygulamasının (Angular) backend API'sine erişmesine izin verir.
+
+### AuditingConfig.java
+
+```java
+package com.example.ecommerce.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.Optional;
+
+@Configuration
+@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
+public class AuditingConfig {
+
+    @Bean
+    public AuditorAware<String> auditorProvider() {
+        return () -> {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return Optional.of("anonymousUser");
+            }
+            return Optional.of(authentication.getName());
+        };
+    }
+}
+```
+
+Bu konfigürasyon sınıfı, JPA varlıklarının denetimini (auditing) yapılandırır. Bu, varlıkların kim tarafından oluşturulduğunu ve güncellendiğini otomatik olarak izlemeyi sağlar.
+
+## Sonuç
+
+Bu bölümde, Spring Boot ile e-ticaret uygulamasının backend kısmının proje yapısını ve konfigürasyonunu detaylı olarak ele aldık. Doğru bir proje yapısı ve konfigürasyon, uygulamanın bakımını kolaylaştırır ve geliştirme sürecini daha verimli hale getirir.
+
+Bir sonraki bölümde, e-ticaret uygulaması için model sınıflarını (Entity) oluşturmayı ele alacağız.

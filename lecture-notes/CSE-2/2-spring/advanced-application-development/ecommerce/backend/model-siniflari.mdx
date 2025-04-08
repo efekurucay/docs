@@ -1,0 +1,849 @@
+---
+title: 'Model Sınıfları (Entity)'
+description: 'Spring Boot ile e-ticaret uygulaması için model sınıfları (Entity) oluşturma'
+---
+
+# Model Sınıfları (Entity)
+
+Bu bölümde, e-ticaret uygulaması için model sınıflarını (Entity) oluşturmayı detaylı olarak ele alacağız. Model sınıfları, veritabanı tablolarını Java nesnelerine eşleştiren sınıflardır ve JPA (Java Persistence API) anotasyonları ile işaretlenir.
+
+## Entity Nedir?
+
+Entity, veritabanındaki bir tabloyu temsil eden bir Java sınıfıdır. JPA, entity sınıflarını kullanarak veritabanı işlemlerini nesne odaklı bir şekilde gerçekleştirmenizi sağlar. Entity sınıfları, `@Entity` anotasyonu ile işaretlenir ve genellikle bir birincil anahtar alanına sahiptir.
+
+## Temel Entity Anotasyonları
+
+Entity sınıflarında kullanılan temel JPA anotasyonları şunlardır:
+
+- **@Entity**: Bir sınıfın entity olduğunu belirtir.
+- **@Table**: Entity'nin eşleştirildiği veritabanı tablosunu belirtir.
+- **@Id**: Birincil anahtar alanını belirtir.
+- **@GeneratedValue**: Birincil anahtar değerinin nasıl oluşturulacağını belirtir.
+- **@Column**: Alanın eşleştirildiği veritabanı sütununu belirtir.
+- **@OneToOne**: Bire bir ilişkiyi belirtir.
+- **@OneToMany**: Bire çok ilişkiyi belirtir.
+- **@ManyToOne**: Çoka bir ilişkiyi belirtir.
+- **@ManyToMany**: Çoka çok ilişkiyi belirtir.
+- **@JoinColumn**: İlişki için kullanılan yabancı anahtar sütununu belirtir.
+
+## Lombok Kullanımı
+
+Lombok, Java sınıflarında tekrarlayan kod yazımını azaltan bir kütüphanedir. Entity sınıflarında getter, setter, constructor, equals, hashCode ve toString metodlarını otomatik olarak oluşturmak için Lombok anotasyonlarını kullanabiliriz.
+
+Temel Lombok anotasyonları şunlardır:
+
+- **@Getter**: Tüm alanlar için getter metodları oluşturur.
+- **@Setter**: Tüm alanlar için setter metodları oluşturur.
+- **@NoArgsConstructor**: Parametresiz bir constructor oluşturur.
+- **@AllArgsConstructor**: Tüm alanları parametre olarak alan bir constructor oluşturur.
+- **@RequiredArgsConstructor**: `final` veya `@NonNull` ile işaretlenmiş alanları parametre olarak alan bir constructor oluşturur.
+- **@Data**: `@Getter`, `@Setter`, `@RequiredArgsConstructor`, `@ToString` ve `@EqualsAndHashCode` anotasyonlarını birleştirir.
+- **@Builder**: Builder deseni için gerekli kodları oluşturur.
+
+## Temel Entity Sınıfı
+
+Aşağıda, tüm entity sınıflarının temel alacağı bir abstract sınıf bulunmaktadır. Bu sınıf, tüm entity'lerde ortak olan alanları ve davranışları içerir.
+
+```java
+package com.example.ecommerce.model;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+public abstract class BaseEntity implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+}
+```
+
+Bu temel sınıf, aşağıdaki özelliklere sahiptir:
+
+- **@MappedSuperclass**: Bu anotasyon, sınıfın bir entity olmadığını, ancak entity sınıfları tarafından miras alınabileceğini belirtir.
+- **@EntityListeners**: Bu anotasyon, entity'nin yaşam döngüsü olaylarını dinleyen sınıfları belirtir. `AuditingEntityListener`, Spring Data JPA'nın denetim (auditing) özelliklerini etkinleştirir.
+- **@Id** ve **@GeneratedValue**: Birincil anahtar alanını ve değerinin otomatik olarak oluşturulacağını belirtir.
+- **@CreatedDate** ve **@LastModifiedDate**: Bu anotasyonlar, entity'nin oluşturulma ve son güncellenme tarihlerini otomatik olarak ayarlar.
+- **@PrePersist** ve **@PreUpdate**: Bu metodlar, entity veritabanına kaydedilmeden veya güncellenmeden önce çağrılır ve tarih alanlarını ayarlar.
+
+## User Entity
+
+Kullanıcıları temsil eden `User` entity sınıfı:
+
+```java
+package com.example.ecommerce.model;
+
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class User extends BaseEntity implements UserDetails {
+
+    @NotBlank
+    @Size(max = 50)
+    @Column(unique = true)
+    private String username;
+
+    @NotBlank
+    @Size(max = 100)
+    @Email
+    @Column(unique = true)
+    private String email;
+
+    @NotBlank
+    @Size(max = 255)
+    private String password;
+
+    @NotBlank
+    @Size(max = 50)
+    private String firstName;
+
+    @NotBlank
+    @Size(max = 50)
+    private String lastName;
+
+    @Size(max = 20)
+    private String phone;
+
+    @Column(name = "is_active")
+    private boolean isActive = true;
+
+    @NotBlank
+    @Size(max = 20)
+    private String role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Address> addresses;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isActive;
+    }
+}
+```
+
+Bu entity sınıfı, aşağıdaki özelliklere sahiptir:
+
+- **@Entity** ve **@Table**: Sınıfın bir entity olduğunu ve `users` tablosuna eşleştirildiğini belirtir.
+- **@NotBlank** ve **@Size**: Bean Validation anotasyonları, alanların boş olmamasını ve belirli bir boyutta olmasını sağlar.
+- **@Email**: E-posta alanının geçerli bir e-posta adresi olmasını sağlar.
+- **@Column(unique = true)**: Alanın benzersiz olması gerektiğini belirtir.
+- **@OneToMany**: Kullanıcının birden fazla adrese ve siparişe sahip olabileceğini belirtir.
+- **UserDetails**: Spring Security'nin kullanıcı kimlik doğrulama ve yetkilendirme işlemleri için kullandığı arayüzü uygular.
+
+## Category Entity
+
+Kategorileri temsil eden `Category` entity sınıfı:
+
+```java
+package com.example.ecommerce.model;
+
+import lombok.*;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "categories")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Category extends BaseEntity {
+
+    @NotBlank
+    @Size(max = 100)
+    private String name;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Category parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Category> subcategories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Product> products = new ArrayList<>();
+
+    public void addSubcategory(Category subcategory) {
+        subcategories.add(subcategory);
+        subcategory.setParent(this);
+    }
+
+    public void removeSubcategory(Category subcategory) {
+        subcategories.remove(subcategory);
+        subcategory.setParent(null);
+    }
+}
+```
+
+Bu entity sınıfı, aşağıdaki özelliklere sahiptir:
+
+- **@ManyToOne**: Bir kategorinin bir üst kategoriye sahip olabileceğini belirtir.
+- **@OneToMany**: Bir kategorinin birden fazla alt kategoriye ve ürüne sahip olabileceğini belirtir.
+- **FetchType.LAZY**: İlişkili nesnelerin, ihtiyaç duyulduğunda yüklenmesini sağlar.
+- **cascade = CascadeType.ALL**: Bir kategori üzerindeki işlemlerin, ilişkili alt kategorilere ve ürünlere de uygulanmasını sağlar.
+- **orphanRemoval = true**: Bir alt kategori veya ürün, kategoriden kaldırıldığında veritabanından da silinmesini sağlar.
+
+## Product Entity
+
+Ürünleri temsil eden `Product` entity sınıfı:
+
+```java
+package com.example.ecommerce.model;
+
+import lombok.*;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "products")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Product extends BaseEntity {
+
+    @NotBlank
+    @Size(max = 255)
+    private String name;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @NotNull
+    @PositiveOrZero
+    private BigDecimal price;
+
+    @NotNull
+    @PositiveOrZero
+    @Column(name = "stock_quantity")
+    private Integer stockQuantity;
+
+    @Size(max = 255)
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderDetail> orderDetails = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+
+    public void addImage(ProductImage image) {
+        images.add(image);
+        image.setProduct(this);
+    }
+
+    public void removeImage(ProductImage image) {
+        images.remove(image);
+        image.setProduct(null);
+    }
+
+    public void addReview(Review review) {
+        reviews.add(review);
+        review.setProduct(this);
+    }
+
+    public void removeReview(Review review) {
+        reviews.remove(review);
+        review.setProduct(null);
+    }
+}
+```
+
+Bu entity sınıfı, aşağıdaki özelliklere sahiptir:
+
+- **@NotNull** ve **@PositiveOrZero**: Alanların null olmamasını ve sıfır veya pozitif bir değere sahip olmasını sağlar.
+- **@ManyToOne**: Bir ürünün bir kategoriye ait olduğunu belirtir.
+- **@OneToMany**: Bir ürünün birden fazla görsele, sipariş detayına ve değerlendirmeye sahip olabileceğini belirtir.
+
+## ProductImage Entity
+
+Ürün görsellerini temsil eden `ProductImage` entity sınıfı:
+
+```java
+package com.example.ecommerce.model;
+
+import lombok.*;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+@Entity
+@Table(name = "product_images")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ProductImage extends BaseEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    @NotBlank
+    @Size(max = 255)
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Column(name = "is_primary")
+    private boolean isPrimary = false;
+}
+```
+
+Bu entity sınıfı, aşağıdaki özelliklere sahiptir:
+
+- **@ManyToOne**: Bir görselin bir ürüne ait olduğunu belirtir.
+
+## Address Entity
+
+Adresleri temsil eden `Address` entity sınıfı:
+
+```java
+package com.example.ecommerce.model;
+
+import lombok.*;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+@Entity
+@Table(name = "addresses")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Address extends BaseEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @NotBlank
+    @Size(max = 255)
+    @Column(name = "address_line1")
+    private String addressLine1;
+
+    @Size(max = 255)
+    @Column(name = "address_line2")
+    private String addressLine2;
+
+    @NotBlank
+    @Size(max = 100)
+    private String city;
+
+    @NotBlank
+    @Size(max = 100)
+    private String state;
+
+    @NotBlank
+    @Size(max = 20)
+    @Column(name = "postal_code")
+    private String postalCode;
+
+    @NotBlank
+    @Size(max = 100)
+    private String country;
+
+    @Column(name = "is_default")
+    private boolean isDefault = false;
+
+    @NotBlank
+    @Size(max = 20)
+    @Column(name = "address_type")
+    private String addressType;
+
+    @OneToMany(mappedBy = "shippingAddress")
+    private java.util.List<Order> shippingOrders;
+
+    @OneToMany(mappedBy = "billingAddress")
+    private java.util.List<Order> billingOrders;
+}
+```
+
+Bu entity sınıfı, aşağıdaki özelliklere sahiptir:
+
+- **@ManyToOne**: Bir adresin bir kullanıcıya ait olduğunu belirtir.
+- **@OneToMany**: Bir adresin birden fazla siparişin teslimat veya fatura adresi olabileceğini belirtir.
+
+## Order Entity
+
+Siparişleri temsil eden `Order` entity sınıfı:
+
+```java
+package com.example.ecommerce.model;
+
+import lombok.*;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "orders")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Order extends BaseEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @NotNull
+    @Column(name = "order_date")
+    private LocalDateTime orderDate;
+
+    @NotNull
+    @PositiveOrZero
+    @Column(name = "total_amount")
+    private BigDecimal totalAmount;
+
+    @NotBlank
+    @Size(max = 20)
+    private String status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shipping_addr_id")
+    private Address shippingAddress;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "billing_addr_id")
+    private Address billingAddress;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderDetail> orderDetails = new ArrayList<>();
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Payment payment;
+
+    public void addOrderDetail(OrderDetail orderDetail) {
+        orderDetails.add(orderDetail);
+        orderDetail.setOrder(this);
+    }
+
+    public void removeOrderDetail(OrderDetail orderDetail) {
+        orderDetails.remove(orderDetail);
+        orderDetail.setOrder(null);
+    }
+
+    public void calculateTotalAmount() {
+        this.totalAmount = orderDetails.stream()
+                .map(OrderDetail::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+}
+```
+
+Bu entity sınıfı, aşağıdaki özelliklere sahiptir:
+
+- **@ManyToOne**: Bir siparişin bir kullanıcıya, bir teslimat adresine ve bir fatura adresine ait olduğunu belirtir.
+- **@OneToMany**: Bir siparişin birden fazla sipariş detayına sahip olabileceğini belirtir.
+- **@OneToOne**: Bir siparişin bir ödemeye sahip olabileceğini belirtir.
+- **calculateTotalAmount()**: Sipariş detaylarındaki alt toplamları toplayarak toplam tutarı hesaplar.
+
+## OrderDetail Entity
+
+Sipariş detaylarını temsil eden `OrderDetail` entity sınıfı:
+
+```java
+package com.example.ecommerce.model;
+
+import lombok.*;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = "order_details")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class OrderDetail extends BaseEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    @NotNull
+    @Positive
+    private Integer quantity;
+
+    @NotNull
+    @PositiveOrZero
+    private BigDecimal price;
+
+    @NotNull
+    @PositiveOrZero
+    private BigDecimal subtotal;
+
+    @PrePersist
+    @PreUpdate
+    public void calculateSubtotal() {
+        this.subtotal = this.price.multiply(BigDecimal.valueOf(this.quantity));
+    }
+}
+```
+
+Bu entity sınıfı, aşağıdaki özelliklere sahiptir:
+
+- **@ManyToOne**: Bir sipariş detayının bir siparişe ve bir ürüne ait olduğunu belirtir.
+- **@Positive**: Alanın pozitif bir değere sahip olmasını sağlar.
+- **calculateSubtotal()**: Birim fiyat ve miktarı çarparak alt toplamı hesaplar.
+
+## Payment Entity
+
+Ödemeleri temsil eden `Payment` entity sınıfı:
+
+```java
+package com.example.ecommerce.model;
+
+import lombok.*;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "payments")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Payment extends BaseEntity {
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
+
+    @NotNull
+    @Column(name = "payment_date")
+    private LocalDateTime paymentDate;
+
+    @NotBlank
+    @Size(max = 50)
+    @Column(name = "payment_method")
+    private String paymentMethod;
+
+    @NotNull
+    @PositiveOrZero
+    private BigDecimal amount;
+
+    @NotBlank
+    @Size(max = 20)
+    private String status;
+}
+```
+
+Bu entity sınıfı, aşağıdaki özelliklere sahiptir:
+
+- **@OneToOne**: Bir ödemenin bir siparişe ait olduğunu belirtir.
+
+## Review Entity
+
+Ürün değerlendirmelerini temsil eden `Review` entity sınıfı:
+
+```java
+package com.example.ecommerce.model;
+
+import lombok.*;
+
+import javax.persistence.*;
+import javax.validation.constraints.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "reviews")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Review extends BaseEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @NotNull
+    @Min(1)
+    @Max(5)
+    private Integer rating;
+
+    @Column(columnDefinition = "TEXT")
+    private String comment;
+
+    @NotNull
+    @Column(name = "review_date")
+    private LocalDateTime reviewDate;
+}
+```
+
+Bu entity sınıfı, aşağıdaki özelliklere sahiptir:
+
+- **@ManyToOne**: Bir değerlendirmenin bir ürüne ve bir kullanıcıya ait olduğunu belirtir.
+- **@Min** ve **@Max**: Değerlendirme puanının 1 ile 5 arasında olmasını sağlar.
+
+## Enum Sınıfları
+
+Entity sınıflarında kullanılan enum sınıfları, belirli alanların alabileceği değerleri sınırlar ve kodun daha okunabilir olmasını sağlar.
+
+### OrderStatus Enum
+
+```java
+package com.example.ecommerce.model.enums;
+
+public enum OrderStatus {
+    PENDING,
+    PROCESSING,
+    SHIPPED,
+    DELIVERED,
+    CANCELLED
+}
+```
+
+### PaymentMethod Enum
+
+```java
+package com.example.ecommerce.model.enums;
+
+public enum PaymentMethod {
+    CREDIT_CARD,
+    DEBIT_CARD,
+    PAYPAL,
+    BANK_TRANSFER,
+    CASH_ON_DELIVERY
+}
+```
+
+### PaymentStatus Enum
+
+```java
+package com.example.ecommerce.model.enums;
+
+public enum PaymentStatus {
+    PENDING,
+    COMPLETED,
+    FAILED,
+    REFUNDED
+}
+```
+
+### AddressType Enum
+
+```java
+package com.example.ecommerce.model.enums;
+
+public enum AddressType {
+    SHIPPING,
+    BILLING
+}
+```
+
+### UserRole Enum
+
+```java
+package com.example.ecommerce.model.enums;
+
+public enum UserRole {
+    ADMIN,
+    USER
+}
+```
+
+## Entity Sınıflarının Kullanımı
+
+Entity sınıfları, veritabanı işlemlerini gerçekleştirmek için repository sınıfları tarafından kullanılır. Aşağıda, entity sınıflarının nasıl kullanılabileceğine dair bazı örnekler bulunmaktadır:
+
+### Yeni Bir Kullanıcı Oluşturma
+
+```java
+User user = User.builder()
+        .username("johndoe")
+        .email("john.doe@example.com")
+        .password(passwordEncoder.encode("password123"))
+        .firstName("John")
+        .lastName("Doe")
+        .phone("5551234567")
+        .isActive(true)
+        .role(UserRole.USER.name())
+        .build();
+
+userRepository.save(user);
+```
+
+### Yeni Bir Ürün Oluşturma
+
+```java
+Category category = categoryRepository.findById(1L).orElseThrow();
+
+Product product = Product.builder()
+        .name("iPhone 13")
+        .description("6.1 inç Super Retina XDR ekran, A15 Bionic çip, 128GB depolama")
+        .price(new BigDecimal("14999.99"))
+        .stockQuantity(50)
+        .imageUrl("https://example.com/images/iphone13.jpg")
+        .category(category)
+        .build();
+
+productRepository.save(product);
+```
+
+### Yeni Bir Sipariş Oluşturma
+
+```java
+User user = userRepository.findById(1L).orElseThrow();
+Address shippingAddress = addressRepository.findById(1L).orElseThrow();
+Address billingAddress = addressRepository.findById(2L).orElseThrow();
+Product product = productRepository.findById(1L).orElseThrow();
+
+Order order = Order.builder()
+        .user(user)
+        .orderDate(LocalDateTime.now())
+        .totalAmount(BigDecimal.ZERO)
+        .status(OrderStatus.PENDING.name())
+        .shippingAddress(shippingAddress)
+        .billingAddress(billingAddress)
+        .build();
+
+OrderDetail orderDetail = OrderDetail.builder()
+        .order(order)
+        .product(product)
+        .quantity(1)
+        .price(product.getPrice())
+        .build();
+
+orderDetail.calculateSubtotal();
+order.addOrderDetail(orderDetail);
+order.calculateTotalAmount();
+
+orderRepository.save(order);
+```
+
+## Sonuç
+
+Bu bölümde, e-ticaret uygulaması için model sınıflarını (Entity) oluşturmayı detaylı olarak ele aldık. Entity sınıfları, veritabanı tablolarını Java nesnelerine eşleştiren sınıflardır ve JPA anotasyonları ile işaretlenir. Doğru tasarlanmış entity sınıfları, uygulamanın veri modelini doğru bir şekilde temsil eder ve veritabanı işlemlerini nesne odaklı bir şekilde gerçekleştirmenizi sağlar.
+
+Bir sonraki bölümde, JPA/Hibernate ile ORM yapılandırmasını ele alacağız.

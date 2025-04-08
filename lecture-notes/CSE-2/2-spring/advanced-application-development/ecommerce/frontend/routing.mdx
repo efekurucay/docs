@@ -1,0 +1,1107 @@
+---
+title: 'Routing Yapılandırması'
+description: 'Angular uygulamasında routing yapılandırması'
+---
+
+# Routing Yapılandırması
+
+Bu bölümde, Angular uygulamasında routing yapılandırmasını detaylı olarak ele alacağız. Routing, tek sayfalı uygulamalarda (SPA) farklı görünümler arasında gezinmeyi sağlayan önemli bir özelliktir.
+
+## Angular Routing Nedir?
+
+Angular Routing, kullanıcının tarayıcı adres çubuğundaki URL'ye göre hangi komponentin görüntüleneceğini belirleyen bir mekanizmadır. Routing, kullanıcıların uygulama içinde gezinmesini sağlar ve tarayıcının geri/ileri düğmelerini kullanarak sayfa geçmişinde gezinmeyi destekler.
+
+Angular Routing'in temel özellikleri şunlardır:
+
+1. **URL Tabanlı Navigasyon**: Kullanıcılar, URL'leri kullanarak uygulamanın farklı bölümlerine erişebilir.
+2. **Derin Bağlantılar (Deep Linking)**: Kullanıcılar, belirli bir sayfaya doğrudan erişebilir.
+3. **Lazy Loading**: Modüller, yalnızca gerektiğinde yüklenir, böylece başlangıç yükleme süresi azalır.
+4. **Route Guards**: Belirli route'lara erişimi kontrol etmek için kullanılır.
+5. **Route Parameters**: URL'de parametreler geçirmek için kullanılır.
+6. **Child Routes**: İç içe route'lar oluşturmak için kullanılır.
+7. **Route Resolvers**: Route'a gitmeden önce veri yüklemek için kullanılır.
+
+## Routing Modülü Oluşturma
+
+Angular CLI ile yeni bir proje oluşturduğunuzda, routing modülünü eklemek için "y" (evet) cevabını vermeniz gerekir. Eğer mevcut bir projeye routing eklemek istiyorsanız, aşağıdaki komutu kullanabilirsiniz:
+
+```bash
+ng generate module app-routing --flat --module=app
+```
+
+Bu komut, `app-routing.module.ts` adında yeni bir routing modülü oluşturur ve bu modülü `app.module.ts` dosyasına ekler.
+
+## Temel Routing Yapılandırması
+
+Temel bir routing yapılandırması, route'ların bir dizisini ve bu route'ları yapılandırmak için bir modülü içerir:
+
+```typescript
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { HomeComponent } from './home/home.component';
+import { ProductListComponent } from './product/product-list/product-list.component';
+import { ProductDetailComponent } from './product/product-detail/product-detail.component';
+import { CartComponent } from './cart/cart.component';
+import { CheckoutComponent } from './checkout/checkout.component';
+import { NotFoundComponent } from './not-found/not-found.component';
+
+const routes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'products', component: ProductListComponent },
+  { path: 'products/:id', component: ProductDetailComponent },
+  { path: 'cart', component: CartComponent },
+  { path: 'checkout', component: CheckoutComponent },
+  { path: '**', component: NotFoundComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
+Bu yapılandırmada, farklı URL path'leri için farklı komponentler tanımlanmıştır. `**` path'i, eşleşmeyen tüm URL'ler için bir wildcard olarak kullanılır ve genellikle 404 sayfası için kullanılır.
+
+## Router Outlet
+
+Router outlet, Angular'ın route'a göre komponenti yerleştirdiği yerdir. `app.component.html` dosyasında, aşağıdaki gibi bir router outlet tanımlamanız gerekir:
+
+```html
+<app-header></app-header>
+<main class="container">
+  <router-outlet></router-outlet>
+</main>
+<app-footer></app-footer>
+```
+
+Bu yapıda, header ve footer sabit kalırken, içerik alanı route'a göre değişir.
+
+## RouterLink Direktifi
+
+RouterLink direktifi, uygulamanın farklı bölümlerine bağlantılar oluşturmak için kullanılır:
+
+```html
+<nav>
+  <ul>
+    <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Ana Sayfa</a></li>
+    <li><a routerLink="/products" routerLinkActive="active">Ürünler</a></li>
+    <li><a routerLink="/cart" routerLinkActive="active">Sepet</a></li>
+    <li><a routerLink="/checkout" routerLinkActive="active">Ödeme</a></li>
+  </ul>
+</nav>
+```
+
+`routerLinkActive` direktifi, geçerli route ile eşleşen bağlantılara bir CSS sınıfı ekler. `[routerLinkActiveOptions]="{exact: true}"` özelliği, yalnızca tam eşleşme durumunda sınıfın eklenmesini sağlar.
+
+## Programatik Navigasyon
+
+Komponentlerde, Router servisini kullanarak programatik olarak navigasyon yapabilirsiniz:
+
+```typescript
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-product-card',
+  templateUrl: './product-card.component.html',
+  styleUrls: ['./product-card.component.scss']
+})
+export class ProductCardComponent {
+  constructor(private router: Router) { }
+  
+  viewProductDetails(productId: number): void {
+    this.router.navigate(['/products', productId]);
+  }
+  
+  goToCheckout(): void {
+    this.router.navigateByUrl('/checkout');
+  }
+}
+```
+
+`navigate` metodu, bir dizi segment alır ve bunları birleştirerek bir URL oluşturur. `navigateByUrl` metodu ise tam bir URL alır.
+
+## Route Parametreleri
+
+Route parametreleri, URL'de değişken değerler geçirmek için kullanılır:
+
+```typescript
+const routes: Routes = [
+  { path: 'products/:id', component: ProductDetailComponent }
+];
+```
+
+Bu route, `products/1`, `products/2` gibi URL'lerle eşleşir ve `:id` parametresi, URL'deki değeri alır.
+
+Komponente, ActivatedRoute servisini enjekte ederek bu parametrelere erişebilirsiniz:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ProductService } from '../../core/services/product.service';
+import { Product } from '../../core/models/product.model';
+
+@Component({
+  selector: 'app-product-detail',
+  templateUrl: './product-detail.component.html',
+  styleUrls: ['./product-detail.component.scss']
+})
+export class ProductDetailComponent implements OnInit {
+  product: Product | null = null;
+  loading = false;
+  error: string | null = null;
+  
+  constructor(
+    private route: ActivatedRoute,
+    private productService: ProductService
+  ) { }
+  
+  ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      const id = Number(params.get('id'));
+      this.loadProduct(id);
+    });
+  }
+  
+  loadProduct(id: number): void {
+    this.loading = true;
+    this.productService.getProductById(id).subscribe(
+      product => {
+        this.product = product;
+        this.loading = false;
+      },
+      error => {
+        this.error = 'Ürün yüklenirken bir hata oluştu.';
+        this.loading = false;
+        console.error('Ürün yüklenirken hata:', error);
+      }
+    );
+  }
+}
+```
+
+Bu örnekte, `paramMap` Observable'ı, route parametrelerindeki değişiklikleri dinler ve her değişiklikte `loadProduct` metodunu çağırır.
+
+## Query Parametreleri
+
+Query parametreleri, URL'de `?` işaretinden sonra gelen parametrelerdir ve genellikle filtreleme, sıralama veya sayfalama için kullanılır:
+
+```typescript
+// Programatik olarak query parametreleri ile navigasyon
+this.router.navigate(['/products'], {
+  queryParams: { category: 'electronics', sort: 'price', order: 'asc' }
+});
+```
+
+Bu kod, `/products?category=electronics&sort=price&order=asc` URL'sine yönlendirir.
+
+Komponente, ActivatedRoute servisini kullanarak bu parametrelere erişebilirsiniz:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ProductService } from '../../core/services/product.service';
+import { Product } from '../../core/models/product.model';
+
+@Component({
+  selector: 'app-product-list',
+  templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.scss']
+})
+export class ProductListComponent implements OnInit {
+  products: Product[] = [];
+  category: string | null = null;
+  sort: string = 'id';
+  order: string = 'asc';
+  
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private productService: ProductService
+  ) { }
+  
+  ngOnInit(): void {
+    this.route.queryParamMap.subscribe(params => {
+      this.category = params.get('category');
+      this.sort = params.get('sort') || 'id';
+      this.order = params.get('order') || 'asc';
+      this.loadProducts();
+    });
+  }
+  
+  loadProducts(): void {
+    // Ürünleri yükle
+  }
+  
+  updateFilters(category: string, sort: string, order: string): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { category, sort, order },
+      queryParamsHandling: 'merge'
+    });
+  }
+}
+```
+
+Bu örnekte, `queryParamMap` Observable'ı, query parametrelerindeki değişiklikleri dinler ve her değişiklikte `loadProducts` metodunu çağırır. `updateFilters` metodu, mevcut query parametrelerini güncellemek için kullanılır.
+
+## Lazy Loading
+
+Lazy loading, uygulamanın başlangıç yükleme süresini azaltmak için modülleri yalnızca gerektiğinde yüklemek için kullanılır. Lazy loading için, modülleri ayrı ayrı tanımlamanız ve route yapılandırmasında `loadChildren` özelliğini kullanmanız gerekir:
+
+```typescript
+const routes: Routes = [
+  { path: '', component: HomeComponent },
+  {
+    path: 'products',
+    loadChildren: () => import('./product/product.module').then(m => m.ProductModule)
+  },
+  {
+    path: 'cart',
+    loadChildren: () => import('./cart/cart.module').then(m => m.CartModule)
+  },
+  {
+    path: 'checkout',
+    loadChildren: () => import('./checkout/checkout.module').then(m => m.CheckoutModule)
+  },
+  {
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)
+  },
+  {
+    path: 'profile',
+    loadChildren: () => import('./profile/profile.module').then(m => m.ProfileModule)
+  },
+  {
+    path: 'admin',
+    loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule)
+  },
+  { path: '**', component: NotFoundComponent }
+];
+```
+
+Her modül, kendi route'larını tanımlar:
+
+```typescript
+// product.module.ts
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Routes } from '@angular/router';
+
+import { SharedModule } from '../shared/shared.module';
+import { ProductListComponent } from './product-list/product-list.component';
+import { ProductDetailComponent } from './product-detail/product-detail.component';
+
+const routes: Routes = [
+  { path: '', component: ProductListComponent },
+  { path: ':id', component: ProductDetailComponent }
+];
+
+@NgModule({
+  declarations: [
+    ProductListComponent,
+    ProductDetailComponent
+  ],
+  imports: [
+    CommonModule,
+    SharedModule,
+    RouterModule.forChild(routes)
+  ]
+})
+export class ProductModule { }
+```
+
+Bu yapılandırmada, `ProductModule` yalnızca kullanıcı `/products` URL'sine gittiğinde yüklenir.
+
+## Route Guards
+
+Route guard'lar, belirli route'lara erişimi kontrol etmek için kullanılır. Angular, aşağıdaki guard türlerini sağlar:
+
+1. **CanActivate**: Kullanıcının bir route'a erişip erişemeyeceğini belirler.
+2. **CanActivateChild**: Kullanıcının bir child route'a erişip erişemeyeceğini belirler.
+3. **CanDeactivate**: Kullanıcının mevcut route'tan ayrılıp ayrılamayacağını belirler.
+4. **CanLoad**: Kullanıcının bir modülü lazy loading ile yükleyip yükleyemeyeceğini belirler.
+5. **Resolve**: Route'a gitmeden önce veri yükler.
+
+### AuthGuard Örneği
+
+```typescript
+import { Injectable } from '@angular/core';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router, UrlTree } from '@angular/router';
+import { Observable } from 'rxjs';
+import { AuthService } from '../services/auth.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthGuard implements CanActivate {
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) { }
+  
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    if (this.authService.isAuthenticated()) {
+      return true;
+    }
+    
+    // Kullanıcı giriş yapmamışsa, login sayfasına yönlendir ve dönüş URL'sini kaydet
+    return this.router.createUrlTree(['/auth/login'], {
+      queryParams: { returnUrl: state.url }
+    });
+  }
+}
+```
+
+Bu guard, kullanıcının kimlik doğrulamasını kontrol eder ve giriş yapmamışsa, login sayfasına yönlendirir.
+
+### AdminGuard Örneği
+
+```typescript
+import { Injectable } from '@angular/core';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router, UrlTree } from '@angular/router';
+import { Observable } from 'rxjs';
+import { AuthService } from '../services/auth.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AdminGuard implements CanActivate {
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) { }
+  
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    if (this.authService.isAuthenticated() && this.authService.hasRole('ADMIN')) {
+      return true;
+    }
+    
+    if (this.authService.isAuthenticated()) {
+      // Kullanıcı giriş yapmış ama admin değilse, ana sayfaya yönlendir
+      return this.router.createUrlTree(['/']);
+    }
+    
+    // Kullanıcı giriş yapmamışsa, login sayfasına yönlendir
+    return this.router.createUrlTree(['/auth/login'], {
+      queryParams: { returnUrl: state.url }
+    });
+  }
+}
+```
+
+Bu guard, kullanıcının admin rolüne sahip olup olmadığını kontrol eder ve değilse, uygun sayfaya yönlendirir.
+
+### CanDeactivate Guard Örneği
+
+```typescript
+import { Injectable } from '@angular/core';
+import { CanDeactivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { Observable } from 'rxjs';
+
+export interface CanComponentDeactivate {
+  canDeactivate: () => Observable<boolean> | Promise<boolean> | boolean;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate> {
+  canDeactivate(
+    component: CanComponentDeactivate,
+    currentRoute: ActivatedRouteSnapshot,
+    currentState: RouterStateSnapshot,
+    nextState?: RouterStateSnapshot
+  ): Observable<boolean> | Promise<boolean> | boolean {
+    return component.canDeactivate ? component.canDeactivate() : true;
+  }
+}
+```
+
+Bu guard, bir komponentin `canDeactivate` metodunu çağırarak, kullanıcının sayfadan ayrılıp ayrılamayacağını belirler. Örneğin, bir form değiştirildiğinde ve kaydedilmediğinde, kullanıcıya bir onay iletişim kutusu gösterilebilir.
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
+import { CanComponentDeactivate } from '../../core/guards/can-deactivate.guard';
+
+@Component({
+  selector: 'app-product-form',
+  templateUrl: './product-form.component.html',
+  styleUrls: ['./product-form.component.scss']
+})
+export class ProductFormComponent implements OnInit, CanComponentDeactivate {
+  productForm: FormGroup;
+  formSubmitted = false;
+  
+  constructor(
+    private fb: FormBuilder,
+    private dialog: MatDialog
+  ) { }
+  
+  ngOnInit(): void {
+    this.productForm = this.fb.group({
+      name: ['', Validators.required],
+      description: [''],
+      price: [0, [Validators.required, Validators.min(0)]],
+      stock: [0, [Validators.required, Validators.min(0)]]
+    });
+  }
+  
+  onSubmit(): void {
+    this.formSubmitted = true;
+    // Form gönderme işlemleri
+  }
+  
+  canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    if (this.formSubmitted || !this.productForm.dirty) {
+      return true;
+    }
+    
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Değişiklikler Kaydedilmedi',
+        message: 'Sayfadan ayrılmak istediğinizden emin misiniz? Yaptığınız değişiklikler kaydedilmeyecek.',
+        confirmText: 'Evet, Ayrıl',
+        cancelText: 'Hayır, Kal'
+      }
+    });
+    
+    return dialogRef.afterClosed();
+  }
+}
+```
+
+Bu örnekte, form değiştirildiğinde ve kaydedilmediğinde, kullanıcıya bir onay iletişim kutusu gösterilir.
+
+## Resolve Guard
+
+Resolve guard, route'a gitmeden önce veri yüklemek için kullanılır. Bu, kullanıcının veri yüklenene kadar boş bir sayfa görmesini önler:
+
+```typescript
+import { Injectable } from '@angular/core';
+import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { ProductService } from '../services/product.service';
+import { Product } from '../models/product.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProductResolver implements Resolve<Product | null> {
+  constructor(private productService: ProductService) { }
+  
+  resolve(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<Product | null> {
+    const id = Number(route.paramMap.get('id'));
+    
+    return this.productService.getProductById(id).pipe(
+      catchError(() => {
+        return of(null);
+      })
+    );
+  }
+}
+```
+
+Bu resolver, ürün detay sayfasına gitmeden önce ürün verilerini yükler. Route yapılandırmasında resolver'ı şu şekilde kullanabilirsiniz:
+
+```typescript
+const routes: Routes = [
+  { path: '', component: ProductListComponent },
+  {
+    path: ':id',
+    component: ProductDetailComponent,
+    resolve: {
+      product: ProductResolver
+    }
+  }
+];
+```
+
+Komponente, resolver'dan gelen verilere erişebilirsiniz:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Product } from '../../core/models/product.model';
+
+@Component({
+  selector: 'app-product-detail',
+  templateUrl: './product-detail.component.html',
+  styleUrls: ['./product-detail.component.scss']
+})
+export class ProductDetailComponent implements OnInit {
+  product: Product | null = null;
+  
+  constructor(private route: ActivatedRoute) { }
+  
+  ngOnInit(): void {
+    this.product = this.route.snapshot.data['product'];
+  }
+}
+```
+
+Bu örnekte, `product` verisi, resolver tarafından yüklenir ve komponente `route.snapshot.data` aracılığıyla erişilir.
+
+## Child Routes
+
+Child routes, iç içe route'lar oluşturmak için kullanılır. Bu, bir parent komponentin içinde farklı child komponentleri göstermek için kullanışlıdır:
+
+```typescript
+const routes: Routes = [
+  {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: '', redirectTo: 'info', pathMatch: 'full' },
+      { path: 'info', component: ProfileInfoComponent },
+      { path: 'orders', component: ProfileOrdersComponent },
+      { path: 'addresses', component: ProfileAddressesComponent },
+      { path: 'settings', component: ProfileSettingsComponent }
+    ]
+  }
+];
+```
+
+Bu yapılandırmada, `/profile` URL'si `ProfileComponent`'i gösterir ve child route'lar, bu komponentin içindeki bir router outlet'te gösterilir:
+
+```html
+<!-- profile.component.html -->
+<div class="profile-container">
+  <div class="profile-sidebar">
+    <ul>
+      <li><a routerLink="info" routerLinkActive="active">Profil Bilgileri</a></li>
+      <li><a routerLink="orders" routerLinkActive="active">Siparişlerim</a></li>
+      <li><a routerLink="addresses" routerLinkActive="active">Adreslerim</a></li>
+      <li><a routerLink="settings" routerLinkActive="active">Ayarlar</a></li>
+    </ul>
+  </div>
+  
+  <div class="profile-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+```
+
+Bu örnekte, sidebar sabit kalırken, içerik alanı child route'a göre değişir.
+
+## Named Router Outlets
+
+Named router outlets, aynı anda birden fazla router outlet kullanmak için kullanılır. Bu, modal pencereler veya yan paneller gibi ikincil içerikler için kullanışlıdır:
+
+```html
+<!-- app.component.html -->
+<app-header></app-header>
+<main class="container">
+  <router-outlet></router-outlet>
+</main>
+<router-outlet name="modal"></router-outlet>
+<app-footer></app-footer>
+```
+
+Named router outlet'lere route yapılandırmasında `outlet` özelliği ile erişebilirsiniz:
+
+```typescript
+const routes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'products', component: ProductListComponent },
+  {
+    path: 'product-detail/:id',
+    component: ProductDetailModalComponent,
+    outlet: 'modal'
+  }
+];
+```
+
+Named router outlet'lere programatik olarak şu şekilde yönlendirebilirsiniz:
+
+```typescript
+this.router.navigate([{
+  outlets: {
+    primary: ['products'],
+    modal: ['product-detail', productId]
+  }
+}]);
+```
+
+Bu kod, primary outlet'te `ProductListComponent`'i ve modal outlet'te `ProductDetailModalComponent`'i gösterir.
+
+## Route Animations
+
+Angular'ın animasyon modülünü kullanarak, route geçişleri için animasyonlar ekleyebilirsiniz:
+
+```typescript
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterModule } from '@angular/router';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    AppRoutingModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+Animasyonları tanımlamak için, `animations.ts` adında bir dosya oluşturabilirsiniz:
+
+```typescript
+import { trigger, transition, style, animate, query, group } from '@angular/animations';
+
+export const routeAnimations = trigger('routeAnimations', [
+  transition('* <=> *', [
+    query(':enter, :leave', [
+      style({
+        position: 'absolute',
+        left: 0,
+        width: '100%',
+        opacity: 0,
+        transform: 'scale(0.95)'
+      })
+    ], { optional: true }),
+    query(':enter', [
+      style({ opacity: 0, transform: 'scale(0.95)' })
+    ], { optional: true }),
+    group([
+      query(':leave', [
+        animate('200ms ease-out', style({ opacity: 0, transform: 'scale(0.95)' }))
+      ], { optional: true }),
+      query(':enter', [
+        animate('300ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))
+      ], { optional: true })
+    ])
+  ])
+]);
+```
+
+Bu animasyonları kullanmak için, `app.component.ts` dosyasını güncelleyin:
+
+```typescript
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { routeAnimations } from './animations';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+  animations: [routeAnimations]
+})
+export class AppComponent {
+  prepareRoute(outlet: RouterOutlet) {
+    return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
+  }
+}
+```
+
+Ve `app.component.html` dosyasını güncelleyin:
+
+```html
+<app-header></app-header>
+<main class="container">
+  <div [@routeAnimations]="prepareRoute(outlet)">
+    <router-outlet #outlet="outlet"></router-outlet>
+  </div>
+</main>
+<app-footer></app-footer>
+```
+
+Route'lara animasyon verileri ekleyin:
+
+```typescript
+const routes: Routes = [
+  { path: '', component: HomeComponent, data: { animation: 'home' } },
+  { path: 'products', component: ProductListComponent, data: { animation: 'products' } },
+  { path: 'products/:id', component: ProductDetailComponent, data: { animation: 'product-detail' } },
+  { path: 'cart', component: CartComponent, data: { animation: 'cart' } },
+  { path: 'checkout', component: CheckoutComponent, data: { animation: 'checkout' } }
+];
+```
+
+Bu yapılandırma, route'lar arasında geçiş yaparken animasyonlar ekler.
+
+## E-Ticaret Uygulaması için Routing Yapılandırması
+
+E-ticaret uygulaması için kapsamlı bir routing yapılandırması oluşturalım:
+
+```typescript
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { AuthGuard } from './core/guards/auth.guard';
+import { AdminGuard } from './core/guards/admin.guard';
+import { CanDeactivateGuard } from './core/guards/can-deactivate.guard';
+import { ProductResolver } from './core/resolvers/product.resolver';
+import { CategoryResolver } from './core/resolvers/category.resolver';
+import { OrderResolver } from './core/resolvers/order.resolver';
+
+import { NotFoundComponent } from './shared/components/not-found/not-found.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    loadChildren: () => import('./features/home/home.module').then(m => m.HomeModule)
+  },
+  {
+    path: 'auth',
+    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
+  },
+  {
+    path: 'products',
+    loadChildren: () => import('./features/product/product.module').then(m => m.ProductModule)
+  },
+  {
+    path: 'cart',
+    loadChildren: () => import('./features/cart/cart.module').then(m => m.CartModule)
+  },
+  {
+    path: 'checkout',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./features/checkout/checkout.module').then(m => m.CheckoutModule)
+  },
+  {
+    path: 'profile',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./features/profile/profile.module').then(m => m.ProfileModule)
+  },
+  {
+    path: 'admin',
+    canActivate: [AuthGuard, AdminGuard],
+    loadChildren: () => import('./features/admin/admin.module').then(m => m.AdminModule)
+  },
+  {
+    path: 'about',
+    loadChildren: () => import('./features/about/about.module').then(m => m.AboutModule)
+  },
+  {
+    path: 'contact',
+    loadChildren: () => import('./features/contact/contact.module').then(m => m.ContactModule)
+  },
+  {
+    path: '**',
+    component: NotFoundComponent
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes, {
+    scrollPositionRestoration: 'enabled',
+    anchorScrolling: 'enabled',
+    scrollOffset: [0, 64] // [x, y]
+  })],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
+Bu yapılandırmada, tüm özellikler lazy loading ile yüklenir ve bazı route'lar guard'lar ile korunur. Ayrıca, `scrollPositionRestoration` özelliği, sayfa geçişlerinde scroll pozisyonunu sıfırlar ve `anchorScrolling` özelliği, URL'deki fragment'lere (örneğin, `#section1`) scroll yapmayı sağlar.
+
+### Home Module Routes
+
+```typescript
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { HomeComponent } from './home/home.component';
+
+const routes: Routes = [
+  { path: '', component: HomeComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class HomeRoutingModule { }
+```
+
+### Auth Module Routes
+
+```typescript
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { AuthLayoutComponent } from './auth-layout/auth-layout.component';
+import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: AuthLayoutComponent,
+    children: [
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
+      { path: 'login', component: LoginComponent },
+      { path: 'register', component: RegisterComponent },
+      { path: 'forgot-password', component: ForgotPasswordComponent },
+      { path: 'reset-password', component: ResetPasswordComponent }
+    ]
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class AuthRoutingModule { }
+```
+
+### Product Module Routes
+
+```typescript
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { ProductListComponent } from './product-list/product-list.component';
+import { ProductDetailComponent } from './product-detail/product-detail.component';
+import { ProductResolver } from '../../core/resolvers/product.resolver';
+import { CategoryResolver } from '../../core/resolvers/category.resolver';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: ProductListComponent,
+    resolve: {
+      categories: CategoryResolver
+    }
+  },
+  {
+    path: 'category/:categoryId',
+    component: ProductListComponent,
+    resolve: {
+      categories: CategoryResolver
+    }
+  },
+  {
+    path: ':id',
+    component: ProductDetailComponent,
+    resolve: {
+      product: ProductResolver
+    }
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class ProductRoutingModule { }
+```
+
+### Cart Module Routes
+
+```typescript
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { CartComponent } from './cart/cart.component';
+
+const routes: Routes = [
+  { path: '', component: CartComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class CartRoutingModule { }
+```
+
+### Checkout Module Routes
+
+```typescript
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { CheckoutComponent } from './checkout/checkout.component';
+import { CheckoutSuccessComponent } from './checkout-success/checkout-success.component';
+import { CanDeactivateGuard } from '../../core/guards/can-deactivate.guard';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: CheckoutComponent,
+    canDeactivate: [CanDeactivateGuard]
+  },
+  {
+    path: 'success/:orderId',
+    component: CheckoutSuccessComponent
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class CheckoutRoutingModule { }
+```
+
+### Profile Module Routes
+
+```typescript
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { ProfileComponent } from './profile/profile.component';
+import { ProfileInfoComponent } from './profile-info/profile-info.component';
+import { ProfileOrdersComponent } from './profile-orders/profile-orders.component';
+import { ProfileOrderDetailComponent } from './profile-order-detail/profile-order-detail.component';
+import { ProfileAddressesComponent } from './profile-addresses/profile-addresses.component';
+import { ProfileSettingsComponent } from './profile-settings/profile-settings.component';
+import { OrderResolver } from '../../core/resolvers/order.resolver';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: ProfileComponent,
+    children: [
+      { path: '', redirectTo: 'info', pathMatch: 'full' },
+      { path: 'info', component: ProfileInfoComponent },
+      { path: 'orders', component: ProfileOrdersComponent },
+      {
+        path: 'orders/:id',
+        component: ProfileOrderDetailComponent,
+        resolve: {
+          order: OrderResolver
+        }
+      },
+      { path: 'addresses', component: ProfileAddressesComponent },
+      { path: 'settings', component: ProfileSettingsComponent }
+    ]
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class ProfileRoutingModule { }
+```
+
+### Admin Module Routes
+
+```typescript
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { AdminComponent } from './admin/admin.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProductManagementComponent } from './product-management/product-management.component';
+import { ProductFormComponent } from './product-form/product-form.component';
+import { CategoryManagementComponent } from './category-management/category-management.component';
+import { CategoryFormComponent } from './category-form/category-form.component';
+import { OrderManagementComponent } from './order-management/order-management.component';
+import { OrderDetailComponent } from './order-detail/order-detail.component';
+import { UserManagementComponent } from './user-management/user-management.component';
+import { UserFormComponent } from './user-form/user-form.component';
+import { CanDeactivateGuard } from '../../core/guards/can-deactivate.guard';
+import { ProductResolver } from '../../core/resolvers/product.resolver';
+import { CategoryResolver } from '../../core/resolvers/category.resolver';
+import { OrderResolver } from '../../core/resolvers/order.resolver';
+import { UserResolver } from '../../core/resolvers/user.resolver';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: AdminComponent,
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'products', component: ProductManagementComponent },
+      {
+        path: 'products/new',
+        component: ProductFormComponent,
+        canDeactivate: [CanDeactivateGuard]
+      },
+      {
+        path: 'products/edit/:id',
+        component: ProductFormComponent,
+        resolve: {
+          product: ProductResolver
+        },
+        canDeactivate: [CanDeactivateGuard]
+      },
+      { path: 'categories', component: CategoryManagementComponent },
+      {
+        path: 'categories/new',
+        component: CategoryFormComponent,
+        canDeactivate: [CanDeactivateGuard]
+      },
+      {
+        path: 'categories/edit/:id',
+        component: CategoryFormComponent,
+        resolve: {
+          category: CategoryResolver
+        },
+        canDeactivate: [CanDeactivateGuard]
+      },
+      { path: 'orders', component: OrderManagementComponent },
+      {
+        path: 'orders/:id',
+        component: OrderDetailComponent,
+        resolve: {
+          order: OrderResolver
+        }
+      },
+      { path: 'users', component: UserManagementComponent },
+      {
+        path: 'users/new',
+        component: UserFormComponent,
+        canDeactivate: [CanDeactivateGuard]
+      },
+      {
+        path: 'users/edit/:id',
+        component: UserFormComponent,
+        resolve: {
+          user: UserResolver
+        },
+        canDeactivate: [CanDeactivateGuard]
+      }
+    ]
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class AdminRoutingModule { }
+```
+
+## Sonuç
+
+Bu bölümde, Angular uygulamasında routing yapılandırmasını detaylı olarak ele aldık. Routing, tek sayfalı uygulamalarda farklı görünümler arasında gezinmeyi sağlayan önemli bir özelliktir.
+
+Temel routing yapılandırmasını, route parametrelerini, query parametrelerini, lazy loading'i, route guard'ları, resolver'ları, child route'ları, named router outlet'leri ve route animasyonlarını inceledik. Ayrıca, e-ticaret uygulaması için kapsamlı bir routing yapılandırması oluşturduk.
+
+Bir sonraki bölümde, Angular reactive forms ve validasyon konularını ele alacağız.

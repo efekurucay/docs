@@ -1,0 +1,1797 @@
+---
+title: 'Kullanıcı Arayüzü Tasarımı ve Stil Uygulaması'
+description: 'Angular uygulamasında UI tasarımı, CSS, SCSS ve Angular Material kullanımı'
+---
+
+# Kullanıcı Arayüzü Tasarımı ve Stil Uygulaması
+
+Bu bölümde, e-ticaret uygulamamızın kullanıcı arayüzü tasarımını ve stil uygulamasını detaylı olarak ele alacağız. Modern, duyarlı (responsive) ve kullanıcı dostu bir arayüz oluşturmak için Angular'ın stil özellikleri, CSS/SCSS ve Angular Material kütüphanesini nasıl kullanacağımızı inceleyeceğiz.
+
+## Angular'da Stil Yaklaşımları
+
+Angular, uygulamanızın stilini yönetmek için çeşitli yaklaşımlar sunar:
+
+1. **Komponent Stilleri**: Her komponentin kendi stil dosyası olabilir ve bu stiller yalnızca o komponente uygulanır.
+2. **Global Stiller**: Tüm uygulamaya uygulanan stil dosyaları.
+3. **CSS Kütüphaneleri**: Bootstrap, Tailwind CSS gibi harici CSS kütüphaneleri.
+4. **UI Komponent Kütüphaneleri**: Angular Material, PrimeNG, NG-Bootstrap gibi hazır UI komponent kütüphaneleri.
+
+### Komponent Stilleri
+
+Angular, her komponentin kendi stil dosyasına sahip olmasını destekler. Bu stiller, varsayılan olarak yalnızca o komponente uygulanır (view encapsulation):
+
+```typescript
+@Component({
+  selector: 'app-product-card',
+  templateUrl: './product-card.component.html',
+  styleUrls: ['./product-card.component.scss']
+})
+export class ProductCardComponent { }
+```
+
+Bu örnekte, `product-card.component.scss` dosyasındaki stiller yalnızca `ProductCardComponent` komponentine uygulanır.
+
+### View Encapsulation
+
+Angular, stil kapsülleme (view encapsulation) için üç mod sunar:
+
+1. **Emulated (Varsayılan)**: Angular, DOM'a eklenen benzersiz nitelikler kullanarak stilleri kapsüller.
+2. **None**: Stiller global olarak uygulanır, kapsülleme yoktur.
+3. **ShadowDom**: Tarayıcının Shadow DOM API'sini kullanarak stilleri kapsüller.
+
+```typescript
+@Component({
+  selector: 'app-product-card',
+  templateUrl: './product-card.component.html',
+  styleUrls: ['./product-card.component.scss'],
+  encapsulation: ViewEncapsulation.Emulated // Varsayılan
+})
+export class ProductCardComponent { }
+```
+
+### Global Stiller
+
+Global stiller, `angular.json` dosyasında belirtilen stil dosyalarıdır ve tüm uygulamaya uygulanır:
+
+```json
+{
+  "projects": {
+    "e-commerce-app": {
+      "architect": {
+        "build": {
+          "options": {
+            "styles": [
+              "src/styles.scss",
+              "src/theme.scss"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Bu örnekte, `styles.scss` ve `theme.scss` dosyaları global stil dosyalarıdır.
+
+## SCSS Kullanımı
+
+SCSS (Sassy CSS), CSS'in bir üst kümesidir ve değişkenler, iç içe kurallar, mixinler ve fonksiyonlar gibi güçlü özellikler sunar. Angular, SCSS'i destekler ve yeni bir Angular projesi oluşturduğunuzda SCSS'i seçebilirsiniz.
+
+### SCSS Değişkenleri
+
+SCSS değişkenleri, tekrar kullanılabilir değerler tanımlamanıza olanak tanır:
+
+```scss
+// src/styles.scss
+
+// Renkler
+$primary-color: #3f51b5;
+$secondary-color: #ff4081;
+$background-color: #f5f5f5;
+$text-color: #333333;
+$light-text-color: #ffffff;
+$border-color: #e0e0e0;
+
+// Yazı tipleri
+$font-family: 'Roboto', sans-serif;
+$font-size-small: 12px;
+$font-size-medium: 14px;
+$font-size-large: 16px;
+$font-size-xlarge: 18px;
+$font-size-xxlarge: 24px;
+
+// Boşluklar
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+
+// Geçişler
+$transition-speed: 0.3s;
+$transition-function: ease-in-out;
+
+// Gölgeler
+$box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+$box-shadow-hover: 0 4px 10px rgba(0, 0, 0, 0.15);
+
+// Kırılma noktaları
+$breakpoint-xs: 576px;
+$breakpoint-sm: 768px;
+$breakpoint-md: 992px;
+$breakpoint-lg: 1200px;
+```
+
+### SCSS Mixinler
+
+Mixinler, tekrar kullanılabilir stil blokları tanımlamanıza olanak tanır:
+
+```scss
+// src/styles.scss
+
+// Duyarlı tasarım için mixin
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == xs {
+    @media (max-width: $breakpoint-xs) { @content; }
+  } @else if $breakpoint == sm {
+    @media (max-width: $breakpoint-sm) { @content; }
+  } @else if $breakpoint == md {
+    @media (max-width: $breakpoint-md) { @content; }
+  } @else if $breakpoint == lg {
+    @media (max-width: $breakpoint-lg) { @content; }
+  }
+}
+
+// Flex kutusu için mixin
+@mixin flex($direction: row, $justify: flex-start, $align: stretch, $wrap: nowrap) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+  flex-wrap: $wrap;
+}
+
+// Geçiş için mixin
+@mixin transition($property: all) {
+  transition: $property $transition-speed $transition-function;
+}
+
+// Gölge için mixin
+@mixin box-shadow($shadow: $box-shadow) {
+  box-shadow: $shadow;
+}
+
+// Kırpılmış metin için mixin
+@mixin truncate($lines: 1) {
+  @if $lines == 1 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+```
+
+### SCSS İç İçe Kurallar
+
+SCSS, iç içe kurallar yazmanıza olanak tanır:
+
+```scss
+// src/app/product-card/product-card.component.scss
+
+.product-card {
+  background-color: #ffffff;
+  border-radius: 4px;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+  @include box-shadow;
+  @include transition;
+  
+  &:hover {
+    @include box-shadow($box-shadow-hover);
+    transform: translateY(-2px);
+  }
+  
+  .product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: $spacing-sm;
+  }
+  
+  .product-title {
+    font-size: $font-size-large;
+    font-weight: 500;
+    color: $text-color;
+    margin-bottom: $spacing-xs;
+    @include truncate;
+  }
+  
+  .product-description {
+    font-size: $font-size-medium;
+    color: lighten($text-color, 20%);
+    margin-bottom: $spacing-sm;
+    @include truncate(2);
+  }
+  
+  .product-price {
+    font-size: $font-size-xlarge;
+    font-weight: 700;
+    color: $primary-color;
+    margin-bottom: $spacing-md;
+  }
+  
+  .product-actions {
+    @include flex(row, space-between, center);
+    
+    .add-to-cart-btn {
+      background-color: $primary-color;
+      color: $light-text-color;
+      border: none;
+      border-radius: 4px;
+      padding: $spacing-sm $spacing-md;
+      font-size: $font-size-medium;
+      cursor: pointer;
+      @include transition;
+      
+      &:hover {
+        background-color: darken($primary-color, 10%);
+      }
+    }
+    
+    .wishlist-btn {
+      background-color: transparent;
+      color: $text-color;
+      border: none;
+      cursor: pointer;
+      @include transition;
+      
+      &:hover {
+        color: $secondary-color;
+      }
+    }
+  }
+  
+  @include respond-to(sm) {
+    .product-image {
+      height: 150px;
+    }
+    
+    .product-title {
+      font-size: $font-size-medium;
+    }
+    
+    .product-price {
+      font-size: $font-size-large;
+    }
+  }
+}
+```
+
+## Duyarlı (Responsive) Tasarım
+
+Duyarlı tasarım, uygulamanızın farklı ekran boyutlarına uyum sağlamasını sağlar. Angular uygulamanızda duyarlı tasarım uygulamak için çeşitli yaklaşımlar kullanabilirsiniz:
+
+### CSS Media Queries
+
+CSS media queries, farklı ekran boyutları için farklı stiller tanımlamanıza olanak tanır:
+
+```scss
+// src/app/product-list/product-list.component.scss
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-md;
+  
+  @media (max-width: $breakpoint-lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: $breakpoint-sm) {
+    grid-template-columns: 1fr;
+  }
+}
+```
+
+### Flexbox ve Grid
+
+Flexbox ve Grid, duyarlı düzenler oluşturmak için güçlü CSS özellikleridir:
+
+```scss
+// src/app/home/home.component.scss
+
+.featured-products {
+  @include flex(row, space-between, stretch, wrap);
+  
+  .product-card {
+    flex: 0 0 calc(25% - #{$spacing-md});
+    margin-bottom: $spacing-md;
+    
+    @include respond-to(lg) {
+      flex: 0 0 calc(33.333% - #{$spacing-md});
+    }
+    
+    @include respond-to(md) {
+      flex: 0 0 calc(50% - #{$spacing-md});
+    }
+    
+    @include respond-to(sm) {
+      flex: 0 0 100%;
+    }
+  }
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: $spacing-md;
+}
+```
+
+### Angular Flex Layout
+
+Angular Flex Layout, Angular uygulamalarında duyarlı düzenler oluşturmak için bir kütüphanedir:
+
+```bash
+npm install @angular/flex-layout
+```
+
+```typescript
+// app.module.ts
+import { FlexLayoutModule } from '@angular/flex-layout';
+
+@NgModule({
+  imports: [
+    FlexLayoutModule
+  ]
+})
+export class AppModule { }
+```
+
+```html
+<!-- product-list.component.html -->
+<div fxLayout="row wrap" fxLayoutGap="16px grid">
+  <div fxFlex="25%" fxFlex.lt-lg="33%" fxFlex.lt-md="50%" fxFlex.lt-sm="100%" *ngFor="let product of products">
+    <app-product-card [product]="product"></app-product-card>
+  </div>
+</div>
+```
+
+## Angular Material Kullanımı
+
+Angular Material, Material Design rehberlerine dayalı yüksek kaliteli UI komponentleri sağlayan bir kütüphanedir. Angular Material'i kullanmak, modern ve tutarlı bir kullanıcı arayüzü oluşturmanıza yardımcı olur.
+
+### Angular Material Kurulumu
+
+Angular Material'i kurmak için:
+
+```bash
+ng add @angular/material
+```
+
+Bu komut, Angular Material'i kurar, tema seçmenizi sağlar ve gerekli modülleri `app.module.ts` dosyasına ekler.
+
+### Angular Material Tema Oluşturma
+
+Angular Material, özelleştirilebilir temalar sunar. Özel bir tema oluşturmak için:
+
+```scss
+// src/theme.scss
+
+@import '~@angular/material/theming';
+
+// Material tasarım tipografisini dahil et
+@include mat-core();
+
+// Özel renkler tanımla
+$primary-palette: (
+  50: #e8eaf6,
+  100: #c5cae9,
+  200: #9fa8da,
+  300: #7986cb,
+  400: #5c6bc0,
+  500: #3f51b5, // Ana renk
+  600: #3949ab,
+  700: #303f9f,
+  800: #283593,
+  900: #1a237e,
+  A100: #8c9eff,
+  A200: #536dfe,
+  A400: #3d5afe,
+  A700: #304ffe,
+  contrast: (
+    50: $dark-primary-text,
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $light-primary-text,
+    400: $light-primary-text,
+    500: $light-primary-text,
+    600: $light-primary-text,
+    700: $light-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text,
+    A100: $dark-primary-text,
+    A200: $light-primary-text,
+    A400: $light-primary-text,
+    A700: $light-primary-text,
+  )
+);
+
+$accent-palette: (
+  50: #fce4ec,
+  100: #f8bbd0,
+  200: #f48fb1,
+  300: #f06292,
+  400: #ec407a,
+  500: #e91e63, // Vurgu rengi
+  600: #d81b60,
+  700: #c2185b,
+  800: #ad1457,
+  900: #880e4f,
+  A100: #ff80ab,
+  A200: #ff4081,
+  A400: #f50057,
+  A700: #c51162,
+  contrast: (
+    50: $dark-primary-text,
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $dark-primary-text,
+    400: $dark-primary-text,
+    500: $light-primary-text,
+    600: $light-primary-text,
+    700: $light-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text,
+    A100: $dark-primary-text,
+    A200: $light-primary-text,
+    A400: $light-primary-text,
+    A700: $light-primary-text,
+  )
+);
+
+// Tema paletlerini oluştur
+$app-primary: mat-palette($primary-palette);
+$app-accent: mat-palette($accent-palette);
+$app-warn: mat-palette($mat-red);
+
+// Açık tema oluştur
+$app-light-theme: mat-light-theme($app-primary, $app-accent, $app-warn);
+
+// Koyu tema oluştur
+$app-dark-theme: mat-dark-theme($app-primary, $app-accent, $app-warn);
+
+// Varsayılan olarak açık temayı uygula
+@include angular-material-theme($app-light-theme);
+
+// Koyu tema için bir sınıf oluştur
+.dark-theme {
+  @include angular-material-theme($app-dark-theme);
+}
+```
+
+### Angular Material Modülleri
+
+Angular Material komponentlerini kullanmak için, ilgili modülleri import etmeniz gerekir:
+
+```typescript
+// material.module.ts
+import { NgModule } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
+@NgModule({
+  exports: [
+    MatButtonModule,
+    MatCardModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatListModule,
+    MatMenuModule,
+    MatNativeDateModule,
+    MatPaginatorModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatRadioModule,
+    MatSelectModule,
+    MatSidenavModule,
+    MatSliderModule,
+    MatSnackBarModule,
+    MatSortModule,
+    MatTableModule,
+    MatTabsModule,
+    MatToolbarModule,
+    MatTooltipModule
+  ]
+})
+export class MaterialModule { }
+```
+
+```typescript
+// app.module.ts
+import { MaterialModule } from './material.module';
+
+@NgModule({
+  imports: [
+    MaterialModule
+  ]
+})
+export class AppModule { }
+```
+
+### Angular Material Komponentleri
+
+Angular Material, çeşitli UI komponentleri sağlar. İşte bazı yaygın komponentlerin kullanım örnekleri:
+
+#### Toolbar ve Sidenav
+
+```html
+<!-- app.component.html -->
+<mat-toolbar color="primary">
+  <button mat-icon-button (click)="sidenav.toggle()">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span>E-Ticaret Uygulaması</span>
+  <span class="spacer"></span>
+  <button mat-icon-button [matMenuTriggerFor]="userMenu">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item routerLink="/profile">
+      <mat-icon>person</mat-icon>
+      <span>Profilim</span>
+    </button>
+    <button mat-menu-item routerLink="/orders">
+      <mat-icon>shopping_bag</mat-icon>
+      <span>Siparişlerim</span>
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>exit_to_app</mat-icon>
+      <span>Çıkış Yap</span>
+    </button>
+  </mat-menu>
+  <button mat-icon-button routerLink="/cart">
+    <mat-icon matBadge="{{cartItemCount}}" matBadgeColor="accent">shopping_cart</mat-icon>
+  </button>
+</mat-toolbar>
+
+<mat-sidenav-container>
+  <mat-sidenav #sidenav mode="over">
+    <mat-nav-list>
+      <a mat-list-item routerLink="/" (click)="sidenav.close()">
+        <mat-icon matListIcon>home</mat-icon>
+        <span matLine>Ana Sayfa</span>
+      </a>
+      <a mat-list-item routerLink="/products" (click)="sidenav.close()">
+        <mat-icon matListIcon>store</mat-icon>
+        <span matLine>Ürünler</span>
+      </a>
+      <a mat-list-item routerLink="/categories" (click)="sidenav.close()">
+        <mat-icon matListIcon>category</mat-icon>
+        <span matLine>Kategoriler</span>
+      </a>
+      <a mat-list-item routerLink="/about" (click)="sidenav.close()">
+        <mat-icon matListIcon>info</mat-icon>
+        <span matLine>Hakkımızda</span>
+      </a>
+      <a mat-list-item routerLink="/contact" (click)="sidenav.close()">
+        <mat-icon matListIcon>contact_support</mat-icon>
+        <span matLine>İletişim</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+  
+  <mat-sidenav-content>
+    <div class="content-container">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+```
+
+```scss
+// app.component.scss
+.spacer {
+  flex: 1 1 auto;
+}
+
+mat-sidenav-container {
+  height: calc(100vh - 64px);
+}
+
+mat-sidenav {
+  width: 250px;
+}
+
+.content-container {
+  padding: $spacing-md;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: $breakpoint-sm) {
+  mat-toolbar {
+    height: 56px;
+  }
+  
+  mat-sidenav-container {
+    height: calc(100vh - 56px);
+  }
+  
+  .content-container {
+    padding: $spacing-sm;
+  }
+}
+```
+
+#### Card ve Button
+
+```html
+<!-- product-card.component.html -->
+<mat-card class="product-card">
+  <img mat-card-image [src]="product.imageUrl" [alt]="product.name" class="product-image">
+  <mat-card-content>
+    <h2 class="product-title">{{ product.name }}</h2>
+    <p class="product-description">{{ product.description }}</p>
+    <p class="product-price">{{ product.price | currency:'TRY':'symbol':'1.2-2' }}</p>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button color="primary" (click)="addToCart()">
+      <mat-icon>add_shopping_cart</mat-icon>
+      Sepete Ekle
+    </button>
+    <button mat-icon-button color="accent" (click)="toggleWishlist()">
+      <mat-icon>{{ isInWishlist ? 'favorite' : 'favorite_border' }}</mat-icon>
+    </button>
+  </mat-card-actions>
+</mat-card>
+```
+
+```scss
+// product-card.component.scss
+.product-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  
+  .product-image {
+    height: 200px;
+    object-fit: cover;
+  }
+  
+  .product-title {
+    font-size: $font-size-large;
+    font-weight: 500;
+    margin-bottom: $spacing-xs;
+    @include truncate;
+  }
+  
+  .product-description {
+    font-size: $font-size-medium;
+    color: rgba(0, 0, 0, 0.6);
+    margin-bottom: $spacing-sm;
+    @include truncate(2);
+  }
+  
+  .product-price {
+    font-size: $font-size-xlarge;
+    font-weight: 700;
+    color: $primary-color;
+    margin-bottom: 0;
+  }
+  
+  mat-card-content {
+    flex-grow: 1;
+  }
+  
+  mat-card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-sm $spacing-md;
+  }
+}
+```
+
+#### Form Fields
+
+```html
+<!-- login.component.html -->
+<div class="login-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Giriş Yap</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>E-posta</mat-label>
+          <input matInput formControlName="email" placeholder="E-posta adresiniz" required>
+          <mat-icon matPrefix>email</mat-icon>
+          <mat-error *ngIf="email.hasError('required')">E-posta gereklidir</mat-error>
+          <mat-error *ngIf="email.hasError('email')">Geçerli bir e-posta adresi giriniz</mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Parola</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Parolanız" required>
+          <mat-icon matPrefix>lock</mat-icon>
+          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="password.hasError('required')">Parola gereklidir</mat-error>
+          <mat-error *ngIf="password.hasError('minlength')">Parola en az 6 karakter olmalıdır</mat-error>
+        </mat-form-field>
+        
+        <div class="form-actions">
+          <mat-checkbox formControlName="rememberMe">Beni hatırla</mat-checkbox>
+          <a routerLink="/auth/forgot-password">Parolamı unuttum</a>
+        </div>
+        
+        <button mat-raised-button color="primary" type="submit" class="full-width" [disabled]="loginForm.invalid || loading">
+          <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+          <span *ngIf="!loading">Giriş Yap</span>
+        </button>
+      </form>
+    </mat-card-content>
+    <mat-card-actions>
+      <p>Hesabınız yok mu? <a routerLink="/auth/register">Kayıt ol</a></p>
+    </mat-card-actions>
+  </mat-card>
+</div>
+```
+
+```scss
+// login.component.scss
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 64px);
+  padding: $spacing-md;
+  
+  mat-card {
+    max-width: 400px;
+    width: 100%;
+  }
+  
+  .full-width {
+    width: 100%;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-md;
+  }
+  
+  mat-card-actions {
+    padding: $spacing-md;
+    text-align: center;
+  }
+}
+```
+
+#### Table
+
+```html
+<!-- order-list.component.html -->
+<div class="order-list-container">
+  <h1>Siparişlerim</h1>
+  
+  <mat-form-field appearance="outline" class="filter-field">
+    <mat-label>Sipariş Ara</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Sipariş numarası, durum vb.">
+    <mat-icon matPrefix>search</mat-icon>
+  </mat-form-field>
+  
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" matSort>
+      <!-- Sipariş No Sütunu -->
+      <ng-container matColumnDef="orderNumber">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Sipariş No</th>
+        <td mat-cell *matCellDef="let order">{{ order.orderNumber }}</td>
+      </ng-container>
+      
+      <!-- Tarih Sütunu -->
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Tarih</th>
+        <td mat-cell *matCellDef="let order">{{ order.date | date:'dd/MM/yyyy' }}</td>
+      </ng-container>
+      
+      <!-- Toplam Sütunu -->
+      <ng-container matColumnDef="total">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Toplam</th>
+        <td mat-cell *matCellDef="let order">{{ order.total | currency:'TRY':'symbol':'1.2-2' }}</td>
+      </ng-container>
+      
+      <!-- Durum Sütunu -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Durum</th>
+        <td mat-cell *matCellDef="let order">
+          <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+            {{ getStatusText(order.status) }}
+          </span>
+        </td>
+      </ng-container>
+      
+      <!-- İşlemler Sütunu -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>İşlemler</th>
+        <td mat-cell *matCellDef="let order">
+          <button mat-icon-button color="primary" [routerLink]="['/orders', order.id]" matTooltip="Sipariş Detayları">
+            <mat-icon>visibility</mat-icon>
+          </button>
+          <button mat-icon-button color="accent" (click)="trackOrder(order)" matTooltip="Sipariş Takibi">
+            <mat-icon>local_shipping</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      
+      <!-- Veri Yok Satırı -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="5">Arama kriterinize uygun sipariş bulunamadı: "{{input.value}}"</td>
+      </tr>
+    </table>
+    
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
+  </div>
+</div>
+```
+
+```scss
+// order-list.component.scss
+.order-list-container {
+  padding: $spacing-md;
+  
+  h1 {
+    margin-bottom: $spacing-md;
+  }
+  
+  .filter-field {
+    width: 100%;
+    margin-bottom: $spacing-md;
+  }
+  
+  table {
+    width: 100%;
+  }
+  
+  .status-badge {
+    padding: $spacing-xs $spacing-sm;
+    border-radius: 16px;
+    font-size: $font-size-small;
+    font-weight: 500;
+    text-transform: uppercase;
+    
+    &.pending {
+      background-color: #fff8e1;
+      color: #f57f17;
+    }
+    
+    &.processing {
+      background-color: #e3f2fd;
+      color: #1565c0;
+    }
+    
+    &.shipped {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    &.delivered {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    &.cancelled {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+  }
+  
+  .mat-column-actions {
+    width: 100px;
+    text-align: center;
+  }
+}
+```
+
+```typescript
+// order-list.component.ts
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { OrderService } from '../../core/services/order.service';
+import { Order } from '../../core/models/order.model';
+
+@Component({
+  selector: 'app-order-list',
+  templateUrl: './order-list.component.html',
+  styleUrls: ['./order-list.component.scss']
+})
+export class OrderListComponent implements OnInit {
+  displayedColumns: string[] = ['orderNumber', 'date', 'total', 'status', 'actions'];
+  dataSource = new MatTableDataSource<Order>([]);
+  
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
+  
+  constructor(private orderService: OrderService) { }
+  
+  ngOnInit(): void {
+    this.loadOrders();
+  }
+  
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+  
+  loadOrders(): void {
+    this.orderService.getOrders().subscribe(
+      response => {
+        this.dataSource.data = response.content;
+      },
+      error => {
+        console.error('Siparişler yüklenirken hata:', error);
+      }
+    );
+  }
+  
+  applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+    
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+  
+  getStatusText(status: string): string {
+    switch (status) {
+      case 'PENDING':
+        return 'Beklemede';
+      case 'PROCESSING':
+        return 'İşleniyor';
+      case 'SHIPPED':
+        return 'Kargoya Verildi';
+      case 'DELIVERED':
+        return 'Teslim Edildi';
+      case 'CANCELLED':
+        return 'İptal Edildi';
+      default:
+        return status;
+    }
+  }
+  
+  getStatusClass(status: string): string {
+    return status.toLowerCase();
+  }
+  
+  trackOrder(order: Order): void {
+    // Sipariş takip işlemi
+  }
+}
+```
+
+#### Dialog
+
+```typescript
+// product-detail.component.ts
+import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
+import { ProductService } from '../../core/services/product.service';
+import { CartService } from '../../core/services/cart.service';
+import { Product } from '../../core/models/product.model';
+import { ImageViewerDialogComponent } from '../image-viewer-dialog/image-viewer-dialog.component';
+
+@Component({
+  selector: 'app-product-detail',
+  templateUrl: './product-detail.component.html',
+  styleUrls: ['./product-detail.component.scss']
+})
+export class ProductDetailComponent implements OnInit {
+  product: Product;
+  quantity = 1;
+  loading = false;
+  
+  constructor(
+    private route: ActivatedRoute,
+    private productService: ProductService,
+    private cartService: CartService,
+    private dialog: MatDialog
+  ) { }
+  
+  ngOnInit(): void {
+    this.loading = true;
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    
+    this.productService.getProductById(id).subscribe(
+      product => {
+        this.product = product;
+        this.loading = false;
+      },
+      error => {
+        console.error('Ürün detayları yüklenirken hata:', error);
+        this.loading = false;
+      }
+    );
+  }
+  
+  openImageViewer(): void {
+    this.dialog.open(ImageViewerDialogComponent, {
+      data: { imageUrl: this.product.imageUrl, productName: this.product.name },
+      maxWidth: '90vw',
+      maxHeight: '90vh'
+    });
+  }
+  
+  addToCart(): void {
+    this.cartService.addToCart(this.product, this.quantity);
+  }
+  
+  incrementQuantity(): void {
+    this.quantity++;
+  }
+  
+  decrementQuantity(): void {
+    if (this.quantity > 1) {
+      this.quantity--;
+    }
+  }
+}
+```
+
+```html
+<!-- image-viewer-dialog.component.html -->
+<div class="image-viewer-dialog">
+  <h2 mat-dialog-title>{{ data.productName }}</h2>
+  <mat-dialog-content>
+    <img [src]="data.imageUrl" [alt]="data.productName" class="full-image">
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Kapat</button>
+  </mat-dialog-actions>
+</div>
+```
+
+```scss
+// image-viewer-dialog.component.scss
+.image-viewer-dialog {
+  .full-image {
+    max-width: 100%;
+    max-height: 70vh;
+    display: block;
+    margin: 0 auto;
+  }
+}
+```
+
+```typescript
+// image-viewer-dialog.component.ts
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+
+@Component({
+  selector: 'app-image-viewer-dialog',
+  templateUrl: './image-viewer-dialog.component.html',
+  styleUrls: ['./image-viewer-dialog.component.scss']
+})
+export class ImageViewerDialogComponent {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { imageUrl: string, productName: string }) { }
+}
+```
+
+#### Snackbar
+
+```typescript
+// notification.service.ts
+import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class NotificationService {
+  constructor(private snackBar: MatSnackBar) { }
+  
+  success(message: string): void {
+    this.snackBar.open(message, 'Tamam', {
+      duration: 3000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top',
+      panelClass: ['success-snackbar']
+    });
+  }
+  
+  error(message: string): void {
+    this.snackBar.open(message, 'Tamam', {
+      duration: 5000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top',
+      panelClass: ['error-snackbar']
+    });
+  }
+  
+  info(message: string): void {
+    this.snackBar.open(message, 'Tamam', {
+      duration: 3000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top',
+      panelClass: ['info-snackbar']
+    });
+  }
+}
+```
+
+```scss
+// styles.scss
+.success-snackbar {
+  background-color: #4caf50;
+  color: white;
+  
+  .mat-simple-snackbar-action {
+    color: white;
+  }
+}
+
+.error-snackbar {
+  background-color: #f44336;
+  color: white;
+  
+  .mat-simple-snackbar-action {
+    color: white;
+  }
+}
+
+.info-snackbar {
+  background-color: #2196f3;
+  color: white;
+  
+  .mat-simple-snackbar-action {
+    color: white;
+  }
+}
+```
+
+## Özel Komponentler ve Direktifler
+
+Özel komponentler ve direktifler oluşturarak, uygulamanızın kullanıcı arayüzünü daha modüler ve yeniden kullanılabilir hale getirebilirsiniz.
+
+### Özel Komponentler
+
+```typescript
+// rating.component.ts
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-rating',
+  template: `
+    <div class="rating">
+      <mat-icon
+        *ngFor="let star of stars; let i = index"
+        [class.filled]="star"
+        (click)="rate(i + 1)"
+        (mouseenter)="hover(i + 1)"
+        (mouseleave)="hover(0)"
+      >
+        {{ star ? 'star' : 'star_border' }}
+      </mat-icon>
+      <span *ngIf="showValue" class="rating-value">{{ value }}</span>
+    </div>
+  `,
+  styles: [`
+    .rating {
+      display: flex;
+      align-items: center;
+    }
+    
+    mat-icon {
+      cursor: pointer;
+      color: #bdbdbd;
+      transition: color 0.2s ease-in-out;
+    }
+    
+    mat-icon.filled {
+      color: #ffc107;
+    }
+    
+    .rating-value {
+      margin-left: 8px;
+      font-weight: 500;
+    }
+  `]
+})
+export class RatingComponent {
+  @Input() value = 0;
+  @Input() max = 5;
+  @Input() readonly = false;
+  @Input() showValue = false;
+  @Output() valueChange = new EventEmitter<number>();
+  
+  stars: boolean[] = [];
+  hoverValue = 0;
+  
+  ngOnInit(): void {
+    this.updateStars();
+  }
+  
+  ngOnChanges(): void {
+    this.updateStars();
+  }
+  
+  rate(value: number): void {
+    if (this.readonly) {
+      return;
+    }
+    
+    this.value = value;
+    this.updateStars();
+    this.valueChange.emit(this.value);
+  }
+  
+  hover(value: number): void {
+    if (this.readonly) {
+      return;
+    }
+    
+    this.hoverValue = value;
+    this.updateStars();
+  }
+  
+  private updateStars(): void {
+    this.stars = Array(this.max).fill(false).map((_, i) => {
+      return this.hoverValue > 0 ? i < this.hoverValue : i < this.value;
+    });
+  }
+}
+```
+
+### Özel Direktifler
+
+```typescript
+// highlight.directive.ts
+import { Directive, ElementRef, Input, HostListener, Renderer2 } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective {
+  @Input('appHighlight') highlightColor = '#f5f5f5';
+  @Input() defaultColor = 'transparent';
+  
+  constructor(private el: ElementRef, private renderer: Renderer2) {
+    this.setBackgroundColor(this.defaultColor);
+  }
+  
+  @HostListener('mouseenter') onMouseEnter(): void {
+    this.setBackgroundColor(this.highlightColor);
+  }
+  
+  @HostListener('mouseleave') onMouseLeave(): void {
+    this.setBackgroundColor(this.defaultColor);
+  }
+  
+  private setBackgroundColor(color: string): void {
+    this.renderer.setStyle(this.el.nativeElement, 'background-color', color);
+  }
+}
+```
+
+```html
+<!-- product-list.component.html -->
+<div class="product-item" *ngFor="let product of products" appHighlight="#f0f0f0" [routerLink]="['/products', product.id]">
+  <img [src]="product.imageUrl" [alt]="product.name">
+  <h3>{{ product.name }}</h3>
+  <p>{{ product.price | currency:'TRY':'symbol':'1.2-2' }}</p>
+</div>
+```
+
+## Animasyonlar
+
+Angular, animasyonlar için güçlü bir API sağlar. Angular animasyonlarını kullanarak, kullanıcı arayüzünüze hareket ve canlılık katabilirsiniz.
+
+```typescript
+// app.module.ts
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+@NgModule({
+  imports: [
+    BrowserAnimationsModule
+  ]
+})
+export class AppModule { }
+```
+
+```typescript
+// fade-in.animation.ts
+import { trigger, transition, style, animate } from '@angular/animations';
+
+export const fadeInAnimation = trigger('fadeIn', [
+  transition(':enter', [
+    style({ opacity: 0 }),
+    animate('300ms ease-in', style({ opacity: 1 }))
+  ])
+]);
+
+export const fadeInUpAnimation = trigger('fadeInUp', [
+  transition(':enter', [
+    style({ opacity: 0, transform: 'translateY(20px)' }),
+    animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+  ])
+]);
+
+export const listAnimation = trigger('listAnimation', [
+  transition('* => *', [
+    query(':enter', [
+      style({ opacity: 0, transform: 'translateY(20px)' }),
+      stagger(100, [
+        animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ], { optional: true })
+  ])
+]);
+```
+
+```typescript
+// product-list.component.ts
+import { Component, OnInit } from '@angular/core';
+import { fadeInAnimation, listAnimation } from '../../shared/animations/fade-in.animation';
+import { ProductService } from '../../core/services/product.service';
+import { Product } from '../../core/models/product.model';
+
+@Component({
+  selector: 'app-product-list',
+  templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.scss'],
+  animations: [fadeInAnimation, listAnimation]
+})
+export class ProductListComponent implements OnInit {
+  products: Product[] = [];
+  loading = false;
+  
+  constructor(private productService: ProductService) { }
+  
+  ngOnInit(): void {
+    this.loading = true;
+    
+    this.productService.getProducts().subscribe(
+      response => {
+        this.products = response.content;
+        this.loading = false;
+      },
+      error => {
+        console.error('Ürünler yüklenirken hata:', error);
+        this.loading = false;
+      }
+    );
+  }
+}
+```
+
+```html
+<!-- product-list.component.html -->
+<div class="product-list-container" @fadeIn>
+  <h1>Ürünler</h1>
+  
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+  
+  <div *ngIf="!loading" class="product-grid" [@listAnimation]="products.length">
+    <div *ngFor="let product of products" class="product-item">
+      <app-product-card [product]="product"></app-product-card>
+    </div>
+  </div>
+</div>
+```
+
+## Tema Değiştirme
+
+Kullanıcıların açık ve koyu tema arasında geçiş yapmasına izin vermek, kullanıcı deneyimini iyileştirebilir.
+
+```typescript
+// theme.service.ts
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ThemeService {
+  private darkTheme = new BehaviorSubject<boolean>(false);
+  isDarkTheme = this.darkTheme.asObservable();
+  
+  constructor() {
+    // Kullanıcının tercihini localStorage'dan al
+    const savedTheme = localStorage.getItem('darkTheme');
+    if (savedTheme) {
+      this.setDarkTheme(savedTheme === 'true');
+    } else {
+      // Kullanıcının sistem tercihini kontrol et
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      this.setDarkTheme(prefersDark);
+    }
+  }
+  
+  setDarkTheme(isDarkTheme: boolean): void {
+    this.darkTheme.next(isDarkTheme);
+    localStorage.setItem('darkTheme', isDarkTheme.toString());
+    
+    if (isDarkTheme) {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
+  }
+  
+  toggleTheme(): void {
+    this.setDarkTheme(!this.darkTheme.value);
+  }
+}
+```
+
+```typescript
+// app.component.ts
+import { Component, OnInit } from '@angular/core';
+import { ThemeService } from './core/services/theme.service';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
+})
+export class AppComponent implements OnInit {
+  isDarkTheme = false;
+  
+  constructor(private themeService: ThemeService) { }
+  
+  ngOnInit(): void {
+    this.themeService.isDarkTheme.subscribe(
+      isDarkTheme => this.isDarkTheme = isDarkTheme
+    );
+  }
+  
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
+  }
+}
+```
+
+```html
+<!-- app.component.html -->
+<mat-toolbar color="primary">
+  <!-- ... -->
+  <button mat-icon-button (click)="toggleTheme()" matTooltip="Tema Değiştir">
+    <mat-icon>{{ isDarkTheme ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+  <!-- ... -->
+</mat-toolbar>
+```
+
+## Erişilebilirlik
+
+Erişilebilirlik, uygulamanızın tüm kullanıcılar tarafından kullanılabilir olmasını sağlar. Angular Material, erişilebilirlik için birçok özellik sağlar, ancak bazı ek iyileştirmeler yapabilirsiniz:
+
+### ARIA Nitelikleri
+
+```html
+<!-- product-card.component.html -->
+<mat-card class="product-card" [attr.aria-label]="product.name + ' ürün kartı'">
+  <img mat-card-image [src]="product.imageUrl" [alt]="product.name" class="product-image">
+  <mat-card-content>
+    <h2 class="product-title" [attr.aria-label]="'Ürün adı: ' + product.name">{{ product.name }}</h2>
+    <p class="product-description" [attr.aria-label]="'Ürün açıklaması: ' + product.description">{{ product.description }}</p>
+    <p class="product-price" [attr.aria-label]="'Ürün fiyatı: ' + (product.price | currency:'TRY':'symbol':'1.2-2')">{{ product.price | currency:'TRY':'symbol':'1.2-2' }}</p>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button color="primary" (click)="addToCart()" aria-label="Sepete ekle">
+      <mat-icon>add_shopping_cart</mat-icon>
+      Sepete Ekle
+    </button>
+    <button mat-icon-button color="accent" (click)="toggleWishlist()" [attr.aria-label]="isInWishlist ? 'Favorilerden çıkar' : 'Favorilere ekle'">
+      <mat-icon>{{ isInWishlist ? 'favorite' : 'favorite_border' }}</mat-icon>
+    </button>
+  </mat-card-actions>
+</mat-card>
+```
+
+### Klavye Navigasyonu
+
+```typescript
+// product-list.component.ts
+import { Component, OnInit, ViewChildren, QueryList, ElementRef } from '@angular/core';
+import { ProductService } from '../../core/services/product.service';
+import { Product } from '../../core/models/product.model';
+
+@Component({
+  selector: 'app-product-list',
+  templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.scss']
+})
+export class ProductListComponent implements OnInit {
+  products: Product[] = [];
+  loading = false;
+  
+  @ViewChildren('productCard') productCards: QueryList<ElementRef>;
+  
+  constructor(private productService: ProductService) { }
+  
+  ngOnInit(): void {
+    this.loadProducts();
+  }
+  
+  loadProducts(): void {
+    this.loading = true;
+    
+    this.productService.getProducts().subscribe(
+      response => {
+        this.products = response.content;
+        this.loading = false;
+      },
+      error => {
+        console.error('Ürünler yüklenirken hata:', error);
+        this.loading = false;
+      }
+    );
+  }
+  
+  @HostListener('keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'ArrowRight' || event.key === 'ArrowLeft' || event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      const cards = this.productCards.toArray();
+      const currentIndex = cards.findIndex(card => card.nativeElement === document.activeElement || card.nativeElement.contains(document.activeElement));
+      
+      if (currentIndex !== -1) {
+        let nextIndex = currentIndex;
+        
+        if (event.key === 'ArrowRight') {
+          nextIndex = Math.min(currentIndex + 1, cards.length - 1);
+        } else if (event.key === 'ArrowLeft') {
+          nextIndex = Math.max(currentIndex - 1, 0);
+        } else if (event.key === 'ArrowDown') {
+          // Bir satır aşağı (örneğin, 4 sütunlu bir grid için)
+          nextIndex = Math.min(currentIndex + 4, cards.length - 1);
+        } else if (event.key === 'ArrowUp') {
+          // Bir satır yukarı
+          nextIndex = Math.max(currentIndex - 4, 0);
+        }
+        
+        if (nextIndex !== currentIndex) {
+          cards[nextIndex].nativeElement.focus();
+          event.preventDefault();
+        }
+      }
+    }
+  }
+}
+```
+
+```html
+<!-- product-list.component.html -->
+<div class="product-grid">
+  <div *ngFor="let product of products" class="product-item">
+    <app-product-card #productCard [product]="product" tabindex="0"></app-product-card>
+  </div>
+</div>
+```
+
+## Performans Optimizasyonu
+
+Kullanıcı arayüzü performansını optimize etmek için çeşitli teknikler kullanabilirsiniz:
+
+### ChangeDetectionStrategy.OnPush
+
+```typescript
+// product-card.component.ts
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Product } from '../../core/models/product.model';
+
+@Component({
+  selector: 'app-product-card',
+  templateUrl: './product-card.component.html',
+  styleUrls: ['./product-card.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class ProductCardComponent {
+  @Input() product: Product;
+  
+  // ...
+}
+```
+
+### trackBy Fonksiyonu
+
+```html
+<!-- product-list.component.html -->
+<div class="product-grid">
+  <div *ngFor="let product of products; trackBy: trackByProductId" class="product-item">
+    <app-product-card [product]="product"></app-product-card>
+  </div>
+</div>
+```
+
+```typescript
+// product-list.component.ts
+trackByProductId(index: number, product: Product): number {
+  return product.id;
+}
+```
+
+### Lazy Loading Görüntüler
+
+```html
+<!-- product-card.component.html -->
+<img [src]="product.imageUrl" [alt]="product.name" class="product-image" loading="lazy">
+```
+
+## Mobil Uyumluluk
+
+Mobil uyumluluk, uygulamanızın farklı cihazlarda iyi görünmesini ve çalışmasını sağlar. İşte mobil uyumlu bir kullanıcı arayüzü oluşturmak için bazı ipuçları:
+
+### Viewport Meta Tag
+
+```html
+<!-- index.html -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+```
+
+### Dokunmatik Hedefler
+
+```scss
+// styles.scss
+button, a, .clickable {
+  min-width: 44px;
+  min-height: 44px;
+}
+```
+
+### Mobil Menü
+
+```html
+<!-- app.component.html -->
+<mat-toolbar color="primary">
+  <button mat-icon-button (click)="sidenav.toggle()" class="menu-button">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span class="app-title">E-Ticaret</span>
+  <span class="spacer"></span>
+  <div class="desktop-menu">
+    <a mat-button routerLink="/">Ana Sayfa</a>
+    <a mat-button routerLink="/products">Ürünler</a>
+    <a mat-button routerLink="/categories">Kategoriler</a>
+    <a mat-button routerLink="/about">Hakkımızda</a>
+    <a mat-button routerLink="/contact">İletişim</a>
+  </div>
+  <button mat-icon-button [matMenuTriggerFor]="userMenu">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item routerLink="/profile">
+      <mat-icon>person</mat-icon>
+      <span>Profilim</span>
+    </button>
+    <button mat-menu-item routerLink="/orders">
+      <mat-icon>shopping_bag</mat-icon>
+      <span>Siparişlerim</span>
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>exit_to_app</mat-icon>
+      <span>Çıkış Yap</span>
+    </button>
+  </mat-menu>
+  <button mat-icon-button routerLink="/cart">
+    <mat-icon matBadge="{{cartItemCount}}" matBadgeColor="accent">shopping_cart</mat-icon>
+  </button>
+</mat-toolbar>
+
+<mat-sidenav-container>
+  <mat-sidenav #sidenav mode="over">
+    <mat-nav-list>
+      <a mat-list-item routerLink="/" (click)="sidenav.close()">
+        <mat-icon matListIcon>home</mat-icon>
+        <span matLine>Ana Sayfa</span>
+      </a>
+      <a mat-list-item routerLink="/products" (click)="sidenav.close()">
+        <mat-icon matListIcon>store</mat-icon>
+        <span matLine>Ürünler</span>
+      </a>
+      <a mat-list-item routerLink="/categories" (click)="sidenav.close()">
+        <mat-icon matListIcon>category</mat-icon>
+        <span matLine>Kategoriler</span>
+      </a>
+      <a mat-list-item routerLink="/about" (click)="sidenav.close()">
+        <mat-icon matListIcon>info</mat-icon>
+        <span matLine>Hakkımızda</span>
+      </a>
+      <a mat-list-item routerLink="/contact" (click)="sidenav.close()">
+        <mat-icon matListIcon>contact_support</mat-icon>
+        <span matLine>İletişim</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+  
+  <mat-sidenav-content>
+    <div class="content-container">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+```
+
+```scss
+// app.component.scss
+.desktop-menu {
+  display: flex;
+  
+  @media (max-width: $breakpoint-md) {
+    display: none;
+  }
+}
+
+.menu-button {
+  @media (min-width: $breakpoint-md) {
+    display: none;
+  }
+}
+
+.app-title {
+  margin-left: $spacing-sm;
+  
+  @media (max-width: $breakpoint-sm) {
+    font-size: $font-size-medium;
+  }
+}
+```
+
+## Sonuç
+
+Bu bölümde, e-ticaret uygulamamızın kullanıcı arayüzü tasarımını ve stil uygulamasını detaylı olarak ele aldık. Angular'da stil yaklaşımları, SCSS kullanımı, duyarlı tasarım, Angular Material kullanımı, özel komponentler ve direktifler, animasyonlar, tema değiştirme, erişilebilirlik, performans optimizasyonu ve mobil uyumluluk konularını inceledik.
+
+Modern, duyarlı ve kullanıcı dostu bir arayüz oluşturmak için Angular'ın stil özellikleri, CSS/SCSS ve Angular Material kütüphanesini nasıl kullanacağımızı öğrendik. Bu bilgiler, e-ticaret uygulamanızın kullanıcı deneyimini iyileştirmenize yardımcı olacaktır.
+
+Bir sonraki bölümde, frontend ve backend entegrasyonunu ve uygulamanın dağıtımını ele alacağız.

@@ -1,0 +1,247 @@
+---
+title: 'Frontend Ortam Kurulumu'
+description: 'Angular geliştirme ortamının kurulumu'
+---
+
+# Frontend Ortam Kurulumu
+
+Bu bölümde, Angular tabanlı frontend uygulaması geliştirmek için gerekli ortamın kurulumunu adım adım anlatacağız. Frontend geliştirme ortamı için Node.js ve Angular CLI'nin kurulumu gerekmektedir.
+
+## Node.js ve npm Kurulumu
+
+Angular, Node.js üzerinde çalışan bir JavaScript framework'üdür. Bu nedenle, öncelikle Node.js ve onun paket yöneticisi olan npm'in kurulması gerekmektedir.
+
+### Windows için Node.js Kurulumu
+
+1. [Node.js resmi web sitesi](https://nodejs.org/) adresine gidin.
+2. LTS (Long Term Support - Uzun Süreli Destek) sürümünü indirin. Bu, en kararlı ve güvenilir sürümdür.
+3. İndirilen kurulum dosyasını çalıştırın ve ekrandaki talimatları izleyin.
+4. Kurulum tamamlandıktan sonra, Node.js ve npm'in doğru şekilde kurulduğunu kontrol etmek için komut istemini (Command Prompt) açın ve aşağıdaki komutları çalıştırın:
+
+```bash
+node -v
+npm -v
+```
+
+Bu komutlar, kurulu olan Node.js ve npm sürümlerini gösterecektir.
+
+### macOS için Node.js Kurulumu
+
+macOS için Node.js'i Homebrew paket yöneticisi ile kurabilirsiniz:
+
+1. Terminal uygulamasını açın.
+2. Homebrew kurulu değilse, aşağıdaki komutu çalıştırarak kurun:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+3. Homebrew kurulduktan sonra, Node.js'i kurmak için aşağıdaki komutu çalıştırın:
+
+```bash
+brew install node
+```
+
+4. Kurulum tamamlandıktan sonra, Node.js ve npm'in doğru şekilde kurulduğunu kontrol etmek için aşağıdaki komutları çalıştırın:
+
+```bash
+node -v
+npm -v
+```
+
+### Linux (Ubuntu) için Node.js Kurulumu
+
+Ubuntu'da Node.js'i apt paket yöneticisi ile kurabilirsiniz:
+
+1. Terminal uygulamasını açın.
+2. Node.js'in resmi paket deposunu ekleyin:
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+```
+
+3. Node.js'i kurun:
+
+```bash
+sudo apt install -y nodejs
+```
+
+4. Kurulum tamamlandıktan sonra, Node.js ve npm'in doğru şekilde kurulduğunu kontrol etmek için aşağıdaki komutları çalıştırın:
+
+```bash
+node -v
+npm -v
+```
+
+## Angular CLI Kurulumu
+
+Angular CLI (Command Line Interface - Komut Satırı Arayüzü), Angular uygulamaları oluşturmak, geliştirmek ve test etmek için kullanılan bir komut satırı aracıdır. Angular CLI, npm kullanılarak kurulur.
+
+1. Komut satırını (Command Prompt, Terminal) açın.
+2. Aşağıdaki komutu çalıştırarak Angular CLI'yi global olarak kurun:
+
+```bash
+npm install -g @angular/cli
+```
+
+3. Kurulum tamamlandıktan sonra, Angular CLI'nin doğru şekilde kurulduğunu kontrol etmek için aşağıdaki komutu çalıştırın:
+
+```bash
+ng version
+```
+
+Bu komut, kurulu olan Angular CLI sürümünü ve diğer bağımlılıkları gösterecektir.
+
+## Angular Projesi Oluşturma
+
+Angular CLI kurulduktan sonra, yeni bir Angular projesi oluşturabilirsiniz:
+
+1. Komut satırını açın ve projeyi oluşturmak istediğiniz dizine gidin.
+2. Aşağıdaki komutu çalıştırarak yeni bir Angular projesi oluşturun:
+
+```bash
+ng new ecommerce-frontend
+```
+
+3. Angular CLI, projeyi oluşturmadan önce bazı yapılandırma seçenekleri soracaktır:
+   - "Would you like to add Angular routing?" (Angular yönlendirmesi eklemek ister misiniz?) sorusuna "y" (evet) yanıtını verin.
+   - "Which stylesheet format would you like to use?" (Hangi stil sayfası formatını kullanmak istersiniz?) sorusuna "CSS" seçeneğini seçin (veya tercih ettiğiniz bir stil formatını seçin).
+
+4. Proje oluşturulduktan sonra, proje dizinine gidin:
+
+```bash
+cd ecommerce-frontend
+```
+
+## Gerekli Angular Bileşenlerini Kurma
+
+E-ticaret uygulaması için bazı ek Angular bileşenlerine ihtiyacımız olacaktır. Aşağıdaki komutları çalıştırarak bu bileşenleri kurun:
+
+1. Angular Material (UI bileşenleri için):
+
+```bash
+ng add @angular/material
+```
+
+Bu komut, Angular Material'i projenize ekleyecek ve bazı yapılandırma seçenekleri soracaktır:
+- Tema seçimi (Indigo/Pink önerilir)
+- Global Typography ayarları (Evet)
+- Browser animations (Evet)
+
+2. Bootstrap (Responsive tasarım için):
+
+```bash
+npm install bootstrap
+```
+
+Bootstrap'i projenize ekledikten sonra, `angular.json` dosyasını açın ve `styles` dizisine Bootstrap CSS dosyasını ekleyin:
+
+```json
+"styles": [
+  "node_modules/bootstrap/dist/css/bootstrap.min.css",
+  "src/styles.css"
+]
+```
+
+3. NgRx (State yönetimi için, opsiyonel):
+
+```bash
+npm install @ngrx/store @ngrx/effects @ngrx/entity @ngrx/store-devtools
+```
+
+## Angular Projesini Çalıştırma
+
+Angular projesini geliştirme sunucusunda çalıştırmak için:
+
+1. Proje dizininde olduğunuzdan emin olun.
+2. Aşağıdaki komutu çalıştırın:
+
+```bash
+ng serve
+```
+
+3. Tarayıcınızda `http://localhost:4200` adresine giderek uygulamanın çalıştığını kontrol edin.
+
+4. Uygulamayı farklı bir port üzerinde çalıştırmak isterseniz, aşağıdaki komutu kullanabilirsiniz:
+
+```bash
+ng serve --port 4201
+```
+
+## Angular Projesinin Yapısı
+
+Angular projesi oluşturulduktan sonra, aşağıdaki temel dosya ve dizinleri içerecektir:
+
+- `src/`: Uygulama kaynak kodlarını içeren ana dizin
+  - `app/`: Angular uygulamasının bileşenlerini, servislerini ve modüllerini içeren dizin
+  - `assets/`: Resimler, fontlar gibi statik dosyaları içeren dizin
+  - `environments/`: Farklı ortamlar (geliştirme, üretim) için yapılandırma dosyalarını içeren dizin
+  - `index.html`: Uygulamanın ana HTML dosyası
+  - `main.ts`: Uygulamanın başlangıç noktası
+  - `styles.css`: Global stil dosyası
+- `angular.json`: Angular CLI yapılandırma dosyası
+- `package.json`: Proje bağımlılıklarını ve komutlarını içeren dosya
+- `tsconfig.json`: TypeScript derleyici yapılandırma dosyası
+
+## Proje Yapılandırması
+
+E-ticaret uygulaması için bazı temel yapılandırmalar yapmamız gerekmektedir:
+
+### Proxy Yapılandırması
+
+Angular uygulaması, geliştirme aşamasında genellikle farklı bir port üzerinde çalışan backend API'sine istek gönderir. CORS (Cross-Origin Resource Sharing) sorunlarını önlemek için, bir proxy yapılandırması oluşturabilirsiniz:
+
+1. Proje kök dizininde `proxy.conf.json` adında bir dosya oluşturun:
+
+```json
+{
+  "/api": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true
+  }
+}
+```
+
+2. `angular.json` dosyasını açın ve `serve` bölümüne proxy yapılandırmasını ekleyin:
+
+```json
+"serve": {
+  "builder": "@angular-devkit/build-angular:dev-server",
+  "options": {
+    "browserTarget": "ecommerce-frontend:build",
+    "proxyConfig": "proxy.conf.json"
+  },
+  // ...
+}
+```
+
+Bu yapılandırma, `/api` ile başlayan tüm istekleri `http://localhost:8080` adresine yönlendirecektir.
+
+### Environment Yapılandırması
+
+Farklı ortamlar (geliştirme, üretim) için farklı yapılandırmalar kullanmak isteyebilirsiniz. `src/environments` dizinindeki dosyaları düzenleyin:
+
+1. `environment.ts` (geliştirme ortamı):
+
+```typescript
+export const environment = {
+  production: false,
+  apiUrl: '/api'
+};
+```
+
+2. `environment.prod.ts` (üretim ortamı):
+
+```typescript
+export const environment = {
+  production: true,
+  apiUrl: '/api'
+};
+```
+
+Bu yapılandırmalar, uygulamanızın farklı ortamlarda doğru API URL'sini kullanmasını sağlar.
+
+## Sonuç
+
+Tebrikler! Frontend geliştirme ortamını başarıyla kurdunuz. Artık Angular kullanarak e-ticaret uygulamasının frontend kısmını geliştirmeye başlayabilirsiniz. Bir sonraki bölümde, IDE ve diğer geliştirme araçlarının kurulumunu anlatacağız.

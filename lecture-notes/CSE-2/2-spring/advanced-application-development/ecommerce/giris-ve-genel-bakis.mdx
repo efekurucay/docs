@@ -1,0 +1,102 @@
+---
+title: 'Giriş ve Proje Genel Bakışı'
+description: 'E-Ticaret Web Uygulaması projesinin amaçları, kapsamı ve genel yapısı'
+---
+
+# Giriş ve Proje Genel Bakışı
+
+## Proje Amacı
+
+Bu proje, modern web teknolojilerini kullanarak tam kapsamlı bir e-ticaret web uygulaması geliştirmeyi amaçlamaktadır. Projede, frontend için Angular, backend için Spring Boot kullanılacak ve bu iki bileşen arasındaki iletişim REST API aracılığıyla sağlanacaktır. Bu proje, öğrencilere gerçek dünya senaryolarında kullanılan teknolojiler ve en iyi uygulamalar hakkında pratik deneyim kazandırmayı hedeflemektedir.
+
+E-ticaret uygulaması, kullanıcıların ürünleri görüntüleyebileceği, sepete ekleyebileceği, sipariş verebileceği ve ödeme işlemlerini gerçekleştirebileceği kapsamlı bir platform olacaktır. Ayrıca, yönetici paneli aracılığıyla ürün yönetimi, kategori yönetimi, kullanıcı yönetimi ve sipariş takibi gibi işlevler de sağlanacaktır.
+
+## Proje Kapsamı
+
+Proje, aşağıdaki temel bileşenleri ve özellikleri içerecektir:
+
+### Frontend (Angular)
+
+Angular, modern ve dinamik kullanıcı arayüzleri oluşturmak için kullanılan güçlü bir JavaScript framework'üdür. Projemizde Angular'ın aşağıdaki özelliklerini kullanacağız:
+
+1. **Veri Bağlama (Data Binding)**: Angular'ın çift yönlü veri bağlama özelliği sayesinde, kullanıcı arayüzü ile uygulama verisi arasında sorunsuz bir iletişim sağlanacaktır. Bu, kullanıcı etkileşimlerinin anında uygulamaya yansıtılmasını ve uygulama verilerindeki değişikliklerin kullanıcı arayüzünde hemen görüntülenmesini sağlar.
+
+2. **Komponent Yaşam Döngüsü (Component Lifecycle Hooks)**: Angular komponentlerinin yaşam döngüsü olaylarını (ngOnInit, ngOnChanges, ngOnDestroy vb.) kullanarak, komponentlerin oluşturulması, güncellenmesi ve yok edilmesi süreçlerini etkin bir şekilde yöneteceğiz.
+
+3. **Yönlendirme (Routing)**: Angular Router kullanarak, uygulama içindeki farklı sayfalar arasında gezinmeyi sağlayacağız. Bu, kullanıcıların ürün listeleme sayfasından ürün detay sayfasına, sepet sayfasından ödeme sayfasına vb. geçişlerini mümkün kılacaktır.
+
+4. **Angular Formları**: Kullanıcı girdilerini almak ve doğrulamak için Angular'ın form modüllerini (Reactive Forms ve Template-driven Forms) kullanacağız. Bu, kullanıcı kayıt formları, giriş formları, ürün arama formları ve ödeme formları gibi çeşitli form uygulamalarını içerecektir.
+
+5. **Bağımlılık Enjeksiyonu (Dependency Injection)**: Angular'ın bağımlılık enjeksiyonu sistemi, uygulamanın modüler ve test edilebilir olmasını sağlayacaktır. Servisler, HTTP istemcileri ve diğer bileşenler arasındaki bağımlılıkları yönetmek için bu özelliği kullanacağız.
+
+6. **RxJS**: Asenkron işlemleri yönetmek için Reactive Extensions for JavaScript (RxJS) kütüphanesini kullanacağız. Bu, HTTP istekleri, kullanıcı etkileşimleri ve diğer asenkron olayları işlemek için güçlü bir araç seti sağlayacaktır.
+
+### Backend (Spring Boot)
+
+Spring Boot, Java tabanlı web uygulamaları geliştirmek için kullanılan güçlü bir framework'tür. Projemizde Spring Boot'un aşağıdaki özelliklerini kullanacağız:
+
+1. **Hibernate/JPA**: Veritabanı işlemleri için Object-Relational Mapping (ORM) aracı olarak Hibernate/JPA kullanacağız. Bu, veritabanı tablolarını Java nesnelerine eşleştirmemizi ve veritabanı işlemlerini nesne odaklı bir şekilde gerçekleştirmemizi sağlayacaktır.
+
+2. **REST API Geliştirme**: Frontend ile iletişim kurmak için RESTful web servisleri geliştireceğiz. Bu API'ler, CRUD (Create, Read, Update, Delete) işlemlerini destekleyecek ve JSON formatında veri alışverişi yapacaktır.
+
+3. **Spring MVC**: Model-View-Controller (MVC) mimarisi kullanarak, uygulama mantığını sunum katmanından ayıracağız. Bu, uygulamanın bakımını kolaylaştıracak ve kodun yeniden kullanılabilirliğini artıracaktır.
+
+4. **Gelişmiş JPA Eşleştirmeleri**: Karmaşık veri ilişkilerini (one-to-one, one-to-many, many-to-many) modellemek için JPA'nın gelişmiş eşleştirme özelliklerini kullanacağız. Bu, ürünler ve kategoriler, siparişler ve ürünler, kullanıcılar ve siparişler arasındaki ilişkileri temsil etmek için gereklidir.
+
+5. **Güvenlik**: Spring Security kullanarak, kullanıcı kimlik doğrulama ve yetkilendirme işlemlerini gerçekleştireceğiz. Bu, kullanıcı hesaplarının güvenliğini sağlayacak ve yetkilendirme tabanlı erişim kontrolü uygulayacaktır.
+
+### Veritabanı
+
+Projede, tüm uygulama verilerini depolamak için MySQL ilişkisel veritabanı kullanılacaktır. Veritabanı şeması, aşağıdaki temel tabloları içerecektir:
+
+1. **Kullanıcılar**: Kullanıcı hesap bilgilerini (ad, soyad, e-posta, şifre, rol vb.) depolayacaktır.
+2. **Ürünler**: Ürün bilgilerini (ad, açıklama, fiyat, stok durumu, resim URL'si vb.) depolayacaktır.
+3. **Kategoriler**: Ürün kategorilerini (ad, açıklama vb.) depolayacaktır.
+4. **Siparişler**: Sipariş bilgilerini (sipariş tarihi, toplam tutar, durum vb.) depolayacaktır.
+5. **Sipariş Detayları**: Siparişlerdeki ürünleri ve miktarlarını depolayacaktır.
+6. **Adresler**: Kullanıcı adres bilgilerini depolayacaktır.
+7. **Ödemeler**: Ödeme bilgilerini depolayacaktır.
+
+Bu tablolar arasında, uygun ilişkiler (foreign key constraints) tanımlanacak ve veritabanı normalizasyon kurallarına uygun bir şekilde tasarlanacaktır.
+
+## Proje Mimarisi
+
+Projemiz, aşağıdaki mimari yapıyı takip edecektir:
+
+### Üç Katmanlı Mimari
+
+1. **Sunum Katmanı (Presentation Layer)**: Angular ile geliştirilen frontend uygulaması, kullanıcı arayüzünü ve kullanıcı etkileşimlerini yönetecektir.
+
+2. **İş Mantığı Katmanı (Business Logic Layer)**: Spring Boot ile geliştirilen backend uygulaması, iş mantığını, veri işleme kurallarını ve güvenlik kontrollerini uygulayacaktır.
+
+3. **Veri Erişim Katmanı (Data Access Layer)**: JPA/Hibernate kullanılarak geliştirilen repository sınıfları, veritabanı işlemlerini gerçekleştirecektir.
+
+### Mikroservis Mimarisi Yaklaşımı
+
+Her ne kadar tam bir mikroservis mimarisi uygulanmayacak olsa da, uygulamamız modüler bir yapıda tasarlanacak ve gelecekte mikroservislere dönüştürülebilecek şekilde yapılandırılacaktır. Backend uygulaması, aşağıdaki temel modülleri içerecektir:
+
+1. **Kullanıcı Yönetimi**: Kullanıcı hesapları, kimlik doğrulama ve yetkilendirme işlemlerini yönetecektir.
+2. **Ürün Yönetimi**: Ürün ve kategori işlemlerini yönetecektir.
+3. **Sipariş Yönetimi**: Sipariş oluşturma, güncelleme ve takip işlemlerini yönetecektir.
+4. **Ödeme İşlemleri**: Ödeme işlemlerini yönetecektir.
+
+## Proje Teslim Gereksinimleri
+
+Proje tamamlandığında, aşağıdaki çıktılar teslim edilecektir:
+
+1. **Uygulama Mimarisi Diyagramı**: Frontend, backend ve veritabanı arasındaki etkileşimi gösteren bir diyagram.
+
+2. **Entity İlişki Diyagramı (ERD)**: Veritabanı şemasını ve ilişkilerini görselleştiren bir diyagram.
+
+3. **Sınıf Diyagramı**: Temel backend bileşenlerinin yapısını gösteren bir diyagram.
+
+4. **Kaynak Kodu**:
+   - Angular frontend kodu
+   - Spring Boot backend kodu
+   - Veritabanı oluşturma ve veri doldurma scriptleri
+
+## Sonuç
+
+Bu proje, öğrencilere modern web teknolojileri kullanarak tam kapsamlı bir e-ticaret uygulaması geliştirme deneyimi sunacaktır. Proje sürecinde, frontend ve backend geliştirme, veritabanı tasarımı, güvenlik uygulamaları ve deployment gibi konularda pratik deneyim kazanılacaktır. Bu deneyim, öğrencilerin gelecekteki profesyonel kariyerlerinde karşılaşacakları gerçek dünya problemlerini çözmelerine yardımcı olacak becerileri geliştirmelerine katkı sağlayacaktır.
+
+Sonraki bölümlerde, projenin her bir aşaması detaylı olarak ele alınacak ve adım adım uygulama geliştirme süreci anlatılacaktır.

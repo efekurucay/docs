@@ -1,0 +1,491 @@
+---
+title: JPA/Hibernate ile ORM
+description: Spring Boot ile e-ticaret uygulaması için JPA/Hibernate ORM yapılandırması
+---
+
+# JPA/Hibernate ile ORM
+
+Bu bölümde, e-ticaret uygulaması için JPA (Java Persistence API) ve Hibernate ORM (Object-Relational Mapping) yapılandırmasını detaylı olarak ele alacağız. JPA ve Hibernate, Java nesneleri ile ilişkisel veritabanı tabloları arasında eşleştirme yaparak, veritabanı işlemlerini nesne odaklı bir şekilde gerçekleştirmenizi sağlar.
+
+## ORM Nedir?
+
+ORM (Object-Relational Mapping), nesne yönelimli programlama dilleri ile ilişkisel veritabanları arasında bir köprü görevi gören bir programlama tekniğidir. ORM, veritabanı tablolarını Java sınıflarına, tablo sütunlarını sınıf alanlarına ve tablo satırlarını nesnelere eşleştirir. Bu sayede, SQL sorguları yazmak yerine, Java nesneleri üzerinde işlem yaparak veritabanı işlemlerini gerçekleştirebilirsiniz.
+
+## JPA Nedir?
+
+JPA (Java Persistence API), Java EE ve Java SE uygulamalarında ilişkisel veritabanı yönetimi için bir standart sağlayan bir Java spesifikasyonudur. JPA, ORM için bir standart tanımlar ve farklı ORM sağlayıcıları (Hibernate, EclipseLink, OpenJPA vb.) bu standardı uygular.
+
+## Hibernate Nedir?
+
+Hibernate, JPA spesifikasyonunu uygulayan en popüler ORM framework'üdür. Hibernate, JPA'nın tüm özelliklerini destekler ve ek olarak kendi özelliklerini de sunar. Spring Boot, varsayılan olarak Hibernate'i JPA sağlayıcısı olarak kullanır.
+
+## Spring Data JPA Nedir?
+
+Spring Data JPA, Spring Framework'ün bir parçasıdır ve JPA tabanlı repository'lerin uygulanmasını kolaylaştırır. Spring Data JPA, CRUD (Create, Read, Update, Delete) işlemleri için hazır metodlar sağlar ve özel sorgular oluşturmak için bir DSL (Domain Specific Language) sunar.
+
+## JPA/Hibernate Yapılandırması
+
+Spring Boot, otomatik yapılandırma özelliği sayesinde, JPA ve Hibernate için temel yapılandırmayı otomatik olarak yapar. Ancak, bazı özel ayarlar için `application.properties` dosyasında yapılandırma yapmamız gerekebilir.
+
+### application.properties
+
+```properties
+# Veritabanı Bağlantı Ayarları
+spring.datasource.url=jdbc:mysql://localhost:3306/ecommerce?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8
+spring.datasource.username=ecommerceuser
+spring.datasource.password=password
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA/Hibernate Ayarları
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.use_sql_comments=true
+spring.jpa.properties.hibernate.type=trace
+
+# Hibernate İstatistikleri
+spring.jpa.properties.hibernate.generate_statistics=true
+logging.level.org.hibernate.stat=debug
+
+# İkinci Seviye Önbellek
+spring.jpa.properties.hibernate.cache.use_second_level_cache=true
+spring.jpa.properties.hibernate.cache.use_query_cache=true
+spring.jpa.properties.hibernate.cache.region.factory_class=org.hibernate.cache.ehcache.EhCacheRegionFactory
+spring.jpa.properties.javax.persistence.sharedCache.mode=ENABLE_SELECTIVE
+```
+
+Bu yapılandırma dosyası, aşağıdaki ayarları içerir:
+
+- **Veritabanı Bağlantı Ayarları**: Veritabanı URL'si, kullanıcı adı, şifre ve sürücü sınıfı.
+- **JPA/Hibernate Ayarları**:
+  - `spring.jpa.hibernate.ddl-auto`: Hibernate'in veritabanı şemasını nasıl yöneteceğini belirtir. `update` değeri, mevcut şemayı güncelleyeceğini belirtir.
+  - `spring.jpa.show-sql`: SQL sorgularının konsola yazdırılıp yazdırılmayacağını belirtir.
+  - `spring.jpa.properties.hibernate.dialect`: Hibernate'in hangi veritabanı dialektini kullanacağını belirtir.
+  - `spring.jpa.properties.hibernate.format_sql`: SQL sorgularının formatlanıp formatlanmayacağını belirtir.
+  - `spring.jpa.properties.hibernate.use_sql_comments`: SQL sorgularına yorum eklenip eklenmeyeceğini belirtir.
+  - `spring.jpa.properties.hibernate.type`: Bağlı parametrelerin değerlerinin loglanıp loglanmayacağını belirtir.
+- **Hibernate İstatistikleri**: Hibernate'in istatistik toplamasını ve bu istatistiklerin loglanmasını sağlar.
+- **İkinci Seviye Önbellek**: Hibernate'in ikinci seviye önbelleğini ve sorgu önbelleğini etkinleştirir.
+
+### Farklı Ortamlar için Yapılandırma
+
+Farklı ortamlar (geliştirme, test, üretim) için farklı JPA/Hibernate yapılandırmaları kullanmak isteyebilirsiniz. Bu durumda, profil tabanlı yapılandırma kullanabilirsiniz.
+
+#### application-dev.properties (Geliştirme Ortamı)
+
+```properties
+# JPA/Hibernate Ayarları
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.use_sql_comments=true
+spring.jpa.properties.hibernate.type=trace
+```
+
+#### application-prod.properties (Üretim Ortamı)
+
+```properties
+# JPA/Hibernate Ayarları
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=false
+spring.jpa.properties.hibernate.use_sql_comments=false
+spring.jpa.properties.hibernate.type=info
+```
+
+## Entity Sınıflarında JPA Anotasyonları
+
+JPA, entity sınıflarını ve ilişkilerini tanımlamak için çeşitli anotasyonlar sağlar. Bu anotasyonlar, Java sınıflarının veritabanı tablolarına nasıl eşleştirileceğini belirtir.
+
+### Temel JPA Anotasyonları
+
+- **@Entity**: Bir sınıfın entity olduğunu belirtir.
+- **@Table**: Entity'nin eşleştirildiği veritabanı tablosunu belirtir.
+- **@Id**: Birincil anahtar alanını belirtir.
+- **@GeneratedValue**: Birincil anahtar değerinin nasıl oluşturulacağını belirtir.
+- **@Column**: Alanın eşleştirildiği veritabanı sütununu belirtir.
+- **@Temporal**: Tarih ve zaman alanlarının nasıl eşleştirileceğini belirtir.
+- **@Enumerated**: Enum alanlarının nasıl eşleştirileceğini belirtir.
+- **@Transient**: Alanın veritabanına eşleştirilmeyeceğini belirtir.
+
+### İlişki Anotasyonları
+
+- **@OneToOne**: Bire bir ilişkiyi belirtir.
+- **@OneToMany**: Bire çok ilişkiyi belirtir.
+- **@ManyToOne**: Çoka bir ilişkiyi belirtir.
+- **@ManyToMany**: Çoka çok ilişkiyi belirtir.
+- **@JoinColumn**: İlişki için kullanılan yabancı anahtar sütununu belirtir.
+- **@JoinTable**: Çoka çok ilişkiler için kullanılan bağlantı tablosunu belirtir.
+
+### Örnek Entity Sınıfı
+
+```java
+@Entity
+@Table(name = "products")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Product extends BaseEntity {
+
+    @NotBlank
+    @Size(max = 255)
+    private String name;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @NotNull
+    @PositiveOrZero
+    private BigDecimal price;
+
+    @NotNull
+    @PositiveOrZero
+    @Column(name = "stock_quantity")
+    private Integer stockQuantity;
+
+    @Size(max = 255)
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderDetail> orderDetails = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+
+    // Helper methods
+}
+```
+
+## İlişki Yönetimi
+
+JPA, entity'ler arasındaki ilişkileri yönetmek için çeşitli özellikler sağlar. Bu özellikler, ilişkilerin nasıl yükleneceğini, güncellemelerin nasıl yayılacağını ve ilişkili entity'lerin nasıl silineceğini belirler.
+
+### Fetch Tipi
+
+Fetch tipi, ilişkili entity'lerin ne zaman yükleneceğini belirler. İki tür fetch tipi vardır:
+
+- **EAGER**: İlişkili entity'ler, ana entity yüklendiğinde hemen yüklenir.
+- **LAZY**: İlişkili entity'ler, ihtiyaç duyulduğunda (erişildiğinde) yüklenir.
+
+```java
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "category_id")
+private Category category;
+```
+
+### Cascade Tipi
+
+Cascade tipi, bir entity üzerindeki işlemlerin ilişkili entity'lere nasıl yayılacağını belirler. Örneğin, bir entity silindiğinde, ilişkili entity'lerin de silinip silinmeyeceğini belirler.
+
+```java
+@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<ProductImage> images = new ArrayList<>();
+```
+
+Cascade tipleri şunlardır:
+
+- **ALL**: Tüm işlemler (PERSIST, MERGE, REMOVE, REFRESH, DETACH) yayılır.
+- **PERSIST**: Kaydetme işlemi yayılır.
+- **MERGE**: Birleştirme işlemi yayılır.
+- **REMOVE**: Silme işlemi yayılır.
+- **REFRESH**: Yenileme işlemi yayılır.
+- **DETACH**: Ayırma işlemi yayılır.
+
+### orphanRemoval
+
+`orphanRemoval` özelliği, bir koleksiyondan kaldırılan entity'lerin veritabanından da silinip silinmeyeceğini belirler. `true` olarak ayarlandığında, koleksiyondan kaldırılan entity'ler veritabanından da silinir.
+
+```java
+@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<ProductImage> images = new ArrayList<>();
+```
+
+### mappedBy
+
+`mappedBy` özelliği, ilişkinin hangi entity tarafından yönetildiğini belirtir. İlişkinin sahibi olmayan tarafta kullanılır ve ilişkinin sahibi olan entity'deki alanın adını belirtir.
+
+```java
+@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<ProductImage> images = new ArrayList<>();
+```
+
+Bu örnekte, `ProductImage` entity'sindeki `product` alanı ilişkinin sahibidir.
+
+## İlişki Türleri
+
+JPA, dört tür ilişkiyi destekler: bire bir, bire çok, çoka bir ve çoka çok. Her ilişki türü, farklı anotasyonlar ve özellikler kullanılarak tanımlanır.
+
+### Bire Bir İlişki (@OneToOne)
+
+Bire bir ilişki, bir entity'nin başka bir entity ile bire bir ilişkisi olduğunu belirtir. Örneğin, bir sipariş bir ödeme ile ilişkilendirilebilir.
+
+```java
+// Order entity
+@OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+private Payment payment;
+
+// Payment entity
+@OneToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "order_id")
+private Order order;
+```
+
+### Bire Çok İlişki (@OneToMany) ve Çoka Bir İlişki (@ManyToOne)
+
+Bire çok ilişki, bir entity'nin birden fazla başka entity ile ilişkisi olduğunu belirtir. Çoka bir ilişki, bunun tersidir. Örneğin, bir kategori birden fazla ürüne sahip olabilir, ancak bir ürün yalnızca bir kategoriye ait olabilir.
+
+```java
+// Category entity
+@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<Product> products = new ArrayList<>();
+
+// Product entity
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "category_id")
+private Category category;
+```
+
+### Çoka Çok İlişki (@ManyToMany)
+
+Çoka çok ilişki, her iki entity'nin de birden fazla diğer entity ile ilişkisi olduğunu belirtir. Örneğin, bir ürün birden fazla etikete sahip olabilir ve bir etiket birden fazla ürüne ait olabilir.
+
+```java
+// Product entity
+@ManyToMany
+@JoinTable(
+    name = "product_tag",
+    joinColumns = @JoinColumn(name = "product_id"),
+    inverseJoinColumns = @JoinColumn(name = "tag_id")
+)
+private Set<Tag> tags = new HashSet<>();
+
+// Tag entity
+@ManyToMany(mappedBy = "tags")
+private Set<Product> products = new HashSet<>();
+```
+
+## JPA Yaşam Döngüsü
+
+JPA entity'leri, belirli bir yaşam döngüsüne sahiptir. Bu yaşam döngüsü, entity'nin durumunu ve veritabanı ile olan ilişkisini tanımlar.
+
+### Entity Durumları
+
+- **Transient (Geçici)**: Entity henüz veritabanına kaydedilmemiştir ve bir `EntityManager` ile ilişkilendirilmemiştir.
+- **Managed (Yönetilen)**: Entity bir `EntityManager` tarafından yönetilmektedir ve veritabanı ile senkronize edilecektir.
+- **Detached (Ayrılmış)**: Entity daha önce bir `EntityManager` tarafından yönetilmiştir, ancak artık yönetilmemektedir.
+- **Removed (Silinmiş)**: Entity bir `EntityManager` tarafından yönetilmektedir, ancak veritabanından silinmek üzere işaretlenmiştir.
+
+### Entity Yaşam Döngüsü Olayları
+
+JPA, entity yaşam döngüsü olaylarını dinlemek için çeşitli anotasyonlar sağlar. Bu anotasyonlar, belirli olaylar gerçekleştiğinde çalıştırılacak metodları işaretlemek için kullanılır.
+
+- **@PrePersist**: Entity veritabanına kaydedilmeden önce çağrılır.
+- **@PostPersist**: Entity veritabanına kaydedildikten sonra çağrılır.
+- **@PreUpdate**: Entity güncellenmeden önce çağrılır.
+- **@PostUpdate**: Entity güncellendikten sonra çağrılır.
+- **@PreRemove**: Entity silinmeden önce çağrılır.
+- **@PostRemove**: Entity silindikten sonra çağrılır.
+- **@PostLoad**: Entity veritabanından yüklendikten sonra çağrılır.
+
+```java
+@Entity
+@Table(name = "products")
+@EntityListeners(AuditingEntityListener.class)
+public class Product extends BaseEntity {
+    // ...
+
+    @PrePersist
+    public void prePersist() {
+        // Entity veritabanına kaydedilmeden önce yapılacak işlemler
+    }
+
+    @PostPersist
+    public void postPersist() {
+        // Entity veritabanına kaydedildikten sonra yapılacak işlemler
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        // Entity güncellenmeden önce yapılacak işlemler
+    }
+
+    @PostUpdate
+    public void postUpdate() {
+        // Entity güncellendikten sonra yapılacak işlemler
+    }
+
+    @PreRemove
+    public void preRemove() {
+        // Entity silinmeden önce yapılacak işlemler
+    }
+
+    @PostRemove
+    public void postRemove() {
+        // Entity silindikten sonra yapılacak işlemler
+    }
+
+    @PostLoad
+    public void postLoad() {
+        // Entity veritabanından yüklendikten sonra yapılacak işlemler
+    }
+}
+```
+
+## JPA Sorgulama
+
+JPA, veritabanı sorgularını gerçekleştirmek için çeşitli yöntemler sağlar. Bu yöntemler, JPQL (Java Persistence Query Language), Criteria API ve Native SQL sorgularını içerir.
+
+### JPQL (Java Persistence Query Language)
+
+JPQL, SQL'e benzer bir sorgu dilidir, ancak veritabanı tablolarını ve sütunlarını değil, entity'leri ve alanlarını hedef alır.
+
+```java
+@Repository
+public class ProductRepositoryImpl implements ProductRepositoryCustom {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Override
+    public List<Product> findProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
+        String jpql = "SELECT p FROM Product p WHERE p.price BETWEEN :minPrice AND :maxPrice";
+        return entityManager.createQuery(jpql, Product.class)
+                .setParameter("minPrice", minPrice)
+                .setParameter("maxPrice", maxPrice)
+                .getResultList();
+    }
+}
+```
+
+### Criteria API
+
+Criteria API, JPQL sorgularını programatik olarak oluşturmak için bir API sağlar. Bu, tip güvenliği ve daha dinamik sorgular oluşturma yeteneği sağlar.
+
+```java
+@Repository
+public class ProductRepositoryImpl implements ProductRepositoryCustom {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Override
+    public List<Product> findProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Product> query = cb.createQuery(Product.class);
+        Root<Product> product = query.from(Product.class);
+        
+        Predicate pricePredicate = cb.between(product.get("price"), minPrice, maxPrice);
+        query.select(product).where(pricePredicate);
+        
+        return entityManager.createQuery(query).getResultList();
+    }
+}
+```
+
+### Native SQL
+
+JPA, native SQL sorguları çalıştırma yeteneği de sağlar. Bu, veritabanına özgü özellikleri kullanmanız gerektiğinde faydalıdır.
+
+```java
+@Repository
+public class ProductRepositoryImpl implements ProductRepositoryCustom {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Override
+    public List<Product> findProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
+        String sql = "SELECT * FROM products WHERE price BETWEEN :minPrice AND :maxPrice";
+        return entityManager.createNativeQuery(sql, Product.class)
+                .setParameter("minPrice", minPrice)
+                .setParameter("maxPrice", maxPrice)
+                .getResultList();
+    }
+}
+```
+
+## JPA Önbelleği
+
+JPA, performansı artırmak için çeşitli önbellek seviyeleri sağlar. Bu önbellekler, veritabanı sorgularının sayısını azaltarak uygulamanın performansını artırır.
+
+### Birinci Seviye Önbellek
+
+Birinci seviye önbellek, `EntityManager` seviyesinde çalışır ve varsayılan olarak etkindir. Bu önbellek, aynı `EntityManager` içinde aynı entity'nin tekrar yüklenmesini önler.
+
+```java
+// İlk sorgu veritabanından yüklenir
+Product product1 = entityManager.find(Product.class, 1L);
+
+// İkinci sorgu önbellekten gelir
+Product product2 = entityManager.find(Product.class, 1L);
+```
+
+### İkinci Seviye Önbellek
+
+İkinci seviye önbellek, `EntityManagerFactory` seviyesinde çalışır ve farklı `EntityManager` örnekleri arasında paylaşılır. Bu önbellek, varsayılan olarak devre dışıdır ve etkinleştirmek için yapılandırma gerektirir.
+
+```properties
+# İkinci Seviye Önbellek
+spring.jpa.properties.hibernate.cache.use_second_level_cache=true
+spring.jpa.properties.hibernate.cache.use_query_cache=true
+spring.jpa.properties.hibernate.cache.region.factory_class=org.hibernate.cache.ehcache.EhCacheRegionFactory
+spring.jpa.properties.javax.persistence.sharedCache.mode=ENABLE_SELECTIVE
+```
+
+Entity sınıflarında, ikinci seviye önbelleği etkinleştirmek için `@Cacheable` anotasyonu kullanılır:
+
+```java
+@Entity
+@Table(name = "products")
+@Cacheable
+public class Product extends BaseEntity {
+    // ...
+}
+```
+
+### Sorgu Önbelleği
+
+Sorgu önbelleği, JPQL ve Criteria API sorgularının sonuçlarını önbelleğe alır. Bu önbellek, varsayılan olarak devre dışıdır ve etkinleştirmek için yapılandırma gerektirir.
+
+```properties
+# Sorgu Önbelleği
+spring.jpa.properties.hibernate.cache.use_query_cache=true
+```
+
+Sorgu önbelleğini kullanmak için, sorguyu oluştururken `setHint` metodunu kullanabilirsiniz:
+
+```java
+@Repository
+public class ProductRepositoryImpl implements ProductRepositoryCustom {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Override
+    public List<Product> findProductsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
+        String jpql = "SELECT p FROM Product p WHERE p.price BETWEEN :minPrice AND :maxPrice";
+        return entityManager.createQuery(jpql, Product.class)
+                .setParameter("minPrice", minPrice)
+                .setParameter("maxPrice", maxPrice)
+                .setHint("org.hibernate.cacheable", true)
+                .getResultList();
+    }
+}
+```
+
+## Sonuç
+
+Bu bölümde, e-ticaret uygulaması için JPA ve Hibernate ORM yapılandırmasını detaylı olarak ele aldık. JPA ve Hibernate, Java nesneleri ile ilişkisel veritabanı tabloları arasında eşleştirme yaparak, veritabanı işlemlerini nesne odaklı bir şekilde gerçekleştirmenizi sağlar. Doğru yapılandırılmış bir ORM katmanı, uygulamanın veritabanı işlemlerini daha verimli ve bakımı daha kolay hale getirir.
+
+Bir sonraki bölümde, repository katmanını oluşturmayı ele alacağız.

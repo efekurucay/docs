@@ -1,0 +1,1263 @@
+---
+title: 'Komponent Yapısı ve Yaşam Döngüsü'
+description: 'Angular komponentlerinin yapısı ve yaşam döngüsü'
+---
+
+# Komponent Yapısı ve Yaşam Döngüsü
+
+Bu bölümde, Angular komponentlerinin yapısını ve yaşam döngüsünü detaylı olarak ele alacağız. Komponentler, Angular uygulamalarının temel yapı taşlarıdır ve kullanıcı arayüzünün farklı bölümlerini oluşturmak için kullanılırlar.
+
+## Angular Komponentleri Nedir?
+
+Angular komponentleri, kullanıcı arayüzünün bağımsız ve yeniden kullanılabilir parçalarıdır. Her komponent, HTML şablonu, CSS stilleri ve TypeScript kodu içerir. Komponentler, veri bağlama (data binding), olay dinleme (event listening) ve yaşam döngüsü kancaları (lifecycle hooks) gibi özelliklere sahiptir.
+
+Komponentler, Angular uygulamalarının modüler ve bakımı kolay olmasını sağlar. Bir komponent, kendi işlevselliğine sahip olabilir ve diğer komponentlerle etkileşimde bulunabilir.
+
+## Komponent Oluşturma
+
+Angular CLI kullanarak yeni bir komponent oluşturmak için, aşağıdaki komutu kullanabilirsiniz:
+
+```bash
+ng generate component features/product/product-list
+```
+
+Bu komut, `features/product/` klasöründe `product-list` adında yeni bir komponent oluşturur. Oluşturulan dosyalar şunlardır:
+
+- **product-list.component.ts**: Komponentin TypeScript kodu.
+- **product-list.component.html**: Komponentin HTML şablonu.
+- **product-list.component.scss**: Komponentin SCSS stilleri.
+- **product-list.component.spec.ts**: Komponentin test dosyası.
+
+### Komponent Dekoratörü
+
+Komponent sınıfı, `@Component` dekoratörü ile işaretlenir. Bu dekoratör, komponentin meta verilerini tanımlar:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-product-list',
+  templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.scss']
+})
+export class ProductListComponent implements OnInit {
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+}
+```
+
+`@Component` dekoratörü, aşağıdaki özelliklere sahiptir:
+
+- **selector**: Komponentin HTML etiketini tanımlar. Bu etiket, komponenti diğer şablonlarda kullanmak için kullanılır.
+- **templateUrl**: Komponentin HTML şablonunun yolunu belirtir.
+- **styleUrls**: Komponentin stil dosyalarının yollarını belirtir.
+
+Alternatif olarak, HTML şablonu ve stiller doğrudan dekoratörde tanımlanabilir:
+
+```typescript
+@Component({
+  selector: 'app-product-list',
+  template: `
+    <div class="product-list">
+      <h2>Ürün Listesi</h2>
+      <div *ngFor="let product of products">
+        {{ product.name }}
+      </div>
+    </div>
+  `,
+  styles: [`
+    .product-list {
+      margin: 20px;
+    }
+    h2 {
+      color: #333;
+    }
+  `]
+})
+```
+
+### Komponent Sınıfı
+
+Komponent sınıfı, komponentin davranışını ve verilerini tanımlar. Bu sınıf, özellikler (properties) ve metodlar içerebilir:
+
+```typescript
+export class ProductListComponent implements OnInit {
+  products: Product[] = [];
+  loading = false;
+  error: string | null = null;
+
+  constructor(private productService: ProductService) { }
+
+  ngOnInit(): void {
+    this.loadProducts();
+  }
+
+  loadProducts(): void {
+    this.loading = true;
+    this.productService.getProducts()
+      .subscribe(
+        products => {
+          this.products = products;
+          this.loading = false;
+        },
+        error => {
+          this.error = 'Ürünler yüklenirken bir hata oluştu.';
+          this.loading = false;
+          console.error('Ürünler yüklenirken hata:', error);
+        }
+      );
+  }
+
+  trackByProductId(index: number, product: Product): number {
+    return product.id;
+  }
+}
+```
+
+Bu örnekte, `ProductListComponent` sınıfı, ürünleri yüklemek ve görüntülemek için gerekli özellikleri ve metodları içerir.
+
+## Komponent Şablonu
+
+Komponent şablonu, komponentin görsel yapısını tanımlar. Şablon, HTML, Angular direktifleri ve veri bağlama ifadeleri içerebilir:
+
+```html
+<div class="product-list-container">
+  <h2>Ürün Listesi</h2>
+  
+  <div *ngIf="loading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+  
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+  
+  <div *ngIf="!loading && !error" class="product-grid">
+    <div *ngFor="let product of products; trackBy: trackByProductId" class="product-card">
+      <img [src]="product.imageUrl" [alt]="product.name" class="product-image">
+      <div class="product-info">
+        <h3>{{ product.name }}</h3>
+        <p>{{ product.description }}</p>
+        <div class="product-price">{{ product.price | currency:'TRY':'symbol':'1.2-2' }}</div>
+        <button mat-raised-button color="primary" (click)="addToCart(product)">Sepete Ekle</button>
+      </div>
+    </div>
+  </div>
+  
+  <div *ngIf="!loading && !error && products.length === 0" class="no-products">
+    Ürün bulunamadı.
+  </div>
+</div>
+```
+
+Bu şablonda, çeşitli Angular özellikleri kullanılmıştır:
+
+- **Yapısal Direktifler**: `*ngIf` ve `*ngFor` gibi yapısal direktifler, DOM'un yapısını değiştirmek için kullanılır.
+- **Özellik Bağlama**: `[src]` ve `[alt]` gibi özellik bağlamaları, HTML özelliklerini komponent özelliklerine bağlamak için kullanılır.
+- **Olay Bağlama**: `(click)` gibi olay bağlamaları, kullanıcı etkileşimlerini komponent metodlarına bağlamak için kullanılır.
+- **İnterpolasyon**: `{{ product.name }}` gibi interpolasyon ifadeleri, komponent özelliklerini şablonda görüntülemek için kullanılır.
+- **Pipe'lar**: `| currency` gibi pipe'lar, veriyi görüntülenmeden önce dönüştürmek için kullanılır.
+
+## Komponent Stilleri
+
+Komponent stilleri, komponentin görünümünü tanımlar. Angular, stilleri kapsülleyerek, bir komponentin stillerinin diğer komponentleri etkilemesini önler:
+
+```scss
+.product-list-container {
+  padding: 20px;
+  
+  h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    margin: 50px 0;
+  }
+  
+  .error-message {
+    color: #f44336;
+    padding: 10px;
+    margin: 20px 0;
+    background-color: #ffebee;
+    border-radius: 4px;
+  }
+  
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .product-card {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .product-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    
+    .product-info {
+      padding: 15px;
+      
+      h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 18px;
+      }
+      
+      p {
+        color: #666;
+        margin-bottom: 15px;
+        height: 60px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+      }
+      
+      .product-price {
+        font-size: 20px;
+        font-weight: bold;
+        color: #2196f3;
+        margin-bottom: 15px;
+      }
+    }
+  }
+  
+  .no-products {
+    text-align: center;
+    padding: 50px;
+    color: #666;
+    font-style: italic;
+  }
+}
+```
+
+Bu SCSS stillerinde, çeşitli CSS özellikleri ve SCSS özellikleri kullanılmıştır:
+
+- **Yuvalanmış Seçiciler**: SCSS, seçicileri yuvalamayı destekler, bu da CSS'i daha organize ve okunabilir hale getirir.
+- **Değişkenler**: SCSS, değişkenleri destekler, bu da renk, boyut gibi değerleri bir yerde tanımlamayı ve birden çok yerde kullanmayı sağlar.
+- **Mixins**: SCSS, mixinleri destekler, bu da CSS kodunu yeniden kullanmayı sağlar.
+- **Operatörler**: SCSS, matematiksel operatörleri destekler, bu da değerleri hesaplamayı sağlar.
+
+## Komponent Yaşam Döngüsü
+
+Angular komponentleri, oluşturulduklarından yok edildiklerine kadar bir dizi yaşam döngüsü olayından geçer. Bu olaylar, komponentin farklı aşamalarında kod çalıştırmanıza olanak tanır.
+
+### Yaşam Döngüsü Kancaları
+
+Angular, aşağıdaki yaşam döngüsü kancalarını sağlar:
+
+1. **ngOnChanges**: Veri bağlı bir özellik değiştiğinde çağrılır.
+2. **ngOnInit**: Komponent başlatıldıktan sonra çağrılır.
+3. **ngDoCheck**: Her değişiklik algılama döngüsünde çağrılır.
+4. **ngAfterContentInit**: Komponentin içeriği başlatıldıktan sonra çağrılır.
+5. **ngAfterContentChecked**: Komponentin içeriği kontrol edildikten sonra çağrılır.
+6. **ngAfterViewInit**: Komponentin görünümü başlatıldıktan sonra çağrılır.
+7. **ngAfterViewChecked**: Komponentin görünümü kontrol edildikten sonra çağrılır.
+8. **ngOnDestroy**: Komponent yok edilmeden önce çağrılır.
+
+Bu kancaları kullanmak için, ilgili arayüzleri uygulamanız gerekir:
+
+```typescript
+import { Component, OnInit, OnChanges, DoCheck, AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy, SimpleChanges, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-product-detail',
+  templateUrl: './product-detail.component.html',
+  styleUrls: ['./product-detail.component.scss']
+})
+export class ProductDetailComponent implements OnInit, OnChanges, DoCheck, AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy {
+  @Input() productId: number;
+  
+  constructor() {
+    console.log('constructor çağrıldı');
+  }
+  
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('ngOnChanges çağrıldı', changes);
+  }
+  
+  ngOnInit(): void {
+    console.log('ngOnInit çağrıldı');
+  }
+  
+  ngDoCheck(): void {
+    console.log('ngDoCheck çağrıldı');
+  }
+  
+  ngAfterContentInit(): void {
+    console.log('ngAfterContentInit çağrıldı');
+  }
+  
+  ngAfterContentChecked(): void {
+    console.log('ngAfterContentChecked çağrıldı');
+  }
+  
+  ngAfterViewInit(): void {
+    console.log('ngAfterViewInit çağrıldı');
+  }
+  
+  ngAfterViewChecked(): void {
+    console.log('ngAfterViewChecked çağrıldı');
+  }
+  
+  ngOnDestroy(): void {
+    console.log('ngOnDestroy çağrıldı');
+  }
+}
+```
+
+### Yaşam Döngüsü Kancalarının Kullanımı
+
+Yaşam döngüsü kancaları, çeşitli senaryolarda kullanılabilir:
+
+#### ngOnInit
+
+`ngOnInit`, komponentin başlatılması sırasında bir kez çağrılır. Bu kanca, genellikle veri yükleme, abonelikler oluşturma ve diğer başlatma işlemleri için kullanılır:
+
+```typescript
+ngOnInit(): void {
+  this.loadProduct();
+  this.subscription = this.route.params.subscribe(params => {
+    this.productId = +params['id'];
+    this.loadProduct();
+  });
+}
+```
+
+#### ngOnChanges
+
+`ngOnChanges`, veri bağlı bir özellik değiştiğinde çağrılır. Bu kanca, genellikle giriş özelliklerindeki değişikliklere tepki vermek için kullanılır:
+
+```typescript
+ngOnChanges(changes: SimpleChanges): void {
+  if (changes['productId'] && !changes['productId'].firstChange) {
+    this.loadProduct();
+  }
+}
+```
+
+#### ngOnDestroy
+
+`ngOnDestroy`, komponent yok edilmeden önce çağrılır. Bu kanca, genellikle abonelikleri iptal etmek, zamanlayıcıları temizlemek ve diğer temizleme işlemleri için kullanılır:
+
+```typescript
+ngOnDestroy(): void {
+  this.subscription.unsubscribe();
+  clearInterval(this.timerInterval);
+}
+```
+
+## Komponent İletişimi
+
+Angular komponentleri, çeşitli yöntemlerle birbirleriyle iletişim kurabilir.
+
+### @Input ve @Output Dekoratörleri
+
+`@Input` dekoratörü, üst komponentten alt komponente veri aktarmak için kullanılır:
+
+```typescript
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-product-card',
+  templateUrl: './product-card.component.html',
+  styleUrls: ['./product-card.component.scss']
+})
+export class ProductCardComponent {
+  @Input() product: Product;
+}
+```
+
+Üst komponent, alt komponente veri aktarmak için özellik bağlamasını kullanır:
+
+```html
+<app-product-card [product]="product"></app-product-card>
+```
+
+`@Output` dekoratörü, alt komponentten üst komponente olay göndermek için kullanılır:
+
+```typescript
+import { Component, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-product-card',
+  templateUrl: './product-card.component.html',
+  styleUrls: ['./product-card.component.scss']
+})
+export class ProductCardComponent {
+  @Input() product: Product;
+  @Output() addToCart = new EventEmitter<Product>();
+  
+  onAddToCart(): void {
+    this.addToCart.emit(this.product);
+  }
+}
+```
+
+Üst komponent, alt komponentin olaylarını dinlemek için olay bağlamasını kullanır:
+
+```html
+<app-product-card 
+  [product]="product" 
+  (addToCart)="onAddToCart($event)">
+</app-product-card>
+```
+
+### ViewChild ve ContentChild
+
+`ViewChild` dekoratörü, bir komponentin şablonundaki bir elemana veya komponente erişmek için kullanılır:
+
+```typescript
+import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+
+@Component({
+  selector: 'app-product-table',
+  templateUrl: './product-table.component.html',
+  styleUrls: ['./product-table.component.scss']
+})
+export class ProductTableComponent implements AfterViewInit {
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
+  
+  dataSource = new MatTableDataSource<Product>();
+  
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+}
+```
+
+`ContentChild` dekoratörü, bir komponentin içeriğindeki bir elemana veya komponente erişmek için kullanılır:
+
+```typescript
+import { Component, ContentChild, AfterContentInit } from '@angular/core';
+import { ProductFilterComponent } from '../product-filter/product-filter.component';
+
+@Component({
+  selector: 'app-product-container',
+  templateUrl: './product-container.component.html',
+  styleUrls: ['./product-container.component.scss']
+})
+export class ProductContainerComponent implements AfterContentInit {
+  @ContentChild(ProductFilterComponent) filter: ProductFilterComponent;
+  
+  ngAfterContentInit(): void {
+    if (this.filter) {
+      this.filter.filterChange.subscribe(filters => {
+        this.applyFilters(filters);
+      });
+    }
+  }
+  
+  applyFilters(filters: any): void {
+    // Filtreleri uygula
+  }
+}
+```
+
+### Servis Kullanarak İletişim
+
+Komponentler arasında veri paylaşmak için bir servis kullanabilirsiniz:
+
+```typescript
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { Product } from '../models/product.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CartService {
+  private cartItemsSubject = new BehaviorSubject<Product[]>([]);
+  cartItems$ = this.cartItemsSubject.asObservable();
+  
+  addToCart(product: Product): void {
+    const currentItems = this.cartItemsSubject.value;
+    this.cartItemsSubject.next([...currentItems, product]);
+  }
+  
+  removeFromCart(productId: number): void {
+    const currentItems = this.cartItemsSubject.value;
+    const updatedItems = currentItems.filter(item => item.id !== productId);
+    this.cartItemsSubject.next(updatedItems);
+  }
+  
+  clearCart(): void {
+    this.cartItemsSubject.next([]);
+  }
+  
+  getCartItems(): Product[] {
+    return this.cartItemsSubject.value;
+  }
+}
+```
+
+Komponentler, bu servisi enjekte ederek kullanabilir:
+
+```typescript
+import { Component } from '@angular/core';
+import { CartService } from '../../core/services/cart.service';
+import { Product } from '../../core/models/product.model';
+
+@Component({
+  selector: 'app-product-list',
+  templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.scss']
+})
+export class ProductListComponent {
+  constructor(private cartService: CartService) { }
+  
+  addToCart(product: Product): void {
+    this.cartService.addToCart(product);
+  }
+}
+```
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { CartService } from '../../core/services/cart.service';
+import { Product } from '../../core/models/product.model';
+import { Observable } from 'rxjs';
+
+@Component({
+  selector: 'app-cart',
+  templateUrl: './cart.component.html',
+  styleUrls: ['./cart.component.scss']
+})
+export class CartComponent implements OnInit {
+  cartItems$: Observable<Product[]>;
+  
+  constructor(private cartService: CartService) { }
+  
+  ngOnInit(): void {
+    this.cartItems$ = this.cartService.cartItems$;
+  }
+  
+  removeFromCart(productId: number): void {
+    this.cartService.removeFromCart(productId);
+  }
+  
+  clearCart(): void {
+    this.cartService.clearCart();
+  }
+}
+```
+
+## Komponent Direktifleri
+
+Angular, komponentlerin davranışını ve görünümünü değiştirmek için çeşitli direktifler sağlar.
+
+### Yapısal Direktifler
+
+Yapısal direktifler, DOM'un yapısını değiştirerek elementleri ekler, kaldırır veya değiştirir.
+
+#### ngIf
+
+`ngIf` direktifi, bir koşula bağlı olarak bir elementi DOM'a ekler veya DOM'dan kaldırır:
+
+```html
+<div *ngIf="product">
+  <h2>{{ product.name }}</h2>
+  <p>{{ product.description }}</p>
+  <div class="price">{{ product.price | currency:'TRY':'symbol':'1.2-2' }}</div>
+</div>
+
+<div *ngIf="!product" class="loading">
+  Ürün yükleniyor...
+</div>
+```
+
+#### ngFor
+
+`ngFor` direktifi, bir koleksiyondaki her öğe için bir elementi tekrarlar:
+
+```html
+<div *ngFor="let product of products; let i = index; trackBy: trackByProductId">
+  <div class="product-card">
+    <h3>{{ i + 1 }}. {{ product.name }}</h3>
+    <p>{{ product.description }}</p>
+    <div class="price">{{ product.price | currency:'TRY':'symbol':'1.2-2' }}</div>
+    <button (click)="addToCart(product)">Sepete Ekle</button>
+  </div>
+</div>
+```
+
+`ngFor` direktifi, aşağıdaki yerel değişkenleri sağlar:
+
+- **index**: Geçerli öğenin dizinini sağlar.
+- **first**: Geçerli öğe ilk öğe ise true, değilse false döndürür.
+- **last**: Geçerli öğe son öğe ise true, değilse false döndürür.
+- **even**: Geçerli öğenin dizini çift ise true, değilse false döndürür.
+- **odd**: Geçerli öğenin dizini tek ise true, değilse false döndürür.
+
+`trackBy` fonksiyonu, Angular'ın koleksiyondaki değişiklikleri daha verimli bir şekilde izlemesini sağlar:
+
+```typescript
+trackByProductId(index: number, product: Product): number {
+  return product.id;
+}
+```
+
+#### ngSwitch
+
+`ngSwitch` direktifi, bir değere bağlı olarak birden çok koşulu değerlendirir:
+
+```html
+<div [ngSwitch]="product.status">
+  <div *ngSwitchCase="'available'" class="status available">Stokta</div>
+  <div *ngSwitchCase="'limited'" class="status limited">Sınırlı Stok</div>
+  <div *ngSwitchCase="'outOfStock'" class="status out-of-stock">Stokta Yok</div>
+  <div *ngSwitchDefault class="status unknown">Bilinmiyor</div>
+</div>
+```
+
+### Özellik Direktifleri
+
+Özellik direktifleri, bir elementin görünümünü veya davranışını değiştirir.
+
+#### ngClass
+
+`ngClass` direktifi, bir elementin sınıflarını dinamik olarak değiştirmek için kullanılır:
+
+```html
+<div [ngClass]="{'available': product.inStock, 'out-of-stock': !product.inStock}">
+  {{ product.name }}
+</div>
+```
+
+#### ngStyle
+
+`ngStyle` direktifi, bir elementin stillerini dinamik olarak değiştirmek için kullanılır:
+
+```html
+<div [ngStyle]="{'color': product.inStock ? 'green' : 'red', 'font-weight': product.featured ? 'bold' : 'normal'}">
+  {{ product.name }}
+</div>
+```
+
+## Komponent Örnekleri
+
+E-ticaret uygulaması için çeşitli komponent örnekleri oluşturalım.
+
+### Header Komponenti
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { AuthService } from '../../core/services/auth.service';
+import { CartService } from '../../core/services/cart.service';
+import { User } from '../../core/models/user.model';
+
+@Component({
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.scss']
+})
+export class HeaderComponent implements OnInit {
+  isLoggedIn$: Observable<boolean>;
+  currentUser$: Observable<User | null>;
+  cartItemCount$: Observable<number>;
+  
+  constructor(
+    private authService: AuthService,
+    private cartService: CartService,
+    private router: Router
+  ) { }
+  
+  ngOnInit(): void {
+    this.isLoggedIn$ = this.authService.isAuthenticated$;
+    this.currentUser$ = this.authService.currentUser$;
+    this.cartItemCount$ = this.cartService.cartItems$.pipe(
+      map(items => items.length)
+    );
+  }
+  
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
+  }
+}
+```
+
+```html
+<header class="header">
+  <div class="container">
+    <div class="logo">
+      <a routerLink="/">E-Ticaret</a>
+    </div>
+    
+    <nav class="navigation">
+      <ul>
+        <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Ana Sayfa</a></li>
+        <li><a routerLink="/products" routerLinkActive="active">Ürünler</a></li>
+        <li><a routerLink="/about" routerLinkActive="active">Hakkımızda</a></li>
+        <li><a routerLink="/contact" routerLinkActive="active">İletişim</a></li>
+      </ul>
+    </nav>
+    
+    <div class="user-actions">
+      <a routerLink="/cart" class="cart-icon">
+        <i class="fa fa-shopping-cart"></i>
+        <span class="cart-count" *ngIf="(cartItemCount$ | async) > 0">{{ cartItemCount$ | async }}</span>
+      </a>
+      
+      <ng-container *ngIf="isLoggedIn$ | async; else notLoggedIn">
+        <button mat-button [matMenuTriggerFor]="userMenu">
+          <i class="fa fa-user"></i>
+          {{ (currentUser$ | async)?.username }}
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item routerLink="/profile">
+            <i class="fa fa-user-circle"></i>
+            Profilim
+          </button>
+          <button mat-menu-item routerLink="/profile/orders">
+            <i class="fa fa-list"></i>
+            Siparişlerim
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <i class="fa fa-sign-out"></i>
+            Çıkış Yap
+          </button>
+        </mat-menu>
+      </ng-container>
+      
+      <ng-template #notLoggedIn>
+        <a routerLink="/auth/login" class="login-button">
+          <i class="fa fa-sign-in"></i>
+          Giriş Yap
+        </a>
+      </ng-template>
+    </div>
+  </div>
+</header>
+```
+
+```scss
+.header {
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .logo {
+    a {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2196f3;
+      text-decoration: none;
+      
+      &:hover {
+        color: #1976d2;
+      }
+    }
+  }
+  
+  .navigation {
+    ul {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      
+      li {
+        margin: 0 10px;
+        
+        a {
+          color: #333;
+          text-decoration: none;
+          padding: 5px 10px;
+          border-radius: 4px;
+          transition: background-color 0.3s ease;
+          
+          &:hover {
+            background-color: #f5f5f5;
+          }
+          
+          &.active {
+            color: #2196f3;
+            font-weight: bold;
+          }
+        }
+      }
+    }
+  }
+  
+  .user-actions {
+    display: flex;
+    align-items: center;
+    
+    .cart-icon {
+      position: relative;
+      margin-right: 20px;
+      color: #333;
+      text-decoration: none;
+      
+      i {
+        font-size: 20px;
+      }
+      
+      .cart-count {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background-color: #f44336;
+        color: #fff;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        font-size: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+    
+    .login-button {
+      color: #2196f3;
+      text-decoration: none;
+      
+      i {
+        margin-right: 5px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    .container {
+      flex-direction: column;
+      padding: 10px;
+    }
+    
+    .logo {
+      margin-bottom: 10px;
+    }
+    
+    .navigation {
+      margin-bottom: 10px;
+      
+      ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        
+        li {
+          margin: 5px;
+        }
+      }
+    }
+  }
+}
+```
+
+### ProductCard Komponenti
+
+```typescript
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Product } from '../../core/models/product.model';
+
+@Component({
+  selector: 'app-product-card',
+  templateUrl: './product-card.component.html',
+  styleUrls: ['./product-card.component.scss']
+})
+export class ProductCardComponent {
+  @Input() product: Product;
+  @Output() addToCart = new EventEmitter<Product>();
+  
+  onAddToCart(event: Event): void {
+    event.stopPropagation();
+    this.addToCart.emit(this.product);
+  }
+}
+```
+
+```html
+<div class="product-card" [routerLink]="['/products', product.id]">
+  <div class="product-image">
+    <img [src]="product.imageUrl" [alt]="product.name">
+    <div class="product-badge" *ngIf="product.discount > 0">
+      {{ product.discount }}% İndirim
+    </div>
+  </div>
+  
+  <div class="product-content">
+    <h3 class="product-title">{{ product.name }}</h3>
+    <p class="product-description">{{ product.description }}</p>
+    
+    <div class="product-price">
+      <span class="current-price">{{ product.price | currency:'TRY':'symbol':'1.2-2' }}</span>
+      <span class="original-price" *ngIf="product.discount > 0">
+        {{ product.originalPrice | currency:'TRY':'symbol':'1.2-2' }}
+      </span>
+    </div>
+    
+    <div class="product-rating">
+      <i class="fa fa-star" *ngFor="let star of [1, 2, 3, 4, 5]" 
+         [ngClass]="{'filled': star <= product.rating, 'empty': star > product.rating}"></i>
+      <span class="rating-count">({{ product.ratingCount }})</span>
+    </div>
+    
+    <div class="product-actions">
+      <button class="add-to-cart-button" (click)="onAddToCart($event)">
+        <i class="fa fa-shopping-cart"></i>
+        Sepete Ekle
+      </button>
+    </div>
+  </div>
+</div>
+```
+
+```scss
+.product-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .product-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .product-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #f44336;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+  }
+  
+  .product-content {
+    padding: 15px;
+    
+    .product-title {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .product-description {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 15px;
+      height: 60px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+    
+    .product-price {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      
+      .current-price {
+        font-size: 18px;
+        font-weight: bold;
+        color: #2196f3;
+      }
+      
+      .original-price {
+        font-size: 14px;
+        color: #999;
+        text-decoration: line-through;
+        margin-left: 10px;
+      }
+    }
+    
+    .product-rating {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      
+      i {
+        color: #ddd;
+        margin-right: 2px;
+        
+        &.filled {
+          color: #ffc107;
+        }
+      }
+      
+      .rating-count {
+        font-size: 12px;
+        color: #666;
+        margin-left: 5px;
+      }
+    }
+    
+    .product-actions {
+      .add-to-cart-button {
+        width: 100%;
+        padding: 10px;
+        background-color: #2196f3;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        
+        i {
+          margin-right: 5px;
+        }
+        
+        &:hover {
+          background-color: #1976d2;
+        }
+      }
+    }
+  }
+}
+```
+
+### ProductList Komponenti
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { ProductService } from '../../core/services/product.service';
+import { CartService } from '../../core/services/cart.service';
+import { Product } from '../../core/models/product.model';
+
+@Component({
+  selector: 'app-product-list',
+  templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.scss']
+})
+export class ProductListComponent implements OnInit {
+  products$: Observable<Product[]>;
+  categoryId: number | null = null;
+  loading = false;
+  error: string | null = null;
+  
+  constructor(
+    private productService: ProductService,
+    private cartService: CartService,
+    private route: ActivatedRoute
+  ) { }
+  
+  ngOnInit(): void {
+    this.loading = true;
+    this.products$ = this.route.paramMap.pipe(
+      switchMap(params => {
+        const categoryId = params.get('categoryId');
+        this.categoryId = categoryId ? +categoryId : null;
+        return this.categoryId 
+          ? this.productService.getProductsByCategory(this.categoryId)
+          : this.productService.getProducts();
+      })
+    );
+    
+    this.products$.subscribe(
+      () => {
+        this.loading = false;
+        this.error = null;
+      },
+      error => {
+        this.loading = false;
+        this.error = 'Ürünler yüklenirken bir hata oluştu.';
+        console.error('Ürünler yüklenirken hata:', error);
+      }
+    );
+  }
+  
+  addToCart(product: Product): void {
+    this.cartService.addToCart(product);
+  }
+  
+  trackByProductId(index: number, product: Product): number {
+    return product.id;
+  }
+}
+```
+
+```html
+<div class="product-list-container">
+  <div class="product-list-header">
+    <h1>{{ categoryId ? 'Kategori Ürünleri' : 'Tüm Ürünler' }}</h1>
+    
+    <div class="product-filters">
+      <mat-form-field appearance="outline">
+        <mat-label>Sırala</mat-label>
+        <mat-select>
+          <mat-option value="price-asc">Fiyat (Artan)</mat-option>
+          <mat-option value="price-desc">Fiyat (Azalan)</mat-option>
+          <mat-option value="name-asc">İsim (A-Z)</mat-option>
+          <mat-option value="name-desc">İsim (Z-A)</mat-option>
+          <mat-option value="rating-desc">Puan (Yüksek-Düşük)</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+  
+  <div *ngIf="loading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+  
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+  
+  <div *ngIf="!(loading || error)" class="product-grid">
+    <app-product-card 
+      *ngFor="let product of products$ | async; trackBy: trackByProductId"
+      [product]="product"
+      (addToCart)="addToCart($event)">
+    </app-product-card>
+  </div>
+  
+  <div *ngIf="!(loading || error) && (products$ | async)?.length === 0" class="no-products">
+    Ürün bulunamadı.
+  </div>
+</div>
+```
+
+```scss
+.product-list-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  
+  .product-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    
+    h1 {
+      font-size: 24px;
+      color: #333;
+      margin: 0;
+    }
+    
+    .product-filters {
+      display: flex;
+      align-items: center;
+      
+      mat-form-field {
+        width: 200px;
+      }
+    }
+  }
+  
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    margin: 50px 0;
+  }
+  
+  .error-message {
+    color: #f44336;
+    padding: 10px;
+    margin: 20px 0;
+    background-color: #ffebee;
+    border-radius: 4px;
+  }
+  
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .no-products {
+    text-align: center;
+    padding: 50px;
+    color: #666;
+    font-style: italic;
+  }
+}
+
+@media (max-width: 768px) {
+  .product-list-container {
+    padding: 10px;
+    
+    .product-list-header {
+      flex-direction: column;
+      align-items: flex-start;
+      
+      h1 {
+        margin-bottom: 10px;
+      }
+    }
+    
+    .product-grid {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+    }
+  }
+}
+```
+
+## Sonuç
+
+Bu bölümde, Angular komponentlerinin yapısını ve yaşam döngüsünü detaylı olarak ele aldık. Komponentler, Angular uygulamalarının temel yapı taşlarıdır ve kullanıcı arayüzünün farklı bölümlerini oluşturmak için kullanılırlar.
+
+Komponentlerin yapısını, yaşam döngüsünü, iletişim yöntemlerini ve direktiflerini inceledik. Ayrıca, e-ticaret uygulaması için çeşitli komponent örnekleri oluşturduk.
+
+Bir sonraki bölümde, Angular servislerini ve bağımlılık enjeksiyonunu ele alacağız.

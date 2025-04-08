@@ -1,0 +1,701 @@
+---
+title: 'Angular Proje Yapısı ve Konfigürasyonu'
+description: 'E-ticaret uygulaması için Angular proje yapısı ve konfigürasyonu'
+---
+
+# Angular Proje Yapısı ve Konfigürasyonu
+
+Bu bölümde, e-ticaret uygulamasının frontend kısmı için Angular proje yapısını ve konfigürasyonunu detaylı olarak ele alacağız. Angular, Google tarafından geliştirilen, TypeScript tabanlı bir frontend framework'üdür ve modern, tek sayfalı uygulamalar (SPA) geliştirmek için kullanılır.
+
+## Angular Nedir?
+
+Angular, modern web uygulamaları geliştirmek için kullanılan güçlü bir JavaScript framework'üdür. Angular, komponent tabanlı bir mimari, güçlü bir şablon sistemi, bağımlılık enjeksiyonu, reaktif programlama ve kapsamlı bir CLI (Command Line Interface) gibi özellikler sunar.
+
+Angular'ın bazı temel özellikleri şunlardır:
+
+1. **Komponent Tabanlı Mimari**: Uygulamanın kullanıcı arayüzü, yeniden kullanılabilir ve bağımsız komponentlerden oluşur.
+2. **TypeScript Desteği**: Angular, TypeScript ile yazılır ve güçlü tip kontrolü sağlar.
+3. **Reaktif Programlama**: RxJS kütüphanesi ile asenkron işlemleri yönetir.
+4. **Bağımlılık Enjeksiyonu**: Uygulamanın farklı parçaları arasında bağımlılıkları yönetir.
+5. **Routing**: Tek sayfalı uygulamalarda sayfa geçişlerini yönetir.
+6. **Form Yönetimi**: Reaktif formlar ve şablon tabanlı formlar ile form işlemlerini yönetir.
+7. **HTTP İstemcisi**: Backend API'leri ile iletişim kurmak için HTTP istemcisi sağlar.
+
+## Angular CLI Kurulumu
+
+Angular CLI (Command Line Interface), Angular uygulamaları oluşturmak, geliştirmek ve yönetmek için kullanılan bir komut satırı aracıdır. Angular CLI, yeni projeler oluşturma, komponentler, servisler ve diğer Angular yapıları oluşturma, uygulamayı derleme, test etme ve dağıtma gibi işlemleri kolaylaştırır.
+
+Angular CLI'yi kurmak için, Node.js ve npm'in (Node Package Manager) yüklü olması gerekir. Node.js ve npm kurulduktan sonra, aşağıdaki komutu kullanarak Angular CLI'yi global olarak kurabilirsiniz:
+
+```bash
+npm install -g @angular/cli
+```
+
+Kurulumun başarılı olup olmadığını kontrol etmek için, aşağıdaki komutu kullanabilirsiniz:
+
+```bash
+ng version
+```
+
+Bu komut, Angular CLI'nin sürümünü ve diğer bağımlılıkların sürümlerini gösterir.
+
+## Yeni Bir Angular Projesi Oluşturma
+
+Angular CLI kullanarak yeni bir Angular projesi oluşturmak için, aşağıdaki komutu kullanabilirsiniz:
+
+```bash
+ng new e-ticaret-frontend
+```
+
+Bu komut, "e-ticaret-frontend" adında yeni bir Angular projesi oluşturur. Komut çalıştırıldığında, Angular CLI size bazı sorular sorar:
+
+1. **Routing**: Angular routing modülünü eklemek isteyip istemediğinizi sorar. E-ticaret uygulaması için routing gerekli olduğundan, "y" (evet) cevabını vermelisiniz.
+2. **Stylesheet Format**: CSS, SCSS, Sass, Less veya Stylus gibi stil formatlarından birini seçmenizi ister. E-ticaret uygulaması için SCSS kullanacağız, bu nedenle "SCSS" seçeneğini seçmelisiniz.
+
+Proje oluşturulduktan sonra, proje dizinine gitmek ve uygulamayı başlatmak için aşağıdaki komutları kullanabilirsiniz:
+
+```bash
+cd e-ticaret-frontend
+ng serve
+```
+
+`ng serve` komutu, uygulamayı derler ve bir geliştirme sunucusu başlatır. Varsayılan olarak, uygulama `http://localhost:4200/` adresinde çalışır.
+
+## Angular Proje Yapısı
+
+Angular projesi oluşturulduktan sonra, proje dizininde aşağıdaki dosya ve klasörleri göreceksiniz:
+
+```
+e-ticaret-frontend/
+├── .angular/
+├── .vscode/
+├── node_modules/
+├── src/
+│   ├── app/
+│   │   ├── app-routing.module.ts
+│   │   ├── app.component.html
+│   │   ├── app.component.scss
+│   │   ├── app.component.spec.ts
+│   │   ├── app.component.ts
+│   │   └── app.module.ts
+│   ├── assets/
+│   ├── environments/
+│   │   ├── environment.prod.ts
+│   │   └── environment.ts
+│   ├── favicon.ico
+│   ├── index.html
+│   ├── main.ts
+│   ├── polyfills.ts
+│   ├── styles.scss
+│   └── test.ts
+├── .browserslistrc
+├── .editorconfig
+├── .gitignore
+├── angular.json
+├── karma.conf.js
+├── package-lock.json
+├── package.json
+├── README.md
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.spec.json
+└── tslint.json
+```
+
+Bu dosya ve klasörlerin her birinin rolünü inceleyelim:
+
+### src/ Klasörü
+
+`src/` klasörü, uygulamanın kaynak kodunu içerir. Bu klasör, aşağıdaki alt klasör ve dosyaları içerir:
+
+#### app/ Klasörü
+
+`app/` klasörü, uygulamanın ana komponentlerini ve modüllerini içerir. Bu klasör, aşağıdaki dosyaları içerir:
+
+- **app-routing.module.ts**: Uygulamanın routing yapılandırmasını içerir.
+- **app.component.html**: Ana komponentin HTML şablonunu içerir.
+- **app.component.scss**: Ana komponentin stil dosyasını içerir.
+- **app.component.spec.ts**: Ana komponentin test dosyasını içerir.
+- **app.component.ts**: Ana komponentin TypeScript kodunu içerir.
+- **app.module.ts**: Uygulamanın ana modülünü içerir.
+
+#### assets/ Klasörü
+
+`assets/` klasörü, uygulamanın statik dosyalarını (resimler, fontlar, vb.) içerir.
+
+#### environments/ Klasörü
+
+`environments/` klasörü, farklı ortamlar (geliştirme, üretim, vb.) için yapılandırma dosyalarını içerir.
+
+- **environment.ts**: Geliştirme ortamı için yapılandırma dosyası.
+- **environment.prod.ts**: Üretim ortamı için yapılandırma dosyası.
+
+#### Diğer Dosyalar
+
+- **index.html**: Uygulamanın ana HTML dosyası.
+- **main.ts**: Uygulamanın başlangıç noktası.
+- **polyfills.ts**: Eski tarayıcılar için polyfill'leri içerir.
+- **styles.scss**: Uygulamanın global stil dosyası.
+- **test.ts**: Test yapılandırma dosyası.
+
+### Konfigürasyon Dosyaları
+
+Proje kök dizininde, çeşitli konfigürasyon dosyaları bulunur:
+
+- **angular.json**: Angular CLI yapılandırma dosyası.
+- **package.json**: npm paket bağımlılıklarını ve betikleri içerir.
+- **tsconfig.json**: TypeScript derleyici yapılandırma dosyası.
+- **.editorconfig**: Editör yapılandırma dosyası.
+- **.gitignore**: Git tarafından yok sayılacak dosyaları belirtir.
+- **karma.conf.js**: Karma test koşucusu yapılandırma dosyası.
+
+## E-Ticaret Uygulaması için Proje Yapısı
+
+E-ticaret uygulaması için, daha organize bir proje yapısı oluşturmak istiyoruz. Bu yapı, uygulamanın farklı bileşenlerini mantıksal olarak gruplandıracak ve kodun bakımını kolaylaştıracaktır.
+
+Aşağıdaki klasör yapısını oluşturacağız:
+
+```
+src/
+├── app/
+│   ├── core/
+│   │   ├── auth/
+│   │   ├── guards/
+│   │   ├── interceptors/
+│   │   ├── models/
+│   │   ├── services/
+│   │   └── core.module.ts
+│   ├── features/
+│   │   ├── admin/
+│   │   ├── auth/
+│   │   ├── cart/
+│   │   ├── checkout/
+│   │   ├── home/
+│   │   ├── product/
+│   │   ├── profile/
+│   │   └── shared/
+│   ├── shared/
+│   │   ├── components/
+│   │   ├── directives/
+│   │   ├── pipes/
+│   │   └── shared.module.ts
+│   ├── app-routing.module.ts
+│   ├── app.component.html
+│   ├── app.component.scss
+│   ├── app.component.ts
+│   └── app.module.ts
+```
+
+Bu yapıyı oluşturmak için, aşağıdaki komutları kullanabilirsiniz:
+
+```bash
+# Core modülü ve alt klasörleri
+ng generate module core
+mkdir -p src/app/core/{auth,guards,interceptors,models,services}
+
+# Features modülü ve alt klasörleri
+mkdir -p src/app/features/{admin,auth,cart,checkout,home,product,profile,shared}
+
+# Shared modülü ve alt klasörleri
+ng generate module shared
+mkdir -p src/app/shared/{components,directives,pipes}
+```
+
+### Core Modülü
+
+`core/` klasörü, uygulamanın çekirdek işlevselliğini içerir. Bu klasör, aşağıdaki alt klasörleri içerir:
+
+- **auth/**: Kimlik doğrulama ile ilgili sınıfları içerir.
+- **guards/**: Route guard'ları içerir.
+- **interceptors/**: HTTP interceptor'ları içerir.
+- **models/**: Veri modellerini içerir.
+- **services/**: Servis sınıflarını içerir.
+
+Core modülü, uygulamanın yalnızca bir kez yüklenmesi gereken servisleri ve bileşenleri içerir. Bu modül, `AppModule` tarafından yalnızca bir kez import edilmelidir.
+
+### Features Modülü
+
+`features/` klasörü, uygulamanın farklı özelliklerini içerir. Her özellik, kendi modülü, komponentleri, servisleri ve diğer dosyaları ile birlikte kendi klasöründe bulunur. Bu klasör, aşağıdaki alt klasörleri içerir:
+
+- **admin/**: Admin paneli ile ilgili komponentleri içerir.
+- **auth/**: Kimlik doğrulama sayfaları ile ilgili komponentleri içerir.
+- **cart/**: Alışveriş sepeti ile ilgili komponentleri içerir.
+- **checkout/**: Ödeme sayfası ile ilgili komponentleri içerir.
+- **home/**: Ana sayfa ile ilgili komponentleri içerir.
+- **product/**: Ürün sayfaları ile ilgili komponentleri içerir.
+- **profile/**: Kullanıcı profili ile ilgili komponentleri içerir.
+- **shared/**: Özellikler arasında paylaşılan komponentleri içerir.
+
+Her özellik modülü, lazy loading ile yüklenebilir, böylece uygulamanın başlangıç yükleme süresi azalır.
+
+### Shared Modülü
+
+`shared/` klasörü, uygulamanın farklı bölümleri arasında paylaşılan komponentleri, direktifleri ve pipe'ları içerir. Bu klasör, aşağıdaki alt klasörleri içerir:
+
+- **components/**: Paylaşılan komponentleri içerir.
+- **directives/**: Paylaşılan direktifleri içerir.
+- **pipes/**: Paylaşılan pipe'ları içerir.
+
+Shared modülü, uygulamanın farklı modülleri tarafından import edilebilir ve paylaşılan işlevselliği sağlar.
+
+## Angular Modülleri
+
+Angular modülleri, uygulamanın farklı parçalarını organize etmek için kullanılır. Her modül, komponentleri, direktifleri, pipe'ları ve servisleri gruplandırır.
+
+### AppModule
+
+`AppModule`, uygulamanın ana modülüdür ve uygulamanın başlangıç noktasıdır. Bu modül, `app.module.ts` dosyasında tanımlanır ve aşağıdaki gibi görünür:
+
+```typescript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { CoreModule } from './core/core.module';
+import { SharedModule } from './shared/shared.module';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    CoreModule,
+    SharedModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+### CoreModule
+
+`CoreModule`, uygulamanın çekirdek işlevselliğini içerir ve yalnızca bir kez yüklenir. Bu modül, `core.module.ts` dosyasında tanımlanır ve aşağıdaki gibi görünür:
+
+```typescript
+import { NgModule, Optional, SkipSelf } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { ErrorInterceptor } from './interceptors/error.interceptor';
+
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule
+  ],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+  ]
+})
+export class CoreModule {
+  constructor(@Optional() @SkipSelf() parentModule: CoreModule) {
+    if (parentModule) {
+      throw new Error('CoreModule is already loaded. Import it in the AppModule only.');
+    }
+  }
+}
+```
+
+### SharedModule
+
+`SharedModule`, uygulamanın farklı bölümleri arasında paylaşılan komponentleri, direktifleri ve pipe'ları içerir. Bu modül, `shared.module.ts` dosyasında tanımlanır ve aşağıdaki gibi görünür:
+
+```typescript
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule
+  ],
+  exports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule
+  ]
+})
+export class SharedModule { }
+```
+
+### Feature Modülleri
+
+Her özellik için ayrı bir modül oluşturacağız. Örneğin, ürün modülü aşağıdaki gibi görünebilir:
+
+```typescript
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Routes } from '@angular/router';
+
+import { SharedModule } from '../../shared/shared.module';
+import { ProductListComponent } from './product-list/product-list.component';
+import { ProductDetailComponent } from './product-detail/product-detail.component';
+
+const routes: Routes = [
+  { path: '', component: ProductListComponent },
+  { path: ':id', component: ProductDetailComponent }
+];
+
+@NgModule({
+  declarations: [
+    ProductListComponent,
+    ProductDetailComponent
+  ],
+  imports: [
+    CommonModule,
+    SharedModule,
+    RouterModule.forChild(routes)
+  ]
+})
+export class ProductModule { }
+```
+
+## Angular Routing
+
+Angular Routing, tek sayfalı uygulamalarda sayfa geçişlerini yönetmek için kullanılır. Routing, URL'ye göre hangi komponentin görüntüleneceğini belirler.
+
+### AppRoutingModule
+
+`AppRoutingModule`, uygulamanın ana routing yapılandırmasını içerir. Bu modül, `app-routing.module.ts` dosyasında tanımlanır ve aşağıdaki gibi görünür:
+
+```typescript
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+
+import { AuthGuard } from './core/guards/auth.guard';
+import { AdminGuard } from './core/guards/admin.guard';
+
+const routes: Routes = [
+  {
+    path: '',
+    loadChildren: () => import('./features/home/home.module').then(m => m.HomeModule)
+  },
+  {
+    path: 'auth',
+    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
+  },
+  {
+    path: 'products',
+    loadChildren: () => import('./features/product/product.module').then(m => m.ProductModule)
+  },
+  {
+    path: 'cart',
+    loadChildren: () => import('./features/cart/cart.module').then(m => m.CartModule)
+  },
+  {
+    path: 'checkout',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./features/checkout/checkout.module').then(m => m.CheckoutModule)
+  },
+  {
+    path: 'profile',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./features/profile/profile.module').then(m => m.ProfileModule)
+  },
+  {
+    path: 'admin',
+    canActivate: [AuthGuard, AdminGuard],
+    loadChildren: () => import('./features/admin/admin.module').then(m => m.AdminModule)
+  },
+  {
+    path: '**',
+    redirectTo: '',
+    pathMatch: 'full'
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
+Bu routing yapılandırması, lazy loading kullanarak her özellik modülünü ayrı ayrı yükler. Lazy loading, uygulamanın başlangıç yükleme süresini azaltır ve yalnızca gerektiğinde modülleri yükler.
+
+### Route Guards
+
+Route guard'lar, belirli route'lara erişimi kontrol etmek için kullanılır. Örneğin, `AuthGuard` kimlik doğrulaması gerektiren route'ları korur ve kullanıcı oturum açmamışsa, kullanıcıyı oturum açma sayfasına yönlendirir.
+
+```typescript
+import { Injectable } from '@angular/core';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { AuthService } from '../services/auth.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthGuard implements CanActivate {
+  constructor(private authService: AuthService, private router: Router) {}
+
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+    if (this.authService.isAuthenticated()) {
+      return true;
+    }
+
+    this.router.navigate(['/auth/login'], { queryParams: { returnUrl: state.url } });
+    return false;
+  }
+}
+```
+
+## Ortam Yapılandırması
+
+Angular, farklı ortamlar (geliştirme, üretim, vb.) için farklı yapılandırmalar sağlar. Bu yapılandırmalar, `environments/` klasöründeki dosyalarda tanımlanır.
+
+### environment.ts
+
+`environment.ts` dosyası, geliştirme ortamı için yapılandırma değerlerini içerir:
+
+```typescript
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:8080/api'
+};
+```
+
+### environment.prod.ts
+
+`environment.prod.ts` dosyası, üretim ortamı için yapılandırma değerlerini içerir:
+
+```typescript
+export const environment = {
+  production: true,
+  apiUrl: 'https://api.example.com/api'
+};
+```
+
+Bu yapılandırma dosyaları, uygulamanın farklı ortamlarda çalışmasını sağlar. Örneğin, geliştirme ortamında yerel bir API'ye bağlanırken, üretim ortamında gerçek API'ye bağlanabilirsiniz.
+
+## Angular CLI Komutları
+
+Angular CLI, çeşitli komutlar sağlar ve bu komutlar, Angular uygulamaları geliştirirken sıkça kullanılır. İşte bazı yaygın Angular CLI komutları:
+
+### Yeni Bir Komponent Oluşturma
+
+```bash
+ng generate component features/product/product-list
+```
+
+Bu komut, `features/product/` klasöründe `product-list` adında yeni bir komponent oluşturur.
+
+### Yeni Bir Servis Oluşturma
+
+```bash
+ng generate service core/services/product
+```
+
+Bu komut, `core/services/` klasöründe `product` adında yeni bir servis oluşturur.
+
+### Yeni Bir Modül Oluşturma
+
+```bash
+ng generate module features/product --routing
+```
+
+Bu komut, `features/` klasöründe `product` adında yeni bir modül oluşturur ve bir routing modülü ekler.
+
+### Uygulamayı Derleme
+
+```bash
+ng build
+```
+
+Bu komut, uygulamayı derler ve `dist/` klasöründe çıktı oluşturur.
+
+### Uygulamayı Üretim İçin Derleme
+
+```bash
+ng build --prod
+```
+
+Bu komut, uygulamayı üretim için derler ve `dist/` klasöründe optimize edilmiş çıktı oluşturur.
+
+### Uygulamayı Çalıştırma
+
+```bash
+ng serve
+```
+
+Bu komut, uygulamayı derler ve bir geliştirme sunucusu başlatır. Varsayılan olarak, uygulama `http://localhost:4200/` adresinde çalışır.
+
+### Testleri Çalıştırma
+
+```bash
+ng test
+```
+
+Bu komut, uygulamanın birim testlerini çalıştırır.
+
+### End-to-End Testleri Çalıştırma
+
+```bash
+ng e2e
+```
+
+Bu komut, uygulamanın end-to-end testlerini çalıştırır.
+
+## Bağımlılıklar ve Paketler
+
+E-ticaret uygulaması için, çeşitli Angular paketleri ve üçüncü taraf kütüphaneleri kullanacağız. Bu paketler, `package.json` dosyasında listelenir ve `npm install` komutu ile kurulur.
+
+### Angular Paketleri
+
+```json
+"dependencies": {
+  "@angular/animations": "~12.0.0",
+  "@angular/common": "~12.0.0",
+  "@angular/compiler": "~12.0.0",
+  "@angular/core": "~12.0.0",
+  "@angular/forms": "~12.0.0",
+  "@angular/platform-browser": "~12.0.0",
+  "@angular/platform-browser-dynamic": "~12.0.0",
+  "@angular/router": "~12.0.0",
+  "rxjs": "~6.6.0",
+  "tslib": "^2.1.0",
+  "zone.js": "~0.11.4"
+}
+```
+
+### Üçüncü Taraf Kütüphaneleri
+
+```json
+"dependencies": {
+  "@angular/cdk": "~12.0.0",
+  "@angular/material": "~12.0.0",
+  "bootstrap": "^5.0.0",
+  "ngx-bootstrap": "^6.2.0",
+  "font-awesome": "^4.7.0",
+  "jwt-decode": "^3.1.2",
+  "ngx-toastr": "^14.0.0"
+}
+```
+
+Bu paketleri kurmak için, aşağıdaki komutu kullanabilirsiniz:
+
+```bash
+npm install @angular/cdk @angular/material bootstrap ngx-bootstrap font-awesome jwt-decode ngx-toastr
+```
+
+## Angular Material Kurulumu
+
+Angular Material, Material Design bileşenlerini Angular uygulamaları için sağlayan bir UI kütüphanesidir. Angular Material'i kurmak için, aşağıdaki komutu kullanabilirsiniz:
+
+```bash
+ng add @angular/material
+```
+
+Bu komut, Angular Material'i kurar ve gerekli yapılandırmaları yapar. Komut çalıştırıldığında, Angular CLI size bazı sorular sorar:
+
+1. **Theme**: Kullanmak istediğiniz temayı seçmenizi ister. E-ticaret uygulaması için "Indigo/Pink" temasını seçebilirsiniz.
+2. **Typography**: Global tipografi stillerini uygulamak isteyip istemediğinizi sorar. "Y" (evet) cevabını verebilirsiniz.
+3. **Browser Animations**: Tarayıcı animasyonlarını etkinleştirmek isteyip istemediğinizi sorar. "Y" (evet) cevabını verebilirsiniz.
+
+Angular Material kurulduktan sonra, `app.module.ts` dosyasına gerekli modülleri import etmeniz gerekir:
+
+```typescript
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatCardModule } from '@angular/material/card';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
+@NgModule({
+  // ...
+  imports: [
+    // ...
+    BrowserAnimationsModule,
+    MatButtonModule,
+    MatIconModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatCardModule,
+    MatToolbarModule,
+    MatMenuModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatDialogModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule
+  ],
+  // ...
+})
+export class AppModule { }
+```
+
+## Bootstrap Kurulumu
+
+Bootstrap, responsive web siteleri ve uygulamaları geliştirmek için kullanılan popüler bir CSS framework'üdür. Bootstrap'i kurmak için, aşağıdaki komutu kullanabilirsiniz:
+
+```bash
+npm install bootstrap
+```
+
+Bootstrap'i uygulamanıza eklemek için, `angular.json` dosyasındaki `styles` ve `scripts` dizilerine Bootstrap dosyalarını eklemeniz gerekir:
+
+```json
+"styles": [
+  "node_modules/bootstrap/dist/css/bootstrap.min.css",
+  "src/styles.scss"
+],
+"scripts": [
+  "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+]
+```
+
+## Font Awesome Kurulumu
+
+Font Awesome, web uygulamalarında kullanılan popüler bir ikon kütüphanesidir. Font Awesome'ı kurmak için, aşağıdaki komutu kullanabilirsiniz:
+
+```bash
+npm install font-awesome
+```
+
+Font Awesome'ı uygulamanıza eklemek için, `angular.json` dosyasındaki `styles` dizisine Font Awesome CSS dosyasını eklemeniz gerekir:
+
+```json
+"styles": [
+  "node_modules/bootstrap/dist/css/bootstrap.min.css",
+  "node_modules/font-awesome/css/font-awesome.min.css",
+  "src/styles.scss"
+]
+```
+
+## Sonuç
+
+Bu bölümde, e-ticaret uygulamasının frontend kısmı için Angular proje yapısını ve konfigürasyonunu detaylı olarak ele aldık. Angular, modern web uygulamaları geliştirmek için güçlü bir framework'tür ve e-ticaret uygulaması için ideal bir seçimdir.
+
+Bir sonraki bölümde, Angular komponentlerini ve yaşam döngüsünü ele alacağız.

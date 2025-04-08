@@ -1,0 +1,683 @@
+---
+title: 'Repository Katmanı'
+description: 'Spring Boot ile e-ticaret uygulaması için repository katmanı oluşturma'
+---
+
+# Repository Katmanı
+
+Bu bölümde, e-ticaret uygulaması için repository katmanını oluşturmayı detaylı olarak ele alacağız. Repository katmanı, veritabanı işlemlerini gerçekleştiren ve entity'ler ile veritabanı arasında bir köprü görevi gören katmandır.
+
+## Repository Nedir?
+
+Repository, veritabanı işlemlerini soyutlayan ve entity'ler üzerinde CRUD (Create, Read, Update, Delete) işlemlerini gerçekleştiren bir tasarım desenidir. Spring Data JPA, repository desenini uygulamak için hazır arayüzler ve implementasyonlar sağlar.
+
+## Spring Data JPA Repository Arayüzleri
+
+Spring Data JPA, repository desenini uygulamak için çeşitli arayüzler sağlar. Bu arayüzler, temel CRUD işlemleri için hazır metodlar içerir ve özel sorgular oluşturmak için bir DSL (Domain Specific Language) sunar.
+
+### Repository Arayüzü
+
+`Repository` arayüzü, tüm repository arayüzlerinin temel arayüzüdür. Bu arayüz, herhangi bir metod içermez ve sadece bir işaretleyici (marker) arayüzüdür.
+
+```java
+public interface Repository<T, ID> {
+}
+```
+
+### CrudRepository Arayüzü
+
+`CrudRepository` arayüzü, temel CRUD işlemleri için metodlar sağlar.
+
+```java
+public interface CrudRepository<T, ID> extends Repository<T, ID> {
+    <S extends T> S save(S entity);
+    <S extends T> Iterable<S> saveAll(Iterable<S> entities);
+    Optional<T> findById(ID id);
+    boolean existsById(ID id);
+    Iterable<T> findAll();
+    Iterable<T> findAllById(Iterable<ID> ids);
+    long count();
+    void deleteById(ID id);
+    void delete(T entity);
+    void deleteAllById(Iterable<? extends ID> ids);
+    void deleteAll(Iterable<? extends T> entities);
+    void deleteAll();
+}
+```
+
+### PagingAndSortingRepository Arayüzü
+
+`PagingAndSortingRepository` arayüzü, `CrudRepository` arayüzünü genişletir ve sayfalama ve sıralama işlemleri için ek metodlar sağlar.
+
+```java
+public interface PagingAndSortingRepository<T, ID> extends CrudRepository<T, ID> {
+    Iterable<T> findAll(Sort sort);
+    Page<T> findAll(Pageable pageable);
+}
+```
+
+### JpaRepository Arayüzü
+
+`JpaRepository` arayüzü, `PagingAndSortingRepository` arayüzünü genişletir ve JPA'ya özgü ek metodlar sağlar.
+
+```java
+public interface JpaRepository<T, ID> extends PagingAndSortingRepository<T, ID>, QueryByExampleExecutor<T> {
+    List<T> findAll();
+    List<T> findAll(Sort sort);
+    List<T> findAllById(Iterable<ID> ids);
+    <S extends T> List<S> saveAll(Iterable<S> entities);
+    void flush();
+    <S extends T> S saveAndFlush(S entity);
+    <S extends T> List<S> saveAllAndFlush(Iterable<S> entities);
+    void deleteAllInBatch(Iterable<T> entities);
+    void deleteAllByIdInBatch(Iterable<ID> ids);
+    void deleteAllInBatch();
+    T getOne(ID id);
+    T getById(ID id);
+    <S extends T> List<S> findAll(Example<S> example);
+    <S extends T> List<S> findAll(Example<S> example, Sort sort);
+}
+```
+
+## Repository Sınıfları Oluşturma
+
+E-ticaret uygulaması için repository sınıflarını oluşturalım. Her entity için bir repository sınıfı oluşturacağız.
+
+### UserRepository
+
+```java
+package com.example.ecommerce.repository;
+
+import com.example.ecommerce.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
+}
+```
+
+Bu repository sınıfı, `User` entity'si için temel CRUD işlemlerini sağlar ve kullanıcı adı ve e-posta ile kullanıcı arama işlemleri için özel metodlar içerir.
+
+### CategoryRepository
+
+```java
+package com.example.ecommerce.repository;
+
+import com.example.ecommerce.model.Category;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface CategoryRepository extends JpaRepository<Category, Long> {
+    Optional<Category> findByName(String name);
+    List<Category> findByParentIsNull();
+    List<Category> findByParentId(Long parentId);
+    
+    @Query("SELECT c FROM Category c WHERE c.parent IS NULL")
+    List<Category> findAllParentCategories();
+    
+    @Query("SELECT c FROM Category c WHERE c.parent.id = :parentId")
+    List<Category> findAllSubcategoriesByParentId(Long parentId);
+}
+```
+
+Bu repository sınıfı, `Category` entity'si için temel CRUD işlemlerini sağlar ve kategori adı, üst kategorisi olmayan kategoriler ve belirli bir üst kategoriye ait alt kategoriler için özel metodlar içerir.
+
+### ProductRepository
+
+```java
+package com.example.ecommerce.repository;
+
+import com.example.ecommerce.model.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Long>, ProductRepositoryCustom {
+    Optional<Product> findByName(String name);
+    List<Product> findByCategoryId(Long categoryId);
+    Page<Product> findByCategoryId(Long categoryId, Pageable pageable);
+    List<Product> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice);
+    Page<Product> findByPriceBetween(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable);
+    
+    @Query("SELECT p FROM Product p WHERE p.name LIKE %:keyword% OR p.description LIKE %:keyword%")
+    Page<Product> searchProducts(String keyword, Pageable pageable);
+    
+    @Query("SELECT p FROM Product p WHERE p.category.id = :categoryId AND (p.name LIKE %:keyword% OR p.description LIKE %:keyword%)")
+    Page<Product> searchProductsByCategory(String keyword, Long categoryId, Pageable pageable);
+    
+    @Query("SELECT p FROM Product p WHERE p.stockQuantity < :threshold")
+    List<Product> findProductsWithLowStock(Integer threshold);
+}
+```
+
+Bu repository sınıfı, `Product` entity'si için temel CRUD işlemlerini sağlar ve ürün adı, kategori, fiyat aralığı, anahtar kelime araması ve düşük stok durumu için özel metodlar içerir.
+
+### ProductRepositoryCustom
+
+Özel sorgu metodları için bir custom repository arayüzü oluşturabiliriz.
+
+```java
+package com.example.ecommerce.repository;
+
+import com.example.ecommerce.model.Product;
+
+import java.util.List;
+import java.util.Map;
+
+public interface ProductRepositoryCustom {
+    List<Product> findProductsByFilters(Map<String, Object> filters);
+    List<Product> findProductsByMultipleCategories(List<Long> categoryIds);
+}
+```
+
+### ProductRepositoryImpl
+
+Custom repository arayüzünün implementasyonu:
+
+```java
+package com.example.ecommerce.repository;
+
+import com.example.ecommerce.model.Product;
+import org.springframework.stereotype.Repository;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@Repository
+public class ProductRepositoryImpl implements ProductRepositoryCustom {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Override
+    public List<Product> findProductsByFilters(Map<String, Object> filters) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Product> query = cb.createQuery(Product.class);
+        Root<Product> product = query.from(Product.class);
+        
+        List<Predicate> predicates = new ArrayList<>();
+        
+        if (filters.containsKey("categoryId")) {
+            predicates.add(cb.equal(product.get("category").get("id"), filters.get("categoryId")));
+        }
+        
+        if (filters.containsKey("minPrice")) {
+            predicates.add(cb.greaterThanOrEqualTo(product.get("price"), (BigDecimal) filters.get("minPrice")));
+        }
+        
+        if (filters.containsKey("maxPrice")) {
+            predicates.add(cb.lessThanOrEqualTo(product.get("price"), (BigDecimal) filters.get("maxPrice")));
+        }
+        
+        if (filters.containsKey("keyword")) {
+            String keyword = "%" + filters.get("keyword") + "%";
+            predicates.add(cb.or(
+                cb.like(product.get("name"), keyword),
+                cb.like(product.get("description"), keyword)
+            ));
+        }
+        
+        query.select(product).where(predicates.toArray(new Predicate[0]));
+        
+        return entityManager.createQuery(query).getResultList();
+    }
+
+    @Override
+    public List<Product> findProductsByMultipleCategories(List<Long> categoryIds) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Product> query = cb.createQuery(Product.class);
+        Root<Product> product = query.from(Product.class);
+        
+        query.select(product).where(product.get("category").get("id").in(categoryIds));
+        
+        return entityManager.createQuery(query).getResultList();
+    }
+}
+```
+
+### AddressRepository
+
+```java
+package com.example.ecommerce.repository;
+
+import com.example.ecommerce.model.Address;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface AddressRepository extends JpaRepository<Address, Long> {
+    List<Address> findByUserId(Long userId);
+    Optional<Address> findByUserIdAndIsDefaultTrue(Long userId);
+    List<Address> findByUserIdAndAddressType(Long userId, String addressType);
+}
+```
+
+Bu repository sınıfı, `Address` entity'si için temel CRUD işlemlerini sağlar ve kullanıcı ID'si, varsayılan adres ve adres tipi için özel metodlar içerir.
+
+### OrderRepository
+
+```java
+package com.example.ecommerce.repository;
+
+import com.example.ecommerce.model.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Repository
+public interface OrderRepository extends JpaRepository<Order, Long> {
+    List<Order> findByUserId(Long userId);
+    Page<Order> findByUserId(Long userId, Pageable pageable);
+    List<Order> findByStatus(String status);
+    Page<Order> findByStatus(String status, Pageable pageable);
+    List<Order> findByOrderDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+    
+    @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND o.status = :status")
+    List<Order> findByUserIdAndStatus(Long userId, String status);
+    
+    @Query("SELECT o FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate AND o.status = :status")
+    List<Order> findByOrderDateBetweenAndStatus(LocalDateTime startDate, LocalDateTime endDate, String status);
+    
+    @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.status = 'DELIVERED'")
+    Double getTotalRevenue();
+    
+    @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate AND o.status = 'DELIVERED'")
+    Double getRevenueByDateRange(LocalDateTime startDate, LocalDateTime endDate);
+}
+```
+
+Bu repository sınıfı, `Order` entity'si için temel CRUD işlemlerini sağlar ve kullanıcı ID'si, sipariş durumu, tarih aralığı ve gelir hesaplama için özel metodlar içerir.
+
+### OrderDetailRepository
+
+```java
+package com.example.ecommerce.repository;
+
+import com.example.ecommerce.model.OrderDetail;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
+    List<OrderDetail> findByOrderId(Long orderId);
+    List<OrderDetail> findByProductId(Long productId);
+    
+    @Query("SELECT od FROM OrderDetail od WHERE od.order.id = :orderId AND od.product.id = :productId")
+    List<OrderDetail> findByOrderIdAndProductId(Long orderId, Long productId);
+    
+    @Query("SELECT od.product.id, SUM(od.quantity) FROM OrderDetail od GROUP BY od.product.id ORDER BY SUM(od.quantity) DESC")
+    List<Object[]> findMostSoldProducts();
+    
+    @Query("SELECT od.product.id, SUM(od.quantity) FROM OrderDetail od WHERE od.order.orderDate BETWEEN :startDate AND :endDate GROUP BY od.product.id ORDER BY SUM(od.quantity) DESC")
+    List<Object[]> findMostSoldProductsByDateRange(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate);
+}
+```
+
+Bu repository sınıfı, `OrderDetail` entity'si için temel CRUD işlemlerini sağlar ve sipariş ID'si, ürün ID'si ve en çok satılan ürünler için özel metodlar içerir.
+
+### PaymentRepository
+
+```java
+package com.example.ecommerce.repository;
+
+import com.example.ecommerce.model.Payment;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface PaymentRepository extends JpaRepository<Payment, Long> {
+    Optional<Payment> findByOrderId(Long orderId);
+    List<Payment> findByStatus(String status);
+    List<Payment> findByPaymentMethod(String paymentMethod);
+    List<Payment> findByPaymentDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+    
+    @Query("SELECT p FROM Payment p WHERE p.order.id = :orderId AND p.status = :status")
+    Optional<Payment> findByOrderIdAndStatus(Long orderId, String status);
+    
+    @Query("SELECT p.paymentMethod, COUNT(p) FROM Payment p WHERE p.status = 'COMPLETED' GROUP BY p.paymentMethod")
+    List<Object[]> countPaymentsByMethod();
+    
+    @Query("SELECT p.paymentMethod, COUNT(p) FROM Payment p WHERE p.paymentDate BETWEEN :startDate AND :endDate AND p.status = 'COMPLETED' GROUP BY p.paymentMethod")
+    List<Object[]> countPaymentsByMethodAndDateRange(LocalDateTime startDate, LocalDateTime endDate);
+}
+```
+
+Bu repository sınıfı, `Payment` entity'si için temel CRUD işlemlerini sağlar ve sipariş ID'si, ödeme durumu, ödeme yöntemi ve ödeme istatistikleri için özel metodlar içerir.
+
+### ReviewRepository
+
+```java
+package com.example.ecommerce.repository;
+
+import com.example.ecommerce.model.Review;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface ReviewRepository extends JpaRepository<Review, Long> {
+    List<Review> findByProductId(Long productId);
+    Page<Review> findByProductId(Long productId, Pageable pageable);
+    List<Review> findByUserId(Long userId);
+    Page<Review> findByUserId(Long userId, Pageable pageable);
+    Optional<Review> findByProductIdAndUserId(Long productId, Long userId);
+    
+    @Query("SELECT AVG(r.rating) FROM Review r WHERE r.product.id = :productId")
+    Double getAverageRatingByProductId(Long productId);
+    
+    @Query("SELECT r.rating, COUNT(r) FROM Review r WHERE r.product.id = :productId GROUP BY r.rating ORDER BY r.rating DESC")
+    List<Object[]> countReviewsByRatingForProduct(Long productId);
+    
+    @Query("SELECT p.id, AVG(r.rating) FROM Review r JOIN r.product p GROUP BY p.id ORDER BY AVG(r.rating) DESC")
+    List<Object[]> findProductsWithHighestRating();
+}
+```
+
+Bu repository sınıfı, `Review` entity'si için temel CRUD işlemlerini sağlar ve ürün ID'si, kullanıcı ID'si, ortalama değerlendirme puanı ve değerlendirme istatistikleri için özel metodlar içerir.
+
+### ProductImageRepository
+
+```java
+package com.example.ecommerce.repository;
+
+import com.example.ecommerce.model.ProductImage;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
+    List<ProductImage> findByProductId(Long productId);
+    Optional<ProductImage> findByProductIdAndIsPrimaryTrue(Long productId);
+}
+```
+
+Bu repository sınıfı, `ProductImage` entity'si için temel CRUD işlemlerini sağlar ve ürün ID'si ve ana görsel için özel metodlar içerir.
+
+## Metod İsimlendirme Kuralları
+
+Spring Data JPA, repository metodlarının isimlerine göre otomatik olarak sorgu oluşturur. Bu, özel sorgular oluşturmak için JPQL veya SQL yazmak zorunda kalmadan, sadece metod isimlerine göre sorgular oluşturmanıza olanak tanır.
+
+### Temel Metod İsimlendirme Kuralları
+
+- **find...By**: Belirli bir kritere göre entity'leri bulmak için kullanılır.
+- **get...By**: `find...By` ile aynıdır.
+- **read...By**: `find...By` ile aynıdır.
+- **query...By**: `find...By` ile aynıdır.
+- **count...By**: Belirli bir kritere göre entity sayısını saymak için kullanılır.
+- **exists...By**: Belirli bir kritere göre entity'nin var olup olmadığını kontrol etmek için kullanılır.
+- **delete...By**: Belirli bir kritere göre entity'leri silmek için kullanılır.
+- **remove...By**: `delete...By` ile aynıdır.
+
+### Özel Metod İsimlendirme Örnekleri
+
+- **findByName**: `name` alanına göre entity'leri bulmak için kullanılır.
+- **findByNameAndDescription**: `name` ve `description` alanlarına göre entity'leri bulmak için kullanılır.
+- **findByNameOrDescription**: `name` veya `description` alanlarına göre entity'leri bulmak için kullanılır.
+- **findByPriceBetween**: `price` alanının belirli bir aralıkta olduğu entity'leri bulmak için kullanılır.
+- **findByPriceGreaterThan**: `price` alanının belirli bir değerden büyük olduğu entity'leri bulmak için kullanılır.
+- **findByPriceLessThan**: `price` alanının belirli bir değerden küçük olduğu entity'leri bulmak için kullanılır.
+- **findByNameLike**: `name` alanının belirli bir desene uyduğu entity'leri bulmak için kullanılır.
+- **findByNameStartingWith**: `name` alanının belirli bir değerle başladığı entity'leri bulmak için kullanılır.
+- **findByNameEndingWith**: `name` alanının belirli bir değerle bittiği entity'leri bulmak için kullanılır.
+- **findByNameContaining**: `name` alanının belirli bir değeri içerdiği entity'leri bulmak için kullanılır.
+- **findByOrderByNameAsc**: Entity'leri `name` alanına göre artan sırada sıralamak için kullanılır.
+- **findByOrderByNameDesc**: Entity'leri `name` alanına göre azalan sırada sıralamak için kullanılır.
+
+## @Query Anotasyonu
+
+Spring Data JPA, metod isimlerine göre otomatik sorgu oluşturmanın yanı sıra, `@Query` anotasyonu ile özel JPQL veya SQL sorguları tanımlamanıza da olanak tanır.
+
+### JPQL Sorguları
+
+JPQL (Java Persistence Query Language), SQL'e benzer bir sorgu dilidir, ancak veritabanı tablolarını ve sütunlarını değil, entity'leri ve alanlarını hedef alır.
+
+```java
+@Query("SELECT p FROM Product p WHERE p.name LIKE %:keyword% OR p.description LIKE %:keyword%")
+Page<Product> searchProducts(String keyword, Pageable pageable);
+```
+
+### Native SQL Sorguları
+
+Native SQL sorguları, veritabanına özgü SQL dilini kullanmanıza olanak tanır.
+
+```java
+@Query(value = "SELECT * FROM products WHERE name LIKE %:keyword% OR description LIKE %:keyword%", nativeQuery = true)
+Page<Product> searchProductsNative(String keyword, Pageable pageable);
+```
+
+### Named Parameters
+
+`@Query` anotasyonu ile tanımlanan sorgularda, `:parameterName` sözdizimi ile named parameters kullanabilirsiniz.
+
+```java
+@Query("SELECT p FROM Product p WHERE p.category.id = :categoryId AND (p.name LIKE %:keyword% OR p.description LIKE %:keyword%)")
+Page<Product> searchProductsByCategory(String keyword, Long categoryId, Pageable pageable);
+```
+
+### Positional Parameters
+
+`@Query` anotasyonu ile tanımlanan sorgularda, `?1`, `?2` gibi sözdizimi ile positional parameters kullanabilirsiniz.
+
+```java
+@Query("SELECT p FROM Product p WHERE p.category.id = ?1 AND (p.name LIKE %?2% OR p.description LIKE %?2%)")
+Page<Product> searchProductsByCategory(Long categoryId, String keyword, Pageable pageable);
+```
+
+## Sayfalama ve Sıralama
+
+Spring Data JPA, sayfalama ve sıralama işlemleri için `Pageable` ve `Sort` sınıflarını sağlar.
+
+### Sayfalama
+
+Sayfalama işlemleri için, repository metodlarına `Pageable` parametresi ekleyebilirsiniz.
+
+```java
+Page<Product> findByCategoryId(Long categoryId, Pageable pageable);
+```
+
+Bu metodu kullanırken, `PageRequest` sınıfını kullanarak bir `Pageable` nesnesi oluşturabilirsiniz:
+
+```java
+Pageable pageable = PageRequest.of(0, 10); // Sayfa numarası 0, sayfa boyutu 10
+Page<Product> products = productRepository.findByCategoryId(1L, pageable);
+```
+
+### Sıralama
+
+Sıralama işlemleri için, repository metodlarına `Sort` parametresi ekleyebilirsiniz veya `Pageable` nesnesine sıralama bilgisi ekleyebilirsiniz.
+
+```java
+List<Product> findByCategoryId(Long categoryId, Sort sort);
+```
+
+Bu metodu kullanırken, `Sort` sınıfını kullanarak bir sıralama nesnesi oluşturabilirsiniz:
+
+```java
+Sort sort = Sort.by(Sort.Direction.ASC, "name");
+List<Product> products = productRepository.findByCategoryId(1L, sort);
+```
+
+Veya `Pageable` nesnesine sıralama bilgisi ekleyebilirsiniz:
+
+```java
+Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name"));
+Page<Product> products = productRepository.findByCategoryId(1L, pageable);
+```
+
+## Specification API
+
+Spring Data JPA, dinamik sorgular oluşturmak için Specification API'sini sağlar. Bu API, JPA Criteria API'sini kullanarak, çalışma zamanında dinamik olarak sorgular oluşturmanıza olanak tanır.
+
+### Specification Arayüzü
+
+`Specification` arayüzü, bir sorgu kriterini temsil eder ve `toPredicate` metodunu içerir.
+
+```java
+public interface Specification<T> {
+    Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder);
+}
+```
+
+### JpaSpecificationExecutor Arayüzü
+
+`JpaSpecificationExecutor` arayüzü, `Specification` nesneleri ile sorgu yapmak için metodlar sağlar.
+
+```java
+public interface JpaSpecificationExecutor<T> {
+    Optional<T> findOne(Specification<T> spec);
+    List<T> findAll(Specification<T> spec);
+    Page<T> findAll(Specification<T> spec, Pageable pageable);
+    List<T> findAll(Specification<T> spec, Sort sort);
+    long count(Specification<T> spec);
+}
+```
+
+### ProductRepository ile Specification Kullanımı
+
+```java
+package com.example.ecommerce.repository;
+
+import com.example.ecommerce.model.Product;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
+    // ...
+}
+```
+
+### ProductSpecification Sınıfı
+
+```java
+package com.example.ecommerce.repository.specification;
+
+import com.example.ecommerce.model.Product;
+import org.springframework.data.jpa.domain.Specification;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.math.BigDecimal;
+
+public class ProductSpecification {
+
+    public static Specification<Product> hasCategory(Long categoryId) {
+        return (root, query, criteriaBuilder) -> {
+            if (categoryId == null) {
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.equal(root.get("category").get("id"), categoryId);
+        };
+    }
+
+    public static Specification<Product> priceBetween(BigDecimal minPrice, BigDecimal maxPrice) {
+        return (root, query, criteriaBuilder) -> {
+            if (minPrice == null && maxPrice == null) {
+                return criteriaBuilder.conjunction();
+            }
+            if (minPrice == null) {
+                return criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice);
+            }
+            if (maxPrice == null) {
+                return criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice);
+            }
+            return criteriaBuilder.between(root.get("price"), minPrice, maxPrice);
+        };
+    }
+
+    public static Specification<Product> nameLike(String keyword) {
+        return (root, query, criteriaBuilder) -> {
+            if (keyword == null || keyword.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            String likePattern = "%" + keyword + "%";
+            return criteriaBuilder.like(root.get("name"), likePattern);
+        };
+    }
+
+    public static Specification<Product> descriptionLike(String keyword) {
+        return (root, query, criteriaBuilder) -> {
+            if (keyword == null || keyword.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            String likePattern = "%" + keyword + "%";
+            return criteriaBuilder.like(root.get("description"), likePattern);
+        };
+    }
+
+    public static Specification<Product> hasStock() {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.greaterThan(root.get("stockQuantity"), 0);
+    }
+}
+```
+
+### Specification Kullanımı
+
+```java
+Specification<Product> spec = Specification.where(ProductSpecification.hasCategory(1L))
+        .and(ProductSpecification.priceBetween(new BigDecimal("100"), new BigDecimal("1000")))
+        .and(ProductSpecification.nameLike("iPhone"))
+        .and(ProductSpecification.hasStock());
+
+List<Product> products = productRepository.findAll(spec);
+```
+
+## Sonuç
+
+Bu bölümde, e-ticaret uygulaması için repository katmanını oluşturmayı detaylı olarak ele aldık. Repository katmanı, veritabanı işlemlerini soyutlayan ve entity'ler ile veritabanı arasında bir köprü görevi gören katmandır. Spring Data JPA, repository desenini uygulamak için hazır arayüzler ve implementasyonlar sağlar ve özel sorgular oluşturmak için çeşitli yöntemler sunar.
+
+Bir sonraki bölümde, service katmanını oluşturmayı ele alacağız.
