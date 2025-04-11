@@ -120,7 +120,7 @@ Simülatör, bir komut setini başka bir sete eşleyen bir araçtır.
 - İşlemci ve ana bellek arasında yer alan çok katmanlı bir bellek sistemidir. 
 - Ana bellekten daha küçük ve daha hızlıdır.
 - Temel amacı, ana bellekteki verilere erişim süresini kısaltarak bellek erişimini hızlandırmaktır. Bu hızlanma, yakın gelecekte kullanılma olasılığı yüksek olan verilerin ana bellekten önbelleğe yerleştirilmesiyle sağlanır.
-#### Çoklu Seviyeli Önbellek: 
+##### Çoklu Seviyeli Önbellek: 
 Performansı daha da artırmak için çoklu seviyeli cache kullanılır. Genellikle üç seviye bulunur:
 
 - **Seviye 1 (L1) cache:** Çekirdeğe en yakın olan ve en hızlı ancak en küçük cache seviyesidir. L1 cache genellikle komut (I-cache) ve veri (D-cache) olmak üzere ikiye ayrılır.
@@ -132,11 +132,11 @@ Cache seviyeleri işlemciden uzaklaştıkça **boyutları artar** ancak **erişi
 
 L1 --> L2 --> L3 --> ANA BELLEK
 
-#### Önbelleğin Faydaları:
+##### Önbelleğin Faydaları:
 - **Bellek gecikmesini azaltır:** Sık kullanılan verilere daha hızlı erişim sağlayarak işlemcinin bekleme süresini azaltır.
 -  **Sistem performansını artırır:** Daha hızlı veri erişimi, programların daha hızlı çalışmasını sağlar ve genel sistem performansını yükseltir.
 - **Veri yolu trafiğini azaltır:** Cache hit durumunda ana belleğe erişim gerekmediğinden, sistem veri yolu üzerindeki yük azalır.
-#### Tasarım Elemanları:
+##### Tasarım Elemanları:
 
 - Cache Adresleri (Cache Addresses): Sanal (logical) veya fiziksel adresler kullanılabilir.
 - Cache Boyutu (Cache Size): Performans ve maliyet arasında bir denge söz konusudur. İşlemci çiplerinde cache için ayrılan alan zamanla artmıştır.
@@ -144,7 +144,7 @@ L1 --> L2 --> L3 --> ANA BELLEK
 - Yer Değiştirme Algoritması (Replacement Algorithm): Cache dolu olduğunda hangi bloğun çıkarılacağını belirler. En az kullanılan (LRU) gibi algoritmalar vardır.
 - Yazma Politikası (Write Policy): Cache'teki bir veri güncellendiğinde ana belleğin ne zaman güncelleneceğini belirler. Yazma yoluyla (write-through) ve geri yazma (write-back) gibi politikalar mevcuttur.
 - Hat Boyutu (Line Size): Bir cache bloğunun (veya hattının) kaç kelime veya bayttan oluştuğunu ifade eder
-#### Çok Çekirdekli Sistemlerde Cache:
+##### Çok Çekirdekli Sistemlerde Cache:
 Çok çekirdekli işlemcilerde cache organizasyonu daha karmaşık hale gelir. Her çekirdeğin kendi özel L1 ve L2 cache'leri olabileceği gibi, bazı seviyeler (özellikle L3) tüm çekirdekler tarafından paylaşılabilir. Cache tutarlılığı (cache coherence), birden fazla çekirdek aynı bellek konumundaki veriyi cache'lediğinde, tüm cache'lerdeki verinin tutarlı kalmasını sağlama sorunudur.
 
 
@@ -189,7 +189,7 @@ IAS bilgisayarı ayrıca ikili (binary) veriler üzerinde işlem yapabilen bir a
 ##### Depolanmış Program kavramı  
 Depolanmış program kavramı, hem verilerin hem de komutların aynı ana bellekte saklanması fikrine dayanır. Bu sayede bilgisayar, programları art arda (sıralı bir şekilde) çalıştırabilir. Programın yürütülmesi genel olarak getir (fetch), çöz (decode) ve çalıştır (execute) döngüsü şeklinde gerçekleşir. 
 
-#### 1.3.1 İkinci Nesil - Transistörler
+#### 1.3.2 İkinci Nesil - Transistörler
 
 - Daha **Küçük**
 - Daha **Ucuz**
@@ -197,6 +197,7 @@ Depolanmış program kavramı, hem verilerin hem de komutların aynı ana bellek
 - Silikondan yapılmış katı hal cihazıdır
 - 1947'de Bell Labs'ta icat edildi.
 - Tam transistörlü bilgisayarlar ticari olarak 1950'lerin sonuna kadar mevcut değildi.
+
 
 | Generation | Approximate Dates | Technology                      | Typical Speed (operations per second) |
 |------------|-------------------|---------------------------------|---------------------------------------|
@@ -223,7 +224,7 @@ Depolanmış program kavramı, hem verilerin hem de komutların aynı ana bellek
 ![[Pasted image 20250411030523.png]]
 
 
-#### 1.3.1 Üçüncü Nesil - Entegre Devre
+#### 1.3.3 Üçüncü Nesil - Entegre Devre
 Bilgisayar tarihinin Üçüncü Nesli, entegre devrelerin icadıyla tanımlanır. 1958 yılında icat edilen entegre devreler, elektronik alanında bir devrim başlatmıştır. 
 
 Bu nesilden önce, elektronik ekipmanlar büyük ölçüde ayrık bileşenlerden oluşuyordu. Tek başına, kendi kendine yeten bir transistör olan bu ayrık bileşenler ayrı ayrı üretiliyor, kendi kutularında paketleniyor ve masonit benzeri devre kartlarına lehimleniyor veya kablolanıyordu. Bu üretim süreci hem pahalı hem de zahmetliydi. İkinci nesil bilgisayarlarda kullanılan transistör sayısı yüz binlere ulaşınca, daha güçlü makinelerin üretimi giderek zorlaşmaya başlamıştı.
@@ -263,3 +264,157 @@ DEC PDP-8, nispeten düşük maliyeti ve küçük boyutu sayesinde diğer üreti
 Şekil 1.12, entegre devrelerdeki transistör sayısındaki büyümeyi göstermektedir. Bu büyüme, daha önceki konuşmamızda da bahsettiğimiz gibi, Intel'in kurucu ortağı Gordon Moore tarafından 1965'te öne sürülen Moore Yasası ile yakından ilişkilidir. Moore Yasası, bir yonga üzerine yerleştirilebilecek transistör sayısının yaklaşık olarak her iki yılda bir ikiye katlanacağını öngörüyordu. 
 
 ![[Pasted image 20250411032737.png]]
+
+#### 1.3.4  Sonraki nesiller - Yarıiletken Bellek Mikroişlemcileri
+
+Bilgisayar tarihinin üçüncü neslinden sonraki dönemler, entegre devre teknolojisindeki ilerlemelerle tanımlanmıştır.
+
+| Generation | Approximate Dates | Technology                      | Typical Speed (operations per second) |
+|------------|-------------------|---------------------------------|---------------------------------------|
+| 1          | 1946–1957         | Vacuum tube                     | 40,000                                |
+| 2          | 1957–1964         | Transistor                      | 200,000                               |
+| 3          | 1965–1971         | Small and medium scale integration | 1,000,000                             |
+| 4          | 1972–1977         | Large scale integration         | 10,000,000                            |
+| 5          | 1978–1991         | Very large scale integration    | 100,000,000                           |
+| 6          | 1991-             | Ultra large scale integration   | >1,000,000,000                        |
+Sonraki nesilleri entegre devrelerdeki bileşen sayısına göre sınıflandırmaktadır.
+
+- LSI (Large Scale Integration): Tek bir entegre devre çipinde 1.000'den fazla bileşenin yerleştirilebildiği dönem. 
+	- Bu dönem kabaca 1972-1977 yıllarını kapsar.
+- VLSI (Very Large Scale Integration): Çip başına 10.000'den fazla bileşenin sığdırılabildiği dönem.
+	-  Bu dönem yaklaşık olarak 1978-1991 yıllarını kapsar.
+- ULSI (Ultra Large Scale Integration): Günümüzde kullanılan ve bir milyardan fazla bileşeni tek bir çip üzerinde barındırabilen teknolojidir.
+	-  Bu dönem 1991 yılından sonra başlamıştır.
+Bu dönemlerdeki en önemli gelişmelerden ikisi yarı iletken bellekler ve mikroişlemciler olmuştur.
+
+##### 1.3.4.1 Yarı İletken Bellekler:
+- 1970 yılında Fairchild, nispeten büyük kapasiteli ilk yarı iletken belleği üretmiştir. Bu çip, tek bir manyetik çekirdek boyutlarındaydı ve 256 bit veri saklayabiliyordu. Ayrıca non-destrüktif (okuma sırasında veri silinmiyordu) ve manyetik çekirdekten çok daha hızlıydı.
+- 1974 yılında yarı iletken belleğin bit başına maliyeti, manyetik çekirdek belleğin maliyetinin altına düşmüştür. Bu olay, yarı iletken belleğin ana bellek teknolojisi olarak yaygınlaşmasının önünü açmıştır.
+- 1970'ten bu yana yarı iletken bellek teknolojisi 13 nesil geçirmiştir. Her yeni nesil, bir önceki neslin dört katı depolama yoğunluğu sunarken, bit başına maliyet düşmüş ve erişim süresi kısalmıştır. Örneğin, 1k, 4k, 16k, 64k, 256k, 1M, 4M, 16M, 64M, 256M, 1G, 4G ve günümüzde 8 Gb'lık çipler üretilmiştir. 
+- Bellek teknolojisindeki bu hızlı gelişmeler, bilgisayarların yapısını önemli ölçüde değiştirmiş ve daha küçük, daha hızlı ve daha büyük bellek kapasitelerine sahip makinelerin ortaya çıkmasını sağlamıştır
+##### 1.3.4.2 Mikroişlemciler:
+- İşlemci çiplerindeki eleman yoğunluğu sürekli olarak artmıştır. Bu sayede tek bir bilgisayar işlemcisini oluşturmak için gereken çip sayısı azalmıştır.
+- 1971 yılında Intel, bir CPU'nun tüm bileşenlerini **tek bir çip** üzerinde barındıran ilk çip olan **4004**'ü geliştirmiştir. Bu, mikroişlemcinin doğuşu olarak kabul edilir. 
+	- 4004, 4-bitlik sayıları toplayabiliyor ve yalnızca tekrarlı toplama yoluyla çarpma işlemi yapabiliyordu.
+- 1972 yılında Intel, ilk 8-bit mikroişlemci olan 8008'i geliştirmiştir.
+- 1974 yılında Intel, ilk genel amaçlı mikroişlemci olan 8080'i piyasaya sürmüştür. 8080, 8-bitlik bir mikroişlemci olmasına rağmen, 4004 ve 8008'e göre daha hızlıydı, daha zengin bir komut kümesine sahipti ve daha geniş bir adresleme yeteneği sunuyordu.
+	- 8080, ilk kişisel bilgisayar olan Altair'de kullanılmıştır.
+- Aynı dönemde 16-bit mikroişlemciler de geliştirilmeye başlanmış, 1970'lerin sonunda ise güçlü ve genel amaçlı 16-bit mikroişlemciler ortaya çıkmıştır. Bunlardan biri 8086 idi. 8088, 8086'nın bir türeviydi ve IBM'in ilk kişisel bilgisayarında kullanılarak Intel'in başarısını sağlamlaştırmıştır. 8086, x86 mimarisinin ilk görünümüdür.
+- Daha sonra 32-bit mikroişlemciler geliştirilmiştir. Intel'in ilk 32-bit işlemcisi olan 80386, 1985 yılında piyasaya sürülmüştür ve çoklu görev (multitasking) desteği sunan ilk Intel işlemcisidir.
+- Intel'in mikroişlemci evrimi, Moore Yasası ile yakından ilişkilidir. Gordon Moore, 1965 yılında tek bir çip üzerine yerleştirilebilecek transistör sayısının her yıl ikiye katlandığını gözlemlemiş ve bu hızın devam edeceğini öngörmüştür.
+- Daha sonra bu hız her 18 ayda bir ikiye katlanma şeklinde revize edilmiş ve bu oran büyük ölçüde korunmuştur.
+- Moore Yasası'nın sonuçları arasında bilgisayar mantık ve bellek devrelerinin maliyetinin düşmesi, çalışma hızının artması, bilgisayarların küçülmesi, güç tüketiminin azalması ve çip arası bağlantı sayısının azalması yer alır.
+- Bu gelişmeler, bilgisayar teknolojisinin sonraki nesillerinde çok daha karmaşık ve güçlü sistemlerin ortaya çıkmasına olanak tanımıştır.
+
+##### 1.3.4.3 Intel Mikroişlemcilerin Evrimi
+
+###### (a) 1970s Processors
+
+|                     | 4004     | 8008     | 8080     | 8086                 | 8088           |
+|---------------------|----------|----------|----------|----------------------|----------------|
+| Introduced          | 1971     | 1972     | 1974     | 1978                 | 1979           |
+| Clock speeds        | 108 kHz  | 108 kHz  | 2 MHz    | 5 MHz, 8 MHz, 10 MHz | 5 MHz, 8 MHz   |
+| Bus width           | 4 bits   | 8 bits   | 8 bits   | 16 bits              | 8 bits         |
+| Number of transistors| 2,300    | 3,500    | 6,000    | 29,000               | 29,000         |
+| Feature size (µm)   | 10       | 8        | 6        | 3                    | 6              |
+| Addressable memory  | 640 Bytes| 16 KB    | 64 KB    | 1 MB                 | 1 MB           |
+
+
+###### (b) 1980s Processors
+
+|                     | 80286          | 386TM DX         | 386TM SX         | 486TM DX CPU     |
+|---------------------|----------------|------------------|------------------|------------------|
+| Introduced          | 1982           | 1985             | 1988             | 1989             |
+| Clock speeds        | 6 MHz - 12.5 MHz| 16 MHz - 33 MHz  | 16 MHz - 33 MHz  | 25 MHz - 50 MHz  |
+| Bus width           | 16 bits        | 32 bits          | 16 bits          | 32 bits          |
+| Number of transistors| 134,000        | 275,000          | 275,000          | 1.2 million      |
+| Feature size (µm)   | 1.5            | 1                | 1                | 0.8 - 1          |
+| Addressable memory  | 16 MB          | 4 GB             | 16 MB            | 4 GB             |
+| Virtual memory      | 1 GB           | 64 TB            | 64 TB            | 64 TB            |
+| Cache               | —              | —                | —                | 8 kB             |
+
+###### (c) 1990s Processors
+
+
+|                       | 486TM SX        | Pentium          | Pentium Pro           | Pentium II        |
+| --------------------- | --------------- | ---------------- | --------------------- | ----------------- |
+| Introduced            | 1991            | 1993             | 1995                  | 1997              |
+| Clock speeds          | 16 MHz - 33 MHz | 60 MHz - 166 MHz | 150 MHz - 200 MHz     | 200 MHz - 300 MHz |
+| Bus width             | 32 bits         | 32 bits          | 64 bits               | 64 bits           |
+| Number of transistors | 1.185 million   | 3.1 million      | 5.5 million           | 7.5 million       |
+| Feature size (µm)     | 1               | 0.8              | 0.6                   | 0.35              |
+| Addressable memory    | 4 GB            | 4 GB             | 64 GB                 | 64 GB             |
+| Virtual memory        | 64 TB           | 64 TB            | 64 TB                 | 64 TB             |
+| Cache                 | 8 kB            | 8 kB             | 512 kB L1 and 1 MB L2 | 512 kB L2         |
+
+###### (d) Recent Processors
+
+|                       | Pentium III   | Pentium 4     | Core 2 Duo     | Core i7 EE 4960X     |
+| --------------------- | ------------- | ------------- | -------------- | -------------------- |
+| Introduced            | 1999          | 2000          | 2006           | 2013                 |
+| Clock speeds          | 450 - 660 MHz | 1.3 - 1.8 GHz | 1.06 - 1.2 GHz | 4 GHz                |
+| Bus width             | 64 bits       | 64 bits       | 64 bits        | 64 bits              |
+| Number of transistors | 9.5 million   | 42 million    | 167 million    | 1.86 billion         |
+| Feature size (nm)     | 250           | 180           | 65             | 22                   |
+| Addressable memory    | 64 GB         | 64 GB         | 64 GB          | 64 GB                |
+| Virtual memory        | 64 TB         | 64 TB         | 64 TB          | 64 TB                |
+| Cache                 | 512 kB L2     | 256 kB L2     | 2 MB L2        | 1.5 MB L2 / 15 MB L3 |
+| Number of cores       | 1             | 1             | 2              | 6                    |
+|                       |               |               |                |                      |
+
+###### Intel x86 Mimarisinin Evrimi
+
+Intel x86 ve ARM mimarileri, günümüzdeki iki temel işlemci ailesini temsil etmektedir. Mevcut x86 işlemcileri, karmaşık komut seti bilgisayarları (CISC) üzerine on yıllarca süren bir tasarım çalışmasının sonucudur. Buna karşılık, indirgenmiş komut seti bilgisayarı (RISC), işlemci tasarımında alternatif bir yaklaşımı temsil eder. ARM mimarisi, çok çeşitli gömülü sistemlerde kullanılmakta olup, piyasadaki en güçlü ve en iyi tasarlanmış RISC tabanlı sistemlerden biridir.
+
+.
+.
+
+| İşlemci     | Öne Çıkan Özellikler                                                                                                                                                                                                                                                                                       |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 4004        | 1971'de , bir CPU'nun tüm bileşenlerini tek bir çip üzerinde barındıran ilk çipti ve mikroişlemcinin doğuşunu işaret etti. Ancak, sadece 4-bitlik sayılarla işlem yapabiliyor ve çarpma işlemini tekrarlı toplama ile gerçekleştirebiliyordu.                                                              |
+| 8008        | 1972'de, ilk 8-bit mikroişlemci olarak ortaya çıktı.                                                                                                                                                                                                                                                       |
+| 8080        | - Dünyanın ilk genel amaçlı mikroişlemcisi  <br> - 8-bit makine, belleğe 8-bit veri yolu  <br> - İlk kişisel bilgisayarda (Altair) kullanıldı<br> - 8-bitlik olmasına rağmen, daha hızlıydı, daha zengin bir komut setine ve daha geniş bir adresleme yeteneğine sahipti.                                  |
+| 8086        | - 1978'de Intel 8086, daha güçlü bir 16-bit makineydi<br> - Talimatları yürütülmeden önce önbelleğe alan bir komut kuyruğuna sahiptir.  <br> - x86 mimarisinin ilk ortaya çıkışı   <br> - 8088 bu işlemcinin bir varyantıydı ve IBM'in ilk kişisel bilgisayarında kullanıldı (Intel'in başarısını sağladı) |
+| 80286       | - 8086’nın genişletilmiş versiyonu, sadece 1 MB yerine 16 MB belleğe adresleme yapılmasını sağladı                                                                                                                                                                                                         |
+| 80386       | - Intel'in ilk 32-bit işlemcisi  <br> - Çoklu görev desteği sunan ilk Intel işlemcisi                                                                                                                                                                                                                      |
+| 80486       | - Daha gelişmiş ve güçlü önbellek teknolojisinin ve gelişmiş komut ardışıklığının (instruction pipelining) kullanımı  <br> - Dahili matematik işlem birimi (coprocessor) içeriyordu                                                                                                                        |
+| Pentium     | - Birden fazla komutun aynı anda yürütülmesine olanak tanıyan superscalar (üstdizisel) tekniklerin kullanımını tanıttı                                                                                                                                                                                     |
+| Pentium Pro | - Superscalar yapıya geçiş devam etti; kayıt yeniden adlandırma, dallanma tahmini, veri akışı analizi ve varsayımsal yürütme gibi teknikler yoğun şekilde kullanıldı                                                                                                                                       |
+| Pentium II  | - Video, ses ve grafik verilerini verimli bir şekilde işlemek için özel olarak tasarlanmış Intel MMX teknolojisini entegre etti                                                                                                                                                                            |
+| Pentium III | - Ek kayan nokta komutları içerir  <br> - SIMD Akış Uzantıları (SSE) içerir                                                                                                                                                                                                                                |
+| Pentium 4   | - Multimedya için ek kayan nokta komutları ve diğer geliştirmeler içerir                                                                                                                                                                                                                                   |
+| Core        | - İlk Intel x86 mikro çekirdeği                                                                                                                                                                                                                                                                            |
+| Core 2      | - Core mimarisini 64 bit'e genişletir  <br> - Core 2 Quad tek bir çip üzerinde dört çekirdek sağlar  <br> - Daha yeni Core sürümleri çip başına 10'a kadar çekirdek içerebilir  <br> - Mimaride önemli bir ekleme: Gelişmiş Vektör Uzantıları (AVX) komut seti                                             |
+
+###### CISC ve RISC Yaklaşımları
+
+Kaynaklar, **x86** mimarisinin bir **CISC (Complex Instruction Set Computer - Karmaşık Komut Seti Bilgisayarı)** mimarisi olduğunu belirtirken, **ARM** mimarisinin ise **RISC (Reduced Instruction Set Computer - İndirgenmiş Komut Seti Bilgisayarı)** tasarım prensiplerinden evrimleştiğini vurgulamaktadır.
+
+- **CISC mimarileri**, genellikle çok sayıda karmaşık komuta sahiptir ve derleyicileri basitleştirmeyi, performansı artırmayı hedefler.  
+  Ancak bu karmaşıklık, işlemci tasarımını zorlaştırabilir.  
+  **x86'nın** karmaşık komut seti; geriye dönük uyumluluk ihtiyacı ve derleyici geliştiricilerine mümkün olan en fazla desteği sağlama isteğinden kaynaklanmaktadır.
+
+- **RISC mimarileri** ise daha az sayıda, basit komutlara odaklanır ve komut işlem hattını (**pipeline**) optimize etmeyi amaçlar.  
+  **ARM mimarisi**, enerji verimliliği ve küçük çip boyutu ile bilinir; bu da onu **gömülü sistemlerde** yaygın kılar.
+
+RISC ve CISC Yakınsaması
+
+Son yıllarda, **RISC** ve **CISC** yaklaşımları arasında bir **yakınsama** olduğu görülmektedir:
+
+- **RISC tasarımları**, bazı **CISC** özelliklerinden faydalanabilir.
+- **CISC tasarımları** ise, performansı artırmak için **RISC prensiplerini** benimseyebilir.  
+  Örneğin, modern **x86 işlemcileri**, **superscalar** yapılar ve **işlem hattı** gibi RISC temelli teknikleri kullanmaktadır.
+
+ Sonuç olarak, 
+
+- **Intel x86 mimarisi**, yıllar içinde sürekli olarak gelişmiş ve karmaşıklaşmıştır.
+  - Geriye dönük uyumluluk ve geniş uygulama desteği ihtiyacı, **CISC** yapısının korunmasına neden olmuştur.
+- Buna karşılık, **ARM mimarisi**, **RISC** prensipleriyle yola çıkarak özellikle gömülü sistemlerde büyük bir başarıya ulaşmıştır.
+
+Her iki mimari de:
+- Performans
+- Enerji verimliliği
+
+gibi faktörleri dengeleyerek evrimleşmeye devam etmektedir.
+
+
