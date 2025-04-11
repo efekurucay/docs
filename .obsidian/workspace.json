@@ -4,17 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "b81c625dcaad0be8",
+        "id": "e84f62262921d4e0",
         "type": "tabs",
         "children": [
           {
-            "id": "a0460b72f024dc67",
+            "id": "27ceaa9aaa20dcfd",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "lecture-notes/CSE-2/2-spring/computer-organization/computer-organization.mdx",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "Yeni sekme"
+              "title": "computer-organization"
             }
           }
         ]
@@ -74,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 450.5
+    "width": 228.5
   },
   "right": {
     "id": "f1ba78a1543eb384",
@@ -163,8 +167,19 @@
       "publish:Değişiklikleri yayınla": false
     }
   },
-  "active": "a0460b72f024dc67",
+  "active": "27ceaa9aaa20dcfd",
   "lastOpenFiles": [
+    "images/Pasted image 20250411004607.png",
+    "images/Pasted image 20250411025133.png",
+    "images/Pasted image 20250411030523.png",
+    "frontend.md",
+    "lecture-notes/CSE-2/2-spring/computer-organization/computer-organization.mdx",
+    "images/Pasted image 20250411032737.png",
+    "images/Pasted image 20250411031629.png",
+    "images/Pasted image 20250411031534.png",
+    "images/Pasted image 20250411031237.png",
+    "images/Pasted image 20250411031159.png",
+    "images/Pasted image 20250411031149.png",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/sql-komutlari.mdx",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/sema-tasarimi.mdx",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/mysql-kurulumu.mdx",
@@ -174,11 +189,8 @@
     "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/ui-tasarim.mdx",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/servisler-dependency-injection.mdx",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/rxjs.mdx",
-    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/routing.mdx",
-    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/frontend/reactive-forms.mdx",
     "deployment.md",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/e-ticaret-dokumantasyon/todo.md",
-    "frontend.md",
     "de.md",
     "node_modules/picomatch/README.md",
     "node_modules/braces/README.md",
@@ -186,11 +198,6 @@
     "Vaughn ve Ark. (2010) Makalesine Eleştirel Bir İnceleme.md",
     "favicon.svg",
     "API Reference.md",
-    "README.md",
-    "images/checks-passed.png",
-    "images/hero-dark.png",
-    "images/hero-light.png",
-    "logo/light.svg",
-    "logo/dark.svg"
+    "README.md"
   ]
 }
