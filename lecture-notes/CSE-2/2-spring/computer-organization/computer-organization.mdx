@@ -418,3 +418,338 @@ Her iki mimari de:
 gibi faktörleri dengeleyerek evrimleşmeye devam etmektedir.
 
 
+##### Gömülü Sistemler
+
+Gömülü sistemler, bir ürün içinde elektronik ve yazılımın kullanılması anlamına gelir. Elektrik gücü kullanan birçok cihazda gömülü bir bilişim sistemi bulunmaktadır. Yakın gelecekte neredeyse tüm bu cihazlarda gömülü sistemlerin olması beklenmektedir.
+
+###### Gerçek Zamanlı Kısıtlamalar
+
+Gömülü sistemler genellikle çevrelerine sıkı sıkıya bağlıdır:
+
+- Çevreyle etkileşim gereksinimi gerçek zamanlı kısıtlamalar doğurur.
+- Zamanlama, hareket hızı, ölçüm hassasiyeti ve işlem süresi gibi kriterler önemlidir.
+- Aynı anda birden fazla aktivite yönetilmesi gerektiğinde bu kısıtlamalar daha da karmaşıklaşır.
+
+###### Gömülü Sistemlerin Kullanım Alanları
+
+Gömülü sistemlere sahip cihazların türleri neredeyse sayısızdır:
+
+- Cep telefonları, dijital/video kameralar, hesap makineleri
+- Mikrodalga fırınlar, ev güvenlik sistemleri, çamaşır makineleri
+- Aydınlatma sistemleri, termostatlar, yazıcılar
+- Otomotiv sistemleri (şanzıman kontrolü, hız sabitleyici, ABS, süspansiyon)
+
+###### Tipik Gömülü Sistem Organizasyonu
+
+Şekil 1.14’te gösterildiği gibi:
+
+- **Sensörler ve aktüatörler** ile çevreyle etkileşim
+- **İnsan arayüzü**: Basit LED’den karmaşık robotik görüş sistemlerine kadar çeşitlenebilir
+- **Teşhis portları**
+- **FPGA, ASIC** gibi özel donanım kullanımı
+- **Uygulamaya özel yazılım**
+- **Enerji, kod boyutu, maliyet ve zaman açısından optimize edilmiştir**
+![[Pasted image 20250411041104.png]]
+
+
+###### Genel Amaçlı Bilgisayarlarla Benzerlikler
+
+- **Yükseltilebilirlik**: Yazılım güncellemeleri artık gömülü sistemlerde de önemlidir.
+- **Gömülü platformlar**: Akıllı telefonlar ve akıllı TV’ler bu platformlara örnektir.
+
+###### IoT ve Derinlemesine Gömülü Sistemler
+
+**Nesnelerin İnterneti (IoT)**, gömülü sistemlerin yaygınlaşmasını hızlandırmıştır:
+
+- Cihazlar arasında yeni iletişim biçimleri geliştirilmektedir.
+- IoT, **düşük bant genişliği**, **düşük tekrar oranı**, **gözlemlenmesi zor sistemler** ile karakterize edilir.
+- **Mikrodenetleyiciler** kullanılır; genellikle programlandıktan sonra değiştirilemezler.
+- Kablosuz bağlantı ve geniş alanlara dağıtılmış sensör ağları ile çalışırlar.
+- Aşırı kaynak kısıtlamalarına (bellek, zaman, güç) sahiptirler.
+
+###### Gömülü İşletim Sistemi Yaklaşımları
+
+1. **Genel işletim sistemlerinin uyarlanması**  
+   - Örn: Gömülü Linux, Windows Embedded, macOS türevleri
+2. **Sıfırdan gömülü OS geliştirme**  
+   - Örn: **TinyOS**, özellikle kablosuz sensör ağlarında kullanılır
+
+###### Yaygın Terimler
+
+- **Uygulama İşlemcileri**:  
+  - Android, Linux, Chrome OS çalıştırabilir; genel amaçlıdır.  
+  - Örn: Akıllı telefonlar
+
+- **Özel Amaçlı İşlemciler**:  
+  - Belirli görevler için optimize edilir.  
+  - Boyut ve maliyet avantajı sağlar.
+
+- **Mikroişlemciler**:  
+  - ALU, yazmaçlar ve kontrol mantığı içerir.  
+  - Artık çok çekirdekli ve büyük önbellekli modeller vardır.
+
+- **Mikrodenetleyiciler**:  
+  - “Çip üzeri bilgisayar”  
+  - Oyuncaklardan araçlara kadar milyarlarca ürün içinde bulunur.  
+  - Tipik olarak MHz hızında çalışır, insanla doğrudan etkileşimi yoktur.  
+  - Girişlere tepki vererek cihazları kontrol ederler.  
+  - 4-bit’ten 32-bit’e kadar farklı mimarilerde bulunurlar.
+
+###### Mikrodenetleyici Yapısı
+
+- İşlemci, RAM, ROM, I/O portları, zamanlayıcılar, ADC/DAC gibi bileşenler tek çip üzerinde entegredir.
+- Şekil 1.15 ve 1.16'da örnek yapılar gösterilmektedir.
+![[Pasted image 20250411041127.png]]
+
+![[Pasted image 20250411041138.png]]
+###### ARM ve Gömülü Sistemler
+
+- **ARM**, RISC tabanlı mikroişlemci/mikrodenetleyici ailesidir.
+- Düşük güç tüketimi ve küçük kalıp boyutları ile bilinir.
+- ARM Holdings işlemci üretmez, tasarım lisansı verir.
+- **ARM lisansları**:
+  - İşlemci çekirdeği lisansı
+  - Mimari lisansı
+
+ - ARM İşlemci Aileleri
+
+	- **Cortex-A**: Uygulama işlemcileri
+	- **Cortex-R**: Gerçek zamanlı sistemler
+	- **Cortex-M**: Mikrodenetleyici uygulamaları
+
+	**Cortex-M**:
+	- Harvard mimarisi kullanır (komut ve veri yolları ayrı)
+	- Aynı anda veri ve komut erişimi mümkündür → paralel işlem artar
+
+###### Gömülü Sistemlerde Bellek
+
+- **NOR flash**: Kodun değişmediği küçük uygulamalar için uygundur (dahili bellek)
+- **NAND flash**: Harici veri depolama (USB, SSD vb.)
+
+###### Veri Yolu Kullanımı
+
+- Mikrodenetleyicilerde veri yolu hâlâ yaygın bir bağlantı yöntemidir.
+- Paylaşımlı iletim ortamı ile cihazlar arası iletişimi sağlar.
+
+#####  Bulut Bilişiminin Tanımı ve Temel Kavramları
+
+**NIST’in tanımıyla Bulut Bilişim**:  
+“İhtiyaç duyulduğunda, her yerden erişilebilen, kullanışlı, isteğe bağlı ağ erişimini, asgari yönetim çabası veya servis sağlayıcı etkileşimi ile hızlı bir şekilde tedarik edilebilen ve serbest bırakılabilen, yapılandırılabilir bilişim kaynaklarının (örneğin, ağlar, sunucular, depolama, uygulamalar ve hizmetler) paylaşılan bir havuzuna sağlayan bir modeldir.”
+
+######  Bulut Bilişimin Sağladığı Temel Faydalar
+
+- **Ölçek ekonomisi**: Kaynak paylaşımı ile maliyet avantajı
+- **Profesyonel ağ yönetimi**
+- **Yüksek düzeyde güvenlik**
+- **İhtiyaç kadar ödeme**
+- **Kolaylık ve esneklik**
+
+> ❗ Güvenlik önlemleri gelişmiş olsa da, güvenlik ihlalleri yaşanabilir.
+
+###### Bulut Ağ İletişimi (Cloud Networking)
+
+- Bulut erişimini mümkün kılan ağ yönetimi işlevlerini içerir.
+- Yüksek performanslı ve güvenilir ağ bağlantıları sağlar.
+- Güvenlik duvarları ve güvenlik cihazları ile erişim güvenliği desteklenir.
+- Kurumsal veri merkezleri bulutla entegre edilebilir.
+
+###### Bulut Depolama (Cloud Storage)
+
+- Uzaktan barındırılan veri depolama çözümleri
+- Donanım satın alma, bakım ve yönetim yükünden kurtarır
+- Bireyler ve küçük işletmeler için ölçeklenebilir çözümler sunar
+
+###### Bulut Hizmet Modelleri (Cloud Service Models)
+
+1. **SaaS** (Software as a Service)
+	- Uygulama düzeyinde hizmet
+	- Örn: Gmail, Salesforce
+	- Yazılım kurulumu, bakımı gerekmez
+
+ 2. **PaaS** (Platform as a Service)
+	- Yazılım geliştirme ortamı sağlar
+	- Örn: Google App Engine, Salesforce1
+	- Geliştiriciler için araç ve çalışma zamanı içerir
+
+3. **IaaS** (Infrastructure as a Service)
+	- Temel altyapı hizmeti sunar
+	- Örn: Amazon EC2, Windows Azure
+	- Kullanıcı, işletim sistemi ve uygulamaları yönetebilir
+
+> SaaS en az özelleştirilebilir, IaaS en fazla özelleştirilebilir yapıdadır.
+
+![[Pasted image 20250411041602.png]]
+
+
+###### Bulut Dağıtım Modelleri (Cloud Deployment Models)
+
+- Herkese Açık Bulut (Public Cloud)
+	- Genel kullanıma açık
+	- Maliyet avantajı yüksek
+
+- Özel Bulut (Private Cloud)
+	- Kuruma özel altyapı
+	- Güvenlik önceliklidir
+
+- Topluluk Bulutu (Community Cloud)
+	- Benzer ihtiyaçlara sahip kuruluşların ortak altyapısı
+
+- Hibrit Bulut (Hybrid Cloud)
+	- Özel + Açık/Topluluk bulutlarının birleşimi
+	- Taşınabilirlik ve entegrasyon sunar
+
+
+###### Bulut Bilişimin Temel Özellikleri (NIST)
+
+- **Geniş Ağ Erişimi**: Mobil cihazlar dahil her yerden erişim
+- **Kaynak Havuzu**: Çoklu kullanıcıya dinamik kaynak tahsisi
+- **Hızlı Esneklik (Rapid Elasticity)**: Kaynaklar hızla ölçeklenebilir
+- **Ölçülen Hizmet (Measured Service)**: Kaynak kullanımı izlenir ve optimize edilir
+- **İsteğe Bağlı Self Servis**: Kullanıcılar hizmetleri kendi başlarına alabilir
+
+###### Bulut Bilişim Referans Mimarisi (NIST SP 500-292)
+
+Ortak bir mimari çerçeve sunar. 5 ana aktör tanımlanmıştır:
+
+- Bulut Tüketicisi (Cloud Consumer)
+	- Hizmetleri kullanan kişi veya kuruluş
+
+- Bulut Sağlayıcısı (Cloud Provider)
+	- Hizmeti sunan taraf
+
+- Bulut Denetçisi (Cloud Auditor)
+	- Güvenlik, performans ve uygunluk denetimini yapar
+
+- Bulut Aracısı (Cloud Broker)
+	- Tüketici ve sağlayıcı arasındaki ilişkiyi yönetir
+	- **Görevleri**: Hizmet aracılığı, hizmet toplama, hizmet tahkimi
+
+- Bulut Taşıyıcısı (Cloud Carrier)
+	- Tüketici ile sağlayıcı arasında bağlantıyı sağlar
+
+###### Genel Değerlendirme
+
+Bulut bilişim:
+- **Modern bilişim altyapısının temel parçalarından biridir.**
+- **Esneklik**, **ölçeklenebilirlik** ve **maliyet etkinliği** sağlar.
+- İşletmeler ve bireyler için büyük avantajlar sunar.
+
+
+
+
+
+### Bölüm 1 Özeti: Temel Kavramlar ve Bilgisayar Evrimi
+
+#### 📌 Bölüm Başlıkları
+
+- Organizasyon ve mimari
+- Yapı ve işlev
+- Bilgisayar tarihçesi
+- Bilgisayar nesilleri:
+  - 1. Nesil: Vakum Tüpleri
+  - 2. Nesil: Transistörler
+  - 3. Nesil: Entegre Devreler
+  - Sonraki nesiller (LSI, VLSI, ULSI)
+- Intel x86 mimarisinin evrimi
+- Bulut bilişim (cloud computing)
+  - Temel kavramlar
+  - Hizmet modelleri
+- Gömülü sistemler ve IoT
+  - Gömülü işletim sistemleri
+  - İşlemci türleri: Uygulama / Özel amaçlı, Mikroişlemci / Mikrodenetleyici
+- ARM mimarisi ve evrimi
+
+---
+
+#### 🖥 Bilgisayar Nesilleri
+
+##### 1️⃣ Birinci Nesil: **Vakum Tüpleri**
+- Dijital mantık elemanları vakum tüpleriyle yapılırdı.
+- IAS bilgisayarı, **von Neumann mimarisi** ile geliştirildi.
+- ALU, bellek, kontrol birimi gibi temel bileşenler tanımlandı.
+
+##### 2️⃣ İkinci Nesil: **Transistörler**
+- Daha küçük, ucuz ve düşük ısı yayan bileşenler
+- Bilgisayar hızında önemli artış
+
+##### 3️⃣ Üçüncü Nesil: **Entegre Devreler (IC)**
+- Tek bir çip üzerinde binlerce transistör
+- Daha küçük, hızlı ve güvenilir sistemler
+- **PDP-8** gibi örnek sistemler
+
+##### 🔁 Sonraki Nesiller:
+- LSI, VLSI, ULSI teknolojileri ile milyarlarca transistör
+- Performans ve entegrasyon artışı
+
+---
+
+#### 🧠 Intel x86 Mimarisi
+
+- 1978: **8086** ile başladı
+- 2013: **Core i7 EE 4960X**’e kadar uzanan gelişim
+- CISC yapısındadır (karmaşık komut seti)
+- Geriye dönük uyumluluk önemlidir
+- Saat hızları, bellek ve transistör sayısı yıllar içinde ciddi artış göstermiştir
+
+---
+
+#### ☁️ Bulut Bilişim (Cloud Computing)
+
+### Tanım:
+- İhtiyaç anında erişilebilen paylaşımlı bilişim kaynakları
+
+### Temel Faydalar:
+- Esneklik
+- Ölçeklenebilirlik
+- Maliyet avantajı
+- Profesyonel güvenlik ve ağ yönetimi
+
+### Hizmet Modelleri:
+- **SaaS**: Yazılım hizmeti (örn. Gmail, Salesforce)
+- **PaaS**: Platform hizmeti (örn. Google App Engine)
+- **IaaS**: Altyapı hizmeti (örn. Amazon EC2)
+
+### Dağıtım Modelleri:
+- **Public Cloud**: Herkese açık
+- **Private Cloud**: Kurum içi özel
+- **Community Cloud**: Ortak paylaşım
+- **Hybrid Cloud**: Hibrit yapı
+
+---
+
+#### 🔧 Gömülü Sistemler
+
+- Ürün içine yerleştirilmiş özel amaçlı bilgisayar sistemleri
+- Milyarlarca cihazda kullanılır (mikrodalga, araba, TV vb.)
+- Genellikle **mikrodenetleyici** içerir
+- **Gerçek zamanlı** kısıtlamalara tabidir
+
+##### Öne Çıkan Konular:
+- **IoT** (Nesnelerin İnterneti): Geniş cihaz bağlantısı
+- **Gömülü İşletim Sistemleri**: TinyOS, gömülü Linux vb.
+- **Uygulama vs. Özel Amaçlı İşlemciler**
+- **Mikroişlemci vs. Mikrodenetleyici**
+- **Gömülü vs. Derinlemesine Gömülü Sistemler**
+
+---
+
+#### ⚙️ ARM Mimarisi
+
+- RISC temelli, gömülü sistemlerde yaygın
+- **ARM Holdings** tarafından tasarlanır, lisansla üretilir
+- Hafif, düşük enerji tüketimli
+- Ürün aileleri:
+  - **Cortex-A**: Uygulama işlemcileri
+  - **Cortex-R**: Gerçek zamanlı uygulamalar
+  - **Cortex-M**: Mikrodenetleyici çözümleri
+
+- **Harvard mimarisi** ile paralel veri ve komut aktarımı yapılabilir
+
+---
+
+#### 🧾 Sonuç
+
+- Bilgisayarların donanım/mimari gelişimi nesillere ayrılarak açıklanmıştır.
+- Intel x86 ve ARM gibi modern mimarilere detaylı giriş yapılmıştır.
+- Bulut bilişim ve gömülü sistemler çağdaş teknolojilerin temel taşları olarak ele alınmıştır.
+
