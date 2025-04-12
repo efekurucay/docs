@@ -78,8 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200,
-    "collapsed": true
+    "width": 200
   },
   "right": {
     "id": "f1ba78a1543eb384",
@@ -170,9 +169,11 @@
   },
   "active": "27ceaa9aaa20dcfd",
   "lastOpenFiles": [
-    "lecture-notes/CSE-2/2-spring/database-management-system/database-management-system.mdx",
     "lecture-notes/CSE-2/2-spring/computer-organization/computer-organization.mdx",
+    "lecture-notes/CSE-1/1-fall/mathematics-for-engineering-1/Mathematics-for-Engineering-1.mdx",
+    "lecture-notes/CSE-1/1-fall/introduction-to-computer-science/Introduction-to-Computer-Science.mdx",
     "lecture-notes/CSE-2/2-spring/discrete-mathematics-2/discrete-mathematics-2.mdx",
+    "lecture-notes/CSE-2/2-spring/database-management-system/database-management-system.mdx",
     "lecture-notes/CSE-2/2-spring/linear-algebra/linear-algebra.mdx",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-theory.mdx",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-lab.mdx",
@@ -190,8 +191,6 @@
     "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/sql-komutlari.mdx",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/sema-tasarimi.mdx",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/mysql-kurulumu.mdx",
-    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/ortam-kurulumu/ide-ve-araclar.mdx",
-    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/ortam-kurulumu/frontend-kurulumu.mdx",
     "deployment.md",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/e-ticaret-dokumantasyon/todo.md",
     "de.md",
