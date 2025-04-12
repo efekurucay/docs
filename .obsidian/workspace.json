@@ -78,7 +78,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200
+    "width": 200,
+    "collapsed": true
   },
   "right": {
     "id": "f1ba78a1543eb384",
@@ -169,6 +170,9 @@
   },
   "active": "27ceaa9aaa20dcfd",
   "lastOpenFiles": [
+    "Pasted image 20250412100418.png",
+    "Pasted image 20250412100405.png",
+    "Pasted image 20250412100402.png",
     "lecture-notes/CSE-2/2-spring/computer-organization/computer-organization.mdx",
     "lecture-notes/CSE-1/1-fall/mathematics-for-engineering-1/Mathematics-for-Engineering-1.mdx",
     "lecture-notes/CSE-1/1-fall/introduction-to-computer-science/Introduction-to-Computer-Science.mdx",
@@ -186,11 +190,8 @@
     "images/Pasted image 20250411030523.png",
     "frontend.md",
     "images/Pasted image 20250411032737.png",
-    "images/Pasted image 20250411031629.png",
-    "images/Pasted image 20250411031534.png",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/sql-komutlari.mdx",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/sema-tasarimi.mdx",
-    "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/mysql-kurulumu.mdx",
     "deployment.md",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/e-ticaret-dokumantasyon/todo.md",
     "de.md",
