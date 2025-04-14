@@ -1,0 +1,123 @@
+---
+title: Advanced Application Development Theory
+description: AAD
+icon: software
+---
+
+
+## Components
+
+Component, angular uygulamalarındaki sayfaları tasarlamamızı sağlayan yapıdır. 
+
+- Genellikle görevi, sayfa altyapıları olarak kullanılmaktır. 
+
+- Sayfa olarak kullanılan component'lerin alt componentleri olarakta kullanılabilmektedir.
+    - Böylece partial mantığında sayfaları geliştirmemize imkan sağlar.
+
+/src
+----/app 
+--------/components 
+
+Başlangıç componentimiz her zaman var. App component
+ app.component.spec.ts
+ app.component.scss
+ app.component.ts
+ app.component.html
+
+Bu ana componentimiz app.module.ts içerisinde belirtiliyor. Ana component olduğunu buradan biliyoruz.
+Uygulamayı ayağa kaldırdığımızda bizleri bu ana component karşılıyor.
+
+Her component, kendi işlevselliğine ve görünümüne odaklıdır, diğerlerinden bağımsız çalışır.
+
+### Componentin bileşenleri
+
+#### Template
+
+Görsel çalışmaların yapıldığı parça.
+componentin .html dosyasına karşılık gelir ve component ile 'templateUrl' fieldi üzerinden ilişkilendirilir. 
+
+eğer ayrı html dosyası istemiyorsak templateUrl yerine template: fieldinin içerisine bütün html kodu yazılabilir.
+
+#### Style
+
+CSS, SCSS ... tasarım parçası.
+
+styleUrls: ile ilgili component ile ilişkilendirilir. birden fazla style dosyası array içerisinde ilişkilendirilebilir.
+
+aynı şekilde styles fieldı ile doğrudan ts dosyası üzerinde css işlemleri yürütülebilir.
+
+#### Component Class
+
+Componentin merkezi ve esas unsuru component class dır. 
+app.component.ts
+
+Business logic barındıran servisler burada tasarlanır. api gibi erişim süreçlerinden de bu sınıf sorumludur.
+
+#### Selector
+
+İlgili componentin uygulamanın herhangi bir noktasında nasıl çağırılacağını tanımlayan bir referans özelliğidir.
+
+selector: 'app-root', ise ana html de bu component  <app-root></app-root> ile çağırılabilir.
+Yalnızca html dosyalarında kullanılabilmektedir.
+
+Dolayısıyla herhangi bir componentin HTML sinde farklı bir componentin selector'u çağırılıyorsa, o selectora karşılık gelen component, complier tarafından render edilecek ve üretilen çıktı o noktaya basılmış olacak.
+    - Yani selectorun ait olduğu ts dosyasındaki bütün özellikler render edilecek.
+
+!! Bunu yapabilmek için ya aynı modülde olmaları, ya da bulundukları modülden export edilmeleri gerekiyor.
+
+Home componentini oluşturdum (selector: app-home olsun.) ve ana html de bunu kullanacağım. Bunun için bu html nin içerisinde yer aldığı componentin ts dosyasında bu componenti import etmemiz gerekiyor.
+
+import { HomeComponent } from "./components/home/home.component";
+
+@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet, CurrencyPipe, HomeComponent],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss'
+})
+
+#### Metadata
+
+Componentin nasıl yapılandırılacağını ve nasıl kullanılacağını tanımlayan bir decoratördür.
+
+@Component({
+//
+})
+
+#### Create Component
+ng generate component
+veya ng g c
+
+## Data Binding 
+Data Binding, Angular'ın temel bir kavramı olarak bileşenlerin verisi ile şablonları arasında bir bağlantı kurma mekanizması olarak tanımlanmaktadır
+
+Bu bağlantı, kullanıcı arayüzünün (UI) bileşenlerdeki veri değişikliklerine dinamik olarak tepki vermesini sağlar.
+Data Binding'in önemi büyüktür çünkü dinamik ve etkileşimli Tek Sayfa Uygulamaları (SPA'lar) oluşturmanın temelini oluşturur.
+
+Component classındaki bir modelin, templatedeki bir alanla canlı bağlantısı.
+
+### Text Interpolation
+Çift köşeli parantez {{ }} ku llanılarak bileşen özelliklerinin değerlerini HTML şablonuna yerleştirmeye olanak tanır.
+Örneğin, {{ message }} ifadesi, componentdaki message özelliğinin değerini görüntüler.
+
+### Property Binding
+
+ Köşeli parantezler [ ] kullanılarak HTML elementlerinin özelliklerini component özelliklerine bağlar.
+ Bu, bileşen verisindeki değişikliklerin doğrudan HTML elementlerinin özelliklerini (örneğin, disabled, value, src) etkilemesini sağlar.
+
+Değer atamaları daha dinamik bir şekilde gerçekleşmiş oluyor.
+
+### Event Binding
+
+Parantezler ( ) kullanılarak HTML elementlerindeki olayları (örneğin, click, input, hover) bileşenlerdeki metotlara bağlar.
+Bu, kullanıcı etkileşimlerinin bileşen mantığında işlenmesini ve bileşen verisinin güncellenmesini sağlar.
+
+### Two-way Data Binding
+
+Hem özellik bağlamayı hem de olay bağlamayı tek bir sözdiziminde birleştirir [()] ve genellikle ngModel direktifi ile kullanılır.
+Bu, bir girdi alanındaki değişikliklerin doğrudan bileşen özelliğini güncellemesini ve bileşen özelliğindeki değişikliklerin de girdi alanını otomatik olarak güncellemesini sağlar.
+
+### Attribute Binding
+
+
+### Style and Class Binding

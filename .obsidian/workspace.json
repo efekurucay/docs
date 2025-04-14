@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "lecture-notes/CSE-2/2-spring/discrete-mathematics-2/discrete-mathematics-2.mdx",
+                "file": "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-theory.mdx",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "discrete-mathematics-2"
+              "title": "advanced-application-development-theory"
             }
           }
         ]
@@ -78,8 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200,
-    "collapsed": true
+    "width": 200
   },
   "right": {
     "id": "f1ba78a1543eb384",
@@ -170,26 +169,26 @@
   },
   "active": "27ceaa9aaa20dcfd",
   "lastOpenFiles": [
+    "lecture-notes/CSE-2/2-spring/computer-organization/computer-organization.mdx",
+    "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-theory.mdx",
+    "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-lab.mdx",
+    "Pasted image 20250411041127.png",
+    "final_report.md",
+    "lecture-notes/CSE-2/2-spring/discrete-mathematics-2/discrete-mathematics-2.mdx",
     "Pasted image 20250412100418.png",
     "Pasted image 20250412100405.png",
     "Pasted image 20250412100402.png",
-    "lecture-notes/CSE-2/2-spring/computer-organization/computer-organization.mdx",
     "lecture-notes/CSE-1/1-fall/mathematics-for-engineering-1/Mathematics-for-Engineering-1.mdx",
     "lecture-notes/CSE-1/1-fall/introduction-to-computer-science/Introduction-to-Computer-Science.mdx",
-    "lecture-notes/CSE-2/2-spring/discrete-mathematics-2/discrete-mathematics-2.mdx",
     "lecture-notes/CSE-2/2-spring/database-management-system/database-management-system.mdx",
     "lecture-notes/CSE-2/2-spring/linear-algebra/linear-algebra.mdx",
-    "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-theory.mdx",
-    "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-lab.mdx",
     "Pasted image 20250411041602.png",
     "Pasted image 20250411041138.png",
-    "Pasted image 20250411041127.png",
     "Pasted image 20250411041104.png",
     "images/Pasted image 20250411004607.png",
     "images/Pasted image 20250411025133.png",
     "images/Pasted image 20250411030523.png",
     "frontend.md",
-    "images/Pasted image 20250411032737.png",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/sql-komutlari.mdx",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/ecommerce/veritabani/sema-tasarimi.mdx",
     "deployment.md",
