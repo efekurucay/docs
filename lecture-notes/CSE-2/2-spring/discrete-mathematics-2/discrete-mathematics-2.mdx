@@ -9,31 +9,186 @@ icon: X
 
 ## 1 - Başlangıç
 
-### 1.1 Euler Yolu ve Königsberg köprüleri
-- Königsberg şehri (bugünkü Kaliningrad, Rusya) bir nehirle bölünmüştü ve bu nehir üzerinde **7 köprü** vardı.
-    
-- Soru şuydu:
-	- Bu köprülerin her birinden **yalnızca bir kez** geçerek bir yürüyüş yapabilir misin?
-	- 
-Euler bu problemi **graf** olarak modelledi:
-- Şehir bölgeleri **düğüm** (vertex), köprüler **kenar** (edge) oldu.
-- Ve ortaya yeni bir kavram çıktı: **Euler Yolu**
-	- Bir Euler yolu: Her kenardan **tam bir kez** geçilen yol.
+### 1.1 Euler Yolu ve Königsberg Köprüleri
 
+- Königsberg (bugünkü Kaliningrad) şehri, Pregel Nehri ile ayrılan dört kara parçası ve bunları birleştiren 7 köprüden oluşuyordu.
+- Euler bu problemi bir **graf** haline getirerek modelledi: Bölgeler düğüm (vertex), köprüler kenar (edge) olarak temsil edildi.
+- Amaç: Her kenardan **yalnızca bir kez** geçerek bir yürüyüş yapılıp yapılamayacağını belirlemek.
 
-Euler, her düğümün derecesini (o düğüme bağlı kenar sayısı) inceledi ve şu sonuca vardı:
-- Eğer bir grafta, her düğümün derecesi çift sayı ise, o zaman her kenardan tam olarak bir kez geçen bir yol (Euler yolu) vardır, ancak bu yol başlangıç noktasına dönmez.
-- Königsberg'in durumunda, tüm düğümlerin dereceleri tek sayıydı, bu nedenle Euler, böyle bir yolun imkansız olduğunu matematiksel olarak kanıtladı.
+#### Temel Kavram: Euler Yolu
+- Bir grafın Euler yolu varsa, **her kenardan tam bir kez geçilir.**
+- **Euler Devresi** (Eulerian Circuit): Euler yolu olup **başladığı yere dönen** yol.
 
+#### Euler’in Sonucu:
+- Bir graf, bağlıysa ve:
+  - **Sıfır ya da iki tane tek dereceli düğüm** varsa → **Euler yolu vardır.**
+  - **Tüm düğümler çift dereceliyse** → **Euler devresi vardır.**
+  - **İkiden fazla tek dereceli düğüm varsa** → **Euler yolu yoktur.**
 
+*Königsberg grafında tüm düğümler tek dereceli olduğundan, Euler yolu yoktur.*
 
 ![[Pasted image 20250412100418.png]]
 
+---
+
+
+
+
 ### 1.2 Hamilton ve Hamilton Yolu
 
-## İçindekiler
+- Sir William Rowan Hamilton (1805-1865), 1859’da her şehirden bir kez geçip başlangıç noktasına dönen bir yol üzerine kurulu bir oyuncağı ticari olarak geliştirdi.
+- Bu tür yollar bugün **Hamilton Yolu** ve **Hamilton Devresi** olarak bilinir.
 
-## Graflar nedir?
+#### Temel Kavram: Hamilton Yolu
+- **Her düğümden yalnızca bir kez geçen bir yol.**
+- Hamilton Devresi: Her düğümden bir kez geçer ve başladığı noktaya döner.
+
+*Hamilton yolları ile ilgili genel bir karar verme algoritması **NP-Tam** sınıfındadır. Yani çözümü doğrulamak kolay, ancak hızlıca çözmek zordur.*
+
+---
+### 1.3 Grafiklerin Güncel Kullanımı
+
+- **Topluluk bulma (community detection):** Büyük sosyal ağlarda, alt toplulukların (subgraph'ların) tespiti.
+- Alt yapılar: Düğümler arasında yoğun bağlantılarla oluşan kümeler.
+
+*Bu, örneğin Facebook ya da LinkedIn gibi platformlarda, kullanıcı gruplarını tespit etmekte kullanılır.*
+
+---
+### 1.4 Büyük Grafikler
+
+- Gerçek dünya ağları (örneğin internet, protein etkileşim ağları) **milyonlarca düğüm ve kenardan** oluşabilir.
+- Bu büyüklükteki graflarda algoritmaların **ölçeklenebilirliği** kritik önemdedir.
+
+---
+### 1.5 Sıralama ve Bağlantılar
+
+- Google'ın ilk PageRank algoritması bir **yönlendirilmiş grafik** üzerinde çalışır.
+- Web siteleri düğümler, hyperlink’ler kenarlar olarak modellenir.
+- Önemli siteler, çok sayıda yüksek kaliteli linke sahiptir → yüksek PageRank değeri alır.
+
+*PageRank, özdeğer ve özvektörlere dayalı matris işlemlerini kullanır.*
+
+---
+
+### 1.6 & 1.7 GPS ve En Kısa Yol Problemleri
+
+- GPS sistemleri, harita üzerindeki yolları graf olarak işler.
+- **Dijkstra algoritması** ya da **A\* algoritması** gibi yollarla en kısa mesafeyi bulur.
+- Kenarlar yol uzunlukları (ağırlıklı), düğümler kavşaklardır.
+
+---
+## 2. Ders İçeriği
+
+Bu kursta neler ele alacağız:
+- Grafikler hakkında temel teori
+- Bağlantı
+- Yollar
+- Ağaçlar
+- Ağlar ve akışlar
+- Euler ve Hamilton grafikleri
+- Renklendirme sorunları
+- Karmaşıklık sorunları
+
+Bir dizi uygulama (büyük grafiklerde):
+- Grafiklerdeki büyük ölçekli sorunlar
+- Büyük grafiklerdeki düğümlerin benzerliği
+- Telefon sorunları ve grafikler
+- Büyük grafiklerde sıralama
+- Büyük grafiklerin kümelenmesi
+*Graf teorisinin uygulama alanları veri madenciliğinden biyoinformatik analizine kadar uzanır.*
+## 3. Graflar nedir?
+### 3.1 Temel Tanım
+
+Bir **graf** \( G = (V, E) \), düğüm (vertex) kümesi \( V \) ve kenar (edge) kümesi \( E \) ile tanımlanır. Bu küme genellikle sonludur:
+- \( |V| = n \) → düğüm sayısı
+- \( |E| = m \) → kenar sayısı
+
+Bir kenar \( e_k = (v_i, v_j) \), \( v_i \) ve \( v_j \) düğümleriyle **incident** (ilişkili) kabul edilir.
+
+```mermaid
+graph TD
+    A[𝑣₁] --> B[𝑣₂]
+    A --> C[𝑣₃]
+    B --> C
+    C --> D[𝑣₄]
+```
+
+
+#### Basit (Simple) Graf:
+- **Self-loop** (kendi kendine bağlı kenar) yoktur.
+- Aynı iki düğüm arasında birden fazla kenar bulunmaz (**çoklu kenar yoktur**).
+
+---
+### 3.2 Derece ve Temel Özellikler
+
+- Bir düğümün **derecesi** \( d(v) \): O düğüme bağlı kenar sayısıdır.
+- Bir **self-loop**, dereceyi **2 artırır.**
+- **İzole bir düğüm**, derecesi sıfır olan düğümdür.
+
+#### Önerme:
+Bir grafın tüm düğümlerinin dereceleri toplamı:
+\[
+\sum_{v \in V} d(v) = 2|E|
+\]
+
+#### Sonuç:
+Tek dereceli düğüm sayısı **her zaman çift sayıdır.**
+
+*Bu özellik Euler yolları ve devrelerini anlamada temel teşkil eder.*
+
+---
+
+### 3.3 Özel Graflar
+
+#### Tam (Complete) Graf:
+- Bütün düğümler birbiriyle bağlıdır.
+- Notasyon: \( K_n \)
+- Kenar sayısı: 
+\[
+|E| = \binom{n}{2} = \frac{n(n-1)}{2}
+\]
+- Her düğümün derecesi \( n - 1 \) → \( K_n \) grafı **(n−1)-regular**'dır.
+
+#### *k*-Düzenli (k-Regular) Graf:
+- Tüm düğümlerin derecesi eşittir: \( d(v) = k \)
+
+---
+
+### 3.4 Bipartite (Çift Parçalı) Graf
+
+Bir graf \( G = (V, E) \), iki alt kümeye ayrılabiliyorsa:
+\[
+V = V_1 \cup V_2, \quad V_1 \cap V_2 = \emptyset
+\]
+ve **hiçbir kenar aynı alt küme içinde değilse**, o graf **bipartite** kabul edilir.
+
+#### Tam Bipartite Graf (Complete Bipartite):
+- Tüm \( V_1 \) ve \( V_2 \) düğümleri arasında kenar vardır.
+- Notasyon: \( K_{n_1, n_2} \)
+- Kenar sayısı: 
+\[
+|E| = |V_1| \cdot |V_2|
+\]
+
+#### Ne Zaman Regular Olur?
+- Eğer \( |V_1| = |V_2| = k \) → Her düğümün derecesi \( k \) olur → **regular** olur.
+
+---
+
+### 3.5 Bipartite Kontrolü: 2 Renkleme Yöntemi
+
+Bir grafın bipartite olup olmadığını belirlemek için:
+
+- **Düğümleri 2 farklı renkle** renklendirmeye çalış.
+- Eğer **her kenar farklı renkte iki düğümü bağlıyorsa**, graf bipartite’tir.
+
+#### Bipartite Olmama Durumu:
+- Eğer graf **tekil (ganj) bir döngü** içeriyorsa ve bu döngü **tek uzunlukta (örneğin üçgen)** ise → **Bipartite olamaz.**
+
+*Genel kural: Tüm döngülerin uzunlukları çift sayı ise graf bipartite olabilir.*
+
+---
+
 
 ## Döngüler
 ## İzomorfizm
