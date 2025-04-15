@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "e84f62262921d4e0",
+        "id": "35dde6b1864916e0",
         "type": "tabs",
         "children": [
           {
-            "id": "27ceaa9aaa20dcfd",
+            "id": "4ed9be9a75762c16",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -78,8 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200,
-    "collapsed": true
+    "width": 200
   },
   "right": {
     "id": "f1ba78a1543eb384",
@@ -169,8 +168,18 @@
       "publish:Değişiklikleri yayınla": false
     }
   },
-  "active": "27ceaa9aaa20dcfd",
+  "active": "4ed9be9a75762c16",
   "lastOpenFiles": [
+    "images/Pasted image 20250411041104.png",
+    "images/Pasted image 20250411041127.png",
+    "package-lock.json",
+    "README.md",
+    "images/Pasted image 20250412100418.png",
+    "images/Pasted image 20250412100405.png",
+    "images/Pasted image 20250412100402.png",
+    "images/Pasted image 20250411041602.png",
+    "images/Pasted image 20250411041138.png",
+    "lecture-notes/CSE-2/2-spring/discrete-mathematics-2/discrete-mathematics-2.mdx",
     "node_modules/xmlbuilder/typings/index.d.ts",
     "node_modules/xmlbuilder/typings",
     "node_modules/webidl-conversions/lib/index.js",
@@ -179,9 +188,6 @@
     "node_modules/unist-util-visit-children/lib/index.d.ts",
     "node_modules/unist-util-visit-children/lib",
     "node_modules/style-to-object/esm/index.mjs",
-    "node_modules/style-to-object/esm/index.d.mts",
-    "node_modules/style-to-object/esm",
-    "node_modules/socket.io-parser/node_modules/debug/src/index.js",
     "node_modules/@asyncapi/specs/migrations/migrate-to-version-6.md",
     "node_modules/@asyncapi/specs/migrations/migrate-to-version-4.md",
     "node_modules/@asyncapi/specs/migrations/migrate-to-version-5.md",
@@ -206,14 +212,6 @@
     "node_modules/readable-stream/README.md",
     "node_modules/parse-latin/readme.md",
     "node_modules/signal-exit/README.md",
-    "node_modules/micromark-extension-mdx-jsx/readme.md",
-    "Pasted image 20250411041127.png",
-    "Pasted image 20250412100418.png",
-    "Pasted image 20250412100405.png",
-    "Pasted image 20250412100402.png",
-    "Pasted image 20250411041602.png",
-    "Pasted image 20250411041138.png",
-    "Pasted image 20250411041104.png",
     "images/Pasted image 20250411004607.png",
     "images/Pasted image 20250411025133.png",
     "images/Pasted image 20250411030523.png"
