@@ -147,7 +147,7 @@ graph TD
 - **İzole bir düğüm**, derecesi sıfır olan düğümdür.
 #### Önerme:
 Bir grafın tüm düğümlerinin dereceleri toplamı:
-Hat sayısının 2 katıdır. 
+Kenar sayısının 2 katıdır. 
 ∑​ d(v) =2∣E∣
 v∈V​
 #### Sonuç:
@@ -194,11 +194,9 @@ Toplam derece:
 
 #### Tam (Complete) Graf:
 - Bütün düğümler birbiriyle bağlıdır.
-- Notasyon: $$K_n$$ 
-- Toplam Kenar sayısı: 
-$$
-|E| = \binom{n}{2} = \frac{n(n-1)}{2}
-$$
+- Notasyon: $K_n$ 
+- Toplam Kenar sayısı: $|E| = \binom{n}{2} = \frac{n(n-1)}{2}$
+
 - Her düğümün derecesi \( n - 1 \) 
 - \( Kn \) grafı **(n−1)-regular graf**'dır.(tüm düğümler aynı dereceye sahip. )
 
@@ -226,42 +224,261 @@ $$
 
 ---
 
-### 3.4 Bipartite (Çift Parçalı) Graf
+#### Bipartite (Çift Parçalı) Graf
 
-Bir graf \( G = (V, E) \), iki alt kümeye ayrılabiliyorsa:
+Bir graf $G = (V, E)$ iki alt kümeye ayrılabiliyorsa:
 
 $V = V_1 \cup V_2, \quad V_1 \cap V_2 = \emptyset$
 
 ve **hiçbir kenar aynı alt küme içinde değilse**, o graf **bipartite** kabul edilir.
 
-#### Tam Bipartite Graf (Complete Bipartite):
-- Tüm \( V_1 \) ve \( V_2 \) düğümleri arasında kenar vardır.
-- Notasyon: \( K_{n_1, n_2} \)
+```mermaid
+graph TD
+    subgraph V1
+        A[v1]
+        B[v2]
+    end
+
+    subgraph V2
+        C[v3]
+        D[v4]
+    end
+
+    A --> C
+    A --> D
+    B --> D
+```
+
+##### Tam Bipartite Graf (Complete Bipartite):
+- Tüm $V_1$ ve $V_2$ düğümleri arasında kenar vardır.
+- Notasyon: $K_{n_1, n_2}$
 - Kenar sayısı: 
 
 $|E| = |V_1| \cdot |V_2|$
 
-#### Ne Zaman Regular Olur?
-- Eğer \( |V_1| = |V_2| = k \) → Her düğümün derecesi \( k \) olur → **regular** olur.
+```mermaid
+graph TD
+    subgraph V1
+        A[v1]
+        B[v2]
+    end
+
+    subgraph V2
+        C[v3]
+        D[v4]
+        E[v5]
+    end
+
+    A --> C
+    A --> D
+    A --> E
+    B --> C
+    B --> D
+    B --> E
+```
+
+##### Ne Zaman Regular Olur?
+- Eğer $|V_1| = |V_2| = k$→ Her düğümün derecesi \( k \) olur → **regular** olur.
+
+```mermaid
+graph TD
+    subgraph V1
+        A[v1]
+        B[v2]
+    end
+
+    subgraph V2
+        C[v3]
+        D[v4]
+    end
+
+    A --> C
+    A --> D
+    B --> D
+    B --> C
+```
 
 ---
 
-### 3.5 Bipartite Kontrolü: 2 Renkleme Yöntemi
+#### Bipartite Kontrolü: 2 Renkleme Yöntemi
 
 Bir grafın bipartite olup olmadığını belirlemek için:
 
-- **Düğümleri 2 farklı renkle** renklendirmeye çalış.
-- Eğer **her kenar farklı renkte iki düğümü bağlıyorsa**, graf bipartite’tir.
+- Graf üzerinde **iki renk** (örneğin kırmızı ve mavi) kullan.
+- Başlangıç düğümünü kırmızı yap → komşularını mavi → onların komşularını tekrar kırmızı, vs.
+- Eğer **aynı renkte iki komşu** bulursan → **bipartite değildir.**
 
-#### Bipartite Olmama Durumu:
+```mermaid
+graph TD
+    A[v1]
+    B[v2]
+    C[v3]
+    D[v4]
+
+    A --> C
+    A --> D
+    B --> C
+    B --> D
+```
+
+Burada:
+
+ 
+- $\{v1, v2\}$ bir grup (kırmızı)
+ 
+- $\{v3, v4\}$ diğer grup (mavi)
+ 
+- Her kenar farklı gruplar arasında → **2 renkleme mümkün**  → ✅ **Bipartite**
+
+
+
+---
+##### Bipartite Olmama Durumu:
 - Eğer graf **tekil (ganj) bir döngü** içeriyorsa ve bu döngü **tek uzunlukta (örneğin üçgen)** ise → **Bipartite olamaz.**
 
 *Genel kural: Tüm döngülerin uzunlukları çift sayı ise graf bipartite olabilir.*
 
+- Eğer graf **yalnızca çift uzunluklu döngüler** içeriyorsa → **Bipartite’tir.**
+- Eğer en az bir tane **tek döngü** varsa → **Bipartite değildir.**
+
+*Bu durum örneğin üçgen (3-cycle) içeren tam graf $K_3$'ün bipartite olamamasını açıklar.*
+
+---
+```mermaid
+graph TD
+    A[v1]
+    B[v2]
+    C[v3]
+
+    A --> B
+    B --> C
+    C --> A
+```
+
+
 ---
 
 
-## Döngüler
+
+## 4 - Yürüyüşler, Döngüler ve Topolojik Sıralama
+
+### 4.1 Graf Üzerinde Yürüyüş (Walk)
+
+Bir graf üzerinde bir **walk**, ardışık kenarlar kullanılarak bir düğümden diğerine yapılan gezintidir.
+
+- Uzunluğu \( k \) olan bir **Walk**:
+ $P = (v_0, v_1, \ldots, v_k)$ -- Düğüm
+ $E = \{(v_0, v_1), (v_1, v_2), \ldots, (v_{k-1}, v_k)\}$-- Kenar
+
+A → B → C → D → B (kenarlar/düğümler tekrar edebilir)
+
+```mermaid
+graph LR
+    A[A] --> B[B]
+    B --> C[C]
+    C --> D[D]
+    D --> B
+```
+
+#### Terimler:
+- **Trail**: Kenarlar tekrar etmez. A → B → C → D
+- **Path**: Hem düğümler hem kenarlar tekrar etmez. A → B → C → D
+- **Closed walk/trail**: Başladığın düğüme geri dönersin → $v_0 = v_k$
+- **Cycle**: Yalnızca $v_0 = v_k$ , ilk ve son düğüm aynı, ama diğer tüm düğümler farklı. B → C → D → B
+
+*Graf teorisinde "**walk**" en genel, "**path**" en kısıtlı yapıdır.*
+
+---
+
+### 4.2 Yardımcı Önermeler
+
+- **Önerme 1:** Eğer $u \neq v$ ise ve $u \rightarrow v$ arasında bir yürüyüş varsa, bir path de vardır.
+
+  *İpucu: Alt döngüleri sil.*
+  - Eğer bir noktadan diğerine bir şekilde ulaşabiliyorsan (walk),
+- O zaman aradaki döngüleri çıkartarak,
+- **Tekrar içermeyen en kısa geçiş yolunu** bulabilirsin (path).
+
+- **Önerme 2:** Tek uzunlukta kapalı bir yürüyüş, **tek uzunlukta bir döngü** içerir.
+
+  *İpucu: Rekürsif altgraflara ayır ve indüksiyon uygula.*
+
+#### Soru:
+Bu önermeler **yalnızca simple graflar** için mi geçerlidir?
+
+*Cevap: Evet, özellikle çoklu kenar ya da self-loop içeren graflarda dikkatli olmak gerekir.*
+
+---
+
+### 4.3 Yönlü Graflar (Directed Graph / Digraph)
+
+- Kenarlar yönlüdür: \( (v_i, v_j) \) → \( v_i \) kaynak (source), \( v_j \) hedef (terminal).
+- Her düğümün:
+  - **Giriş derecesi**: $d_{in}(v)$
+  - **Çıkış derecesi**: $d_{out}(v)$
+
+#### Dengeli Graf:
+Tüm düğümler için $d_{in}(v) = d_{out}(v)$
+
+*Bu özellikle akış problemleri ve Euler devresi analizlerinde önemlidir.*
+
+---
+
+### 4.4 Topolojik Sıralama
+
+#### Tanım:
+Bir yönlü grafın düğümlerine öyle bir sıra verilir ki:
+$(i, j) \in E \Rightarrow \text{ sıra}(i) < \text{ sıra}(j)$
+Bu sıraya **topolojik sıralama (topological order)** denir.
+
+- Yalnızca **acyclic** (döngüsüz) yönlü graflar (DAG) için mümkündür.
+
+---
+
+### 4.5 Acyclic Graf
+
+- Döngü içermeyen graflardır.
+- **Önerme:** Her acyclic graf, **en az bir tane giriş derecesi sıfır olan düğüm** içerir.
+
+#### Kanıt (çelişki ile):
+- Her düğümün bir öncecisi olduğunu varsay → Düğümler sonsuz bir döngü oluşturur → Çelişki
+
+*Bu özellik topolojik sıralama algoritmalarında kullanılır.*
+
+---
+
+### 4.6 Topolojik Sıralama Algoritması
+
+#### Algoritma: FindTopOrd(G)
+
+1. \( t := 0 \), \( G' := G \)
+2. Giriş derecesi 0 olan bir düğüm bul
+3. Düğümü çıkar, sıraya ekle, \( t := t+1 \)
+4. Tekrar et
+5. Eğer \( t < n \) → **Graf döngü içerir**
+6. Aksi takdirde → **Topolojik sıralama başarılı**
+
+---
+
+### 4.7 Örnek Uygulama
+
+Adım adım:
+- İlk giriş derecesi 0 olan düğüm: \( v_4 \)
+- Sonrasında: \( v_3, v_1, v_2, v_5, v_6 \)
+- Topolojik sıralama sonucu: 
+\[
+\{v_4, v_3, v_1, v_2, v_5, v_6\}
+$
+
+---
+
+### 4.8 Zaman Karmaşıklığı
+
+- Kaba kuvvetle: \( O(n^2) \)
+- Etkili veri yapılarıyla (ör. adjacency list + queue): \( O(V + E) \)
+
+*Topolojik sıralama, görev zamanlama, bağımlılık çözümü gibi birçok problemde kullanılır.*
+
 ## İzomorfizm
 
 ## Grafları Temsil Etme

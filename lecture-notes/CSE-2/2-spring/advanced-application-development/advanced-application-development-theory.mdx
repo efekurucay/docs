@@ -121,3 +121,32 @@ Bu, bir girdi alanındaki değişikliklerin doğrudan bileşen özelliğini gün
 
 
 ### Style and Class Binding
+
+
+'''mermaid
+
+graph TD
+    A["Client Browser"] --> B["Angular Frontend"]
+    B --> C["Spring Boot Backend"]
+    C --> D["MySQL Database"]
+    
+    subgraph "Frontend Layer"
+    B --> B1["Components"]
+    B --> B2["Services"]
+    B --> B3["Guards"]
+    B --> B4["Interceptors"]
+    end
+    
+    subgraph "Backend Layer"
+    C --> C1["Controllers"]
+    C --> C2["Services"]
+    C --> C3["Repositories"]
+    C --> C4["Models"]
+    C --> C5["Security"]
+    end
+    
+    subgraph "Database Layer"
+    D --> D1["Tables"]
+    D --> D2["Relationships"]
+    D --> D3["Constraints"]
+    end
