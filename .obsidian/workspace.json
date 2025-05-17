@@ -197,8 +197,9 @@
   },
   "active": "c957b7292b765914",
   "lastOpenFiles": [
-    "README.md",
+    "asdas.md",
     "a.md",
+    "README.md",
     "yahya efe kurucay.pdf",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-lab.mdx",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-theory.mdx",
@@ -241,7 +242,6 @@
     "node_modules/socks/README.md",
     "node_modules/hast-util-to-html/readme.md",
     "node_modules/readable-stream/README.md",
-    "node_modules/parse-latin/readme.md",
     "images/Pasted image 20250411004607.png"
   ]
 }
