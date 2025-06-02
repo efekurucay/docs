@@ -13,42 +13,15 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "README.md",
+                "file": "ai-area/prompts.mdx",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "README"
-            }
-          },
-          {
-            "id": "c957b7292b765914",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "a.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "a"
-            }
-          },
-          {
-            "id": "f12d9f4c59897c7d",
-            "type": "leaf",
-            "state": {
-              "type": "release-notes",
-              "state": {
-                "currentVersion": "1.8.10"
-              },
-              "icon": "lucide-book-up",
-              "title": "Release Notes 1.8.10"
+              "title": "prompts"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -195,31 +168,36 @@
       "publish:Değişiklikleri yayınla": false
     }
   },
-  "active": "c957b7292b765914",
+  "active": "88b835f2ffd7e523",
   "lastOpenFiles": [
-    "asdas.md",
-    "a.md",
     "README.md",
     "yahya efe kurucay.pdf",
+    "Pasted image 20250601181109.png",
+    "package-lock.json",
+    "inkilap_sorulari.md",
+    "favicon.svg",
+    "docs.json",
+    "development.mdx",
+    "deployment.md",
+    "Başlıksız.md",
+    "a.md",
+    "asdas.md",
+    "ATA.md",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-lab.mdx",
     "lecture-notes/CSE-2/2-spring/advanced-application-development/advanced-application-development-theory.mdx",
     "lecture-notes/CSE-2/2-spring/database-management-system/database-management-system.mdx",
     "lecture-notes/CSE-2/cse-2-lectures.mdx",
-    "favicon.svg",
     "package.json",
     "Ekran görüntüsü 2025-04-20 222602.png",
     "lecture-notes/CSE-2/2-spring/database-management-system/mt25.md",
     "lecture-notes/CSE-2/2-spring/discrete-mathematics-2/discrete-mathematics-2.mdx",
     "images/Pasted image 20250411041104.png",
     "images/Pasted image 20250411041127.png",
-    "package-lock.json",
     "images/Pasted image 20250412100418.png",
     "images/Pasted image 20250412100405.png",
     "images/Pasted image 20250412100402.png",
     "images/Pasted image 20250411041602.png",
     "images/Pasted image 20250411041138.png",
-    "node_modules/xmlbuilder/typings/index.d.ts",
-    "node_modules/xmlbuilder/typings",
     "node_modules/@asyncapi/specs/migrations/migrate-to-version-6.md",
     "node_modules/@asyncapi/specs/migrations/migrate-to-version-4.md",
     "node_modules/@asyncapi/specs/migrations/migrate-to-version-5.md",
@@ -236,12 +214,6 @@
     "node_modules/cosmiconfig/README.md",
     "node_modules/@mintlify/prebuild/README.md",
     "node_modules/object-inspect/CHANGELOG.md",
-    "node_modules/chromium-bidi/node_modules/zod/README.md",
-    "node_modules/ast-types/README.md",
-    "node_modules/ip-address/README.md",
-    "node_modules/socks/README.md",
-    "node_modules/hast-util-to-html/readme.md",
-    "node_modules/readable-stream/README.md",
-    "images/Pasted image 20250411004607.png"
+    "node_modules/chromium-bidi/node_modules/zod/README.md"
   ]
 }
